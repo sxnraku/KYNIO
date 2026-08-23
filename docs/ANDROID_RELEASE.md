@@ -85,7 +85,8 @@ Instala primeiro um APK `preview` num Android real e executa os fluxos Maestro.
 ## 7. Play Console
 
 1. Cria a aplicação com package `com.kynio.app`.
-2. Preenche descrições, ícone 512 × 512, feature graphic 1024 × 500 e screenshots reais.
+2. Usa os recursos prontos em `store/google-play/assets/app-icon-512x512.png` e
+   `store/google-play/assets/feature-graphic-1024x500.png`; adiciona screenshots reais de um Android.
 3. Adiciona Política de Privacidade e o URL de eliminação de conta.
 4. Revê `docs/GOOGLE_PLAY_DATA_SAFETY.md` e preenche Data Safety com o comportamento da build final.
 5. Define categoria, público-alvo e classificação etária sem alegações clínicas.
