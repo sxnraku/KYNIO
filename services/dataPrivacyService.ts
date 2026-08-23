@@ -3,8 +3,11 @@ import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
 import { deleteAndReinitializeDatabase, getInitializedDatabase } from '@/db/client';
+import { deleteCloudAccountAndData } from '@/services/cloudAuthService';
 import {
   fasts,
+  type FriendRecord,
+  friends,
   meals,
   type FastRecord,
   type MealRecord,
@@ -17,14 +20,16 @@ import {
   DATA_EXPORTS_DIRECTORY_NAME,
   deletePrivateLocalFiles,
 } from '@/services/localMealImageService';
+import { isCloudSyncConfigured } from '@/services/supabaseClient';
 
 export interface LocalDataExport {
   app: 'KYNIO';
   exportedAt: string;
   fasts: FastRecord[];
+  friends: FriendRecord[];
   meals: MealRecord[];
   profile: UserProfileRecord | null;
-  schemaVersion: 2;
+  schemaVersion: 3;
   workouts: WorkoutRecord[];
 }
 
@@ -36,6 +41,11 @@ async function getFastsForExport(): Promise<FastRecord[]> {
 async function getMealsForExport(): Promise<MealRecord[]> {
   const database = await getInitializedDatabase();
   return database.select().from(meals);
+}
+
+async function getFriendsForExport(): Promise<FriendRecord[]> {
+  const database = await getInitializedDatabase();
+  return database.select().from(friends);
 }
 
 async function getProfileForExport(): Promise<UserProfileRecord | null> {
@@ -50,8 +60,9 @@ async function getWorkoutsForExport(): Promise<WorkoutRecord[]> {
 }
 
 export async function collectLocalData(): Promise<LocalDataExport> {
-  const [fastRecords, mealRecords, profile, workoutRecords] = await Promise.all([
+  const [fastRecords, friendRecords, mealRecords, profile, workoutRecords] = await Promise.all([
     getFastsForExport(),
+    getFriendsForExport(),
     getMealsForExport(),
     getProfileForExport(),
     getWorkoutsForExport(),
@@ -61,9 +72,10 @@ export async function collectLocalData(): Promise<LocalDataExport> {
     app: 'KYNIO',
     exportedAt: new Date().toISOString(),
     fasts: fastRecords,
+    friends: friendRecords,
     meals: mealRecords,
     profile,
-    schemaVersion: 2,
+    schemaVersion: 3,
     workouts: workoutRecords,
   };
 }
@@ -116,6 +128,10 @@ export async function exportAllLocalData(): Promise<string> {
 }
 
 export async function deleteAllLocalData(): Promise<void> {
+  if (isCloudSyncConfigured) {
+    await deleteCloudAccountAndData();
+  }
+
   deletePrivateLocalFiles();
   await deleteAndReinitializeDatabase();
 }

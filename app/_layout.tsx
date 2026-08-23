@@ -13,8 +13,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { COLORS } from '@/constants/colors';
+import { CloudSyncBootstrap } from '@/components/cloud-sync-bootstrap';
 import { LegalOnboardingModal } from '@/components/ui/legal-onboarding-modal';
+import { COLORS } from '@/constants/colors';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -46,6 +47,7 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
+      <CloudSyncBootstrap />
       <LegalOnboardingModal />
     </>
   );

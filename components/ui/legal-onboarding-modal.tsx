@@ -68,17 +68,29 @@ export function LegalOnboardingModal() {
                 <View className="flex-row items-start gap-3">
                   <Ionicons color={COLORS.success} name="lock-closed-outline" size={19} />
                   <Text className="flex-1 font-body text-sm leading-5 text-muted">
-                    O histórico é guardado no dispositivo. Uma fotografia ou descrição só é
-                    enviada à API quando pedes uma análise de refeição.
+                    O histórico começa guardado no dispositivo. Se ligares uma conta Google,
+                    perfil, amigos e registos serão também sincronizados remotamente entre os
+                    teus dispositivos. Uma fotografia de refeição só é enviada à API quando pedes
+                    uma análise.
                   </Text>
                 </View>
               </View>
 
               {errorMessage ? (
-                <View
-                  accessibilityLiveRegion="polite"
-                  className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-                  <Text className="font-body text-sm leading-5 text-red-300">{errorMessage}</Text>
+                <View className="mt-4">
+                  <View
+                    accessibilityLiveRegion="polite"
+                    className="rounded-xl border border-red-500/20 bg-red-500/10 p-3">
+                    <Text className="font-body text-sm leading-5 text-red-500">
+                      {errorMessage}
+                    </Text>
+                  </View>
+                  <Pressable
+                    accessibilityRole="button"
+                    className="mt-2 min-h-11 items-center justify-center rounded-xl border border-border bg-surface-raised px-4 active:opacity-70"
+                    onPress={() => void hydrateConsent()}>
+                    <Text className="font-headline text-sm text-foreground">Tentar novamente</Text>
+                  </Pressable>
                 </View>
               ) : null}
 

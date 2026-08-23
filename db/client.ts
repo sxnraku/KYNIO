@@ -5,6 +5,7 @@ import {
   type SQLiteBindParams,
   type SQLiteDatabase,
 } from 'expo-sqlite';
+import { Platform } from 'react-native';
 
 import * as schema from '@/db/schema';
 import migrations from '@/drizzle/migrations';
@@ -15,6 +16,22 @@ const MIGRATIONS_TABLE = '__drizzle_migrations';
 interface AppliedMigrationRow {
   created_at: number | string | null;
 }
+
+interface DatabaseRuntimeState {
+  database?: LocalDatabase;
+  databasePromise?: Promise<LocalDatabase>;
+  initializationPromise?: Promise<LocalDatabase>;
+  sqliteClient?: SQLiteDatabase;
+}
+
+const moduleRuntime: DatabaseRuntimeState = {};
+const globalRuntime = globalThis as typeof globalThis & {
+  __kynioDatabaseRuntime?: DatabaseRuntimeState;
+};
+const runtime =
+  Platform.OS === 'web'
+    ? (globalRuntime.__kynioDatabaseRuntime ??= {})
+    : moduleRuntime;
 
 async function applyMigrations(sqlite: SQLiteDatabase): Promise<void> {
   await sqlite.execAsync(`
@@ -95,33 +112,51 @@ async function createDatabase(): Promise<LocalDatabase> {
   await sqlite.execAsync('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
   await applyMigrations(sqlite);
 
-  sqliteClient = sqlite;
+  runtime.sqliteClient = sqlite;
   return createDrizzleDatabase(sqlite);
+}
+
+function isInvalidWebVfsState(error: unknown): boolean {
+  return (
+    Platform.OS === 'web' &&
+    error instanceof Error &&
+    error.message.toLowerCase().includes('invalid vfs state')
+  );
+}
+
+async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
+  try {
+    return await createDatabase();
+  } catch (error) {
+    if (!isInvalidWebVfsState(error)) {
+      throw error;
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 200);
+    });
+    return createDatabase();
+  }
 }
 
 export type LocalDatabase = SqliteRemoteDatabase<typeof schema>;
 
-let database: LocalDatabase | undefined;
-let databasePromise: Promise<LocalDatabase> | undefined;
-let initializationPromise: Promise<LocalDatabase> | undefined;
-let sqliteClient: SQLiteDatabase | undefined;
-
 export function getDatabase(): Promise<LocalDatabase> {
-  if (database) {
-    return Promise.resolve(database);
+  if (runtime.database) {
+    return Promise.resolve(runtime.database);
   }
 
-  databasePromise ??= createDatabase()
+  runtime.databasePromise ??= createDatabaseWithWebRecovery()
     .then((createdDatabase) => {
-      database = createdDatabase;
+      runtime.database = createdDatabase;
       return createdDatabase;
     })
     .catch((error: unknown) => {
-      databasePromise = undefined;
+      runtime.databasePromise = undefined;
       throw error;
     });
 
-  return databasePromise;
+  return runtime.databasePromise;
 }
 
 async function initializeDatabase(): Promise<LocalDatabase> {
@@ -136,23 +171,23 @@ async function initializeDatabase(): Promise<LocalDatabase> {
 }
 
 export function getInitializedDatabase(): Promise<LocalDatabase> {
-  initializationPromise ??= initializeDatabase().catch((error: unknown) => {
-    initializationPromise = undefined;
+  runtime.initializationPromise ??= initializeDatabase().catch((error: unknown) => {
+    runtime.initializationPromise = undefined;
     throw error;
   });
-  return initializationPromise;
+  return runtime.initializationPromise;
 }
 
 export async function deleteAndReinitializeDatabase(): Promise<LocalDatabase> {
-  if (initializationPromise) {
-    await initializationPromise;
+  if (runtime.initializationPromise) {
+    await runtime.initializationPromise;
   }
 
-  const clientToClose = sqliteClient;
-  database = undefined;
-  databasePromise = undefined;
-  initializationPromise = undefined;
-  sqliteClient = undefined;
+  const clientToClose = runtime.sqliteClient;
+  runtime.database = undefined;
+  runtime.databasePromise = undefined;
+  runtime.initializationPromise = undefined;
+  runtime.sqliteClient = undefined;
 
   if (clientToClose) {
     await clientToClose.closeAsync();

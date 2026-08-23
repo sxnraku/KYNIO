@@ -14,9 +14,11 @@ interface LegalConsentState {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : 'Não foi possível verificar os termos guardados localmente.';
+  if (error instanceof Error && error.message.toLowerCase().includes('invalid vfs state')) {
+    return 'O armazenamento local do browser foi interrompido durante a atualização. Tenta novamente.';
+  }
+
+  return 'Não foi possível preparar o armazenamento local. Tenta novamente.';
 }
 
 export const useLegalConsentStore = create<LegalConsentState>((set, get) => ({

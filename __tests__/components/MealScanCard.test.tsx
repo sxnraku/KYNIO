@@ -52,8 +52,18 @@ const SAVED_MEAL: MealRecord = {
 };
 
 const UPDATED_PROFILE: UserProfileRecord = {
+  avatarRemotePath: null,
+  avatarUri: null,
+  bio: '',
+  cloudLinkedAt: null,
+  cloudUserId: null,
   currentLevel: 1,
+  displayName: 'Utilizador KYNIO',
+  googleAvatarUrl: null,
+  googleDisplayName: null,
+  googleEmail: null,
   id: 1,
+  profileUpdatedAt: 0,
   streakDays: 0,
   termsAcceptedAt: 1_787_400_000_000,
   totalXp: 30,

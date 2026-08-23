@@ -66,7 +66,7 @@ export default function SettingsScreen() {
   const confirmDelete = () => {
     Alert.alert(
       'Eliminar todos os dados?',
-      'Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento e fotografias privadas. Não elimina ficheiros que já tenhas exportado para outro destino e não pode ser anulada.',
+      'Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.',
       [
         { style: 'cancel', text: 'Cancelar' },
         {
@@ -101,18 +101,25 @@ export default function SettingsScreen() {
               <Ionicons color={COLORS.success} name="phone-portrait-outline" size={22} />
             </View>
             <View className="flex-1">
-              <Text className="font-headline text-lg text-foreground">Privacidade local</Text>
-              <Text className="mt-1 font-body text-sm text-muted">Sem conta ou perfil remoto</Text>
+              <Text className="font-headline text-lg text-foreground">Privacidade e controlo</Text>
+              <Text className="mt-1 font-body text-sm text-muted">
+                Local por defeito · cloud opcional
+              </Text>
             </View>
           </View>
 
           <View className="mt-5 gap-3">
             <Text className="font-body text-sm leading-5 text-muted">
-              • Jejuns, refeições, progresso e fotografias confirmadas ficam neste dispositivo.
+              • Jejuns, refeições, progresso e fotografias confirmadas ficam sempre disponíveis
+              neste dispositivo.
+            </Text>
+            <Text className="font-body text-sm leading-5 text-muted">
+              • Ao ligares uma conta Google, perfil, amigos e registos são também sincronizados
+              para permitir utilização em vários dispositivos.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
               • A análise de refeição envia apenas a fotografia e/ou descrição escolhida para a
-              API, sem ID de utilizador e sem histórico local.
+              API; o restante histórico não acompanha esse pedido.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
               • A exportação abre o seletor do sistema; só sai do dispositivo quando escolhes um
@@ -152,7 +159,7 @@ export default function SettingsScreen() {
 
         <View className="mt-4">
           <SettingsActionCard
-            description="Remove a base SQLite, o perfil, XP, consentimento e as cópias privadas das fotografias."
+            description="Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados."
             destructive
             disabled={isExporting}
             icon="trash-outline"
