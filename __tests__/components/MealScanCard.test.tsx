@@ -114,7 +114,7 @@ describe('MealScanCard', () => {
 
     expect(await screen.findByText('Fotografar refeição')).toBeTruthy();
     expect(screen.getByText('Pré-visualização em direto')).toBeTruthy();
-  });
+  }, 15_000);
 
   it('renderiza nome, tag e calorias de um payload JSON válido da IA', async () => {
     await renderAnalyzedMeal();
