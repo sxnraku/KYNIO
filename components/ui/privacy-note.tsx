@@ -1,7 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { COLORS } from '@/constants/colors';
+import { COLORS } from "@/constants/colors";
 
 export function PrivacyNote() {
   return (
@@ -13,8 +14,8 @@ export function PrivacyNote() {
         </Text>
       </View>
       <Text className="mt-2 max-w-xs text-center font-body text-xs leading-4 text-muted opacity-70">
-        A cloud só é usada após ligares uma conta. A aplicação não substitui aconselhamento
-        profissional.
+        A cloud só é usada após ligares uma conta. A aplicação não substitui
+        aconselhamento profissional.
       </Text>
     </View>
   );

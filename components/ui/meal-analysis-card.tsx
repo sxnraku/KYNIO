@@ -1,14 +1,16 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { TextInput } from "@/components/ui/text-input";
 
-import { Card } from '@/components/ui/card';
-import { COLORS } from '@/constants/colors';
+import { Card } from "@/components/ui/card";
+import { COLORS } from "@/constants/colors";
 import type {
   EditableMealNutrition,
   EditableMealNutritionField,
   MealAnalysisConfidence,
   MealAnalysisResult,
-} from '@/types/meal';
+} from "@/types/meal";
 
 interface MealAnalysisCardProps {
   analysis: MealAnalysisResult;
@@ -27,15 +29,23 @@ interface NutritionInputProps {
 }
 
 const CONFIDENCE_LABELS: Record<MealAnalysisConfidence, string> = {
-  high: 'Confiança alta',
-  medium: 'Confiança média',
-  low: 'Confiança baixa',
+  high: "Confiança alta",
+  medium: "Confiança média",
+  low: "Confiança baixa",
 };
 
-function NutritionInput({ field, label, onChange, suffix, value }: NutritionInputProps) {
+function NutritionInput({
+  field,
+  label,
+  onChange,
+  suffix,
+  value,
+}: NutritionInputProps) {
   return (
     <View className="flex-1 rounded-xl border border-border bg-background px-3 py-3">
-      <Text className="font-label text-[9px] uppercase tracking-wider text-muted">{label}</Text>
+      <Text className="font-label text-[9px] uppercase tracking-wider text-muted">
+        {label}
+      </Text>
       <View className="mt-1 flex-row items-end">
         <TextInput
           accessibilityLabel={`${label}, editável`}
@@ -66,7 +76,9 @@ export function MealAnalysisCard({
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
             Resultado estruturado
           </Text>
-          <Text className="mt-2 font-headline text-2xl text-foreground">{analysis.dish_name}</Text>
+          <Text className="mt-2 font-headline text-2xl text-foreground">
+            {analysis.dish_name}
+          </Text>
         </View>
         <View className="rounded-full bg-success/10 px-3 py-1.5">
           <Text className="font-label text-[9px] uppercase text-success">
@@ -81,7 +93,9 @@ export function MealAnalysisCard({
             <Text className="font-label text-[10px] uppercase tracking-widest text-muted">
               Calorias estimadas
             </Text>
-            <Text className="mt-1 font-body text-xs text-muted">Toca no valor para ajustar</Text>
+            <Text className="mt-1 font-body text-xs text-muted">
+              Toca no valor para ajustar
+            </Text>
           </View>
           <View className="flex-row items-end" style={{ flexShrink: 0 }}>
             <TextInput
@@ -89,7 +103,9 @@ export function MealAnalysisCard({
               className="p-0 text-right font-headline text-3xl text-success"
               inputMode="numeric"
               keyboardType="number-pad"
-              onChangeText={(value) => onChangeNutrition('estimatedCalories', value)}
+              onChangeText={(value) =>
+                onChangeNutrition("estimatedCalories", value)
+              }
               selectTextOnFocus
               style={{ width: 88 }}
               value={editableNutrition.estimatedCalories}
@@ -131,8 +147,11 @@ export function MealAnalysisCard({
           {analysis.tags.map((tag, index) => (
             <View
               className="rounded-full border border-border bg-background px-3 py-2"
-              key={`${tag}-${index}`}>
-              <Text className="font-label text-[10px] text-foreground">{tag}</Text>
+              key={`${tag}-${index}`}
+            >
+              <Text className="font-label text-[10px] text-foreground">
+                {tag}
+              </Text>
             </View>
           ))}
         </View>
@@ -143,21 +162,26 @@ export function MealAnalysisCard({
         accessibilityState={{ disabled: isSaving }}
         className="mt-6 min-h-14 flex-row items-center justify-center gap-2 rounded-xl bg-xp px-5 active:opacity-80 disabled:opacity-60"
         disabled={isSaving}
-        onPress={onConfirm}>
+        onPress={onConfirm}
+      >
         {isSaving ? (
           <ActivityIndicator color={COLORS.foreground} size="small" />
         ) : (
-          <Ionicons color={COLORS.foreground} name="checkmark-circle" size={21} />
+          <Ionicons
+            color={COLORS.foreground}
+            name="checkmark-circle"
+            size={21}
+          />
         )}
         <Text className="font-headline text-base text-foreground">
-          {isSaving ? 'A guardar…' : 'Confirmar e Ganhar +30 XP'}
+          {isSaving ? "A guardar…" : "Confirmar e Ganhar +30 XP"}
         </Text>
       </Pressable>
 
       <View className="mt-5 border-t border-border pt-4">
         <Text className="font-body text-xs leading-5 text-muted">
-          Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente
-          conforme necessário.
+          Valores estimados por IA para acompanhamento pessoal de hábitos.
+          Ajuste manualmente conforme necessário.
         </Text>
       </View>
     </Card>

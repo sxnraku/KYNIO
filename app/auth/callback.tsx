@@ -1,8 +1,9 @@
-import * as WebBrowser from 'expo-web-browser';
-import { ActivityIndicator, Text, View } from 'react-native';
+import * as WebBrowser from "expo-web-browser";
+import { ActivityIndicator, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { Screen } from '@/components/ui/screen';
-import { COLORS } from '@/constants/colors';
+import { Screen } from "@/components/ui/screen";
+import { COLORS } from "@/constants/colors";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -17,7 +18,8 @@ export default function AuthCallbackScreen() {
           A concluir a ligação segura…
         </Text>
         <Text className="mt-2 text-center font-body text-sm leading-5 text-muted">
-          Esta janela fecha automaticamente quando a conta Google estiver ligada.
+          Esta janela fecha automaticamente quando a conta Google estiver
+          ligada.
         </Text>
       </View>
     </Screen>

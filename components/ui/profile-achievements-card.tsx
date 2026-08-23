@@ -1,31 +1,72 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Pressable, Share, Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { Card } from '@/components/ui/card';
-import { COLORS } from '@/constants/colors';
-import type { GamificationProgressSnapshot } from '@/hooks/use-gamification-progress';
+import { AchievementShareCard } from "@/components/ui/achievement-share-card";
+import { Card } from "@/components/ui/card";
+import { COLORS } from "@/constants/colors";
+import type { GamificationProgressSnapshot } from "@/hooks/use-gamification-progress";
+import { shareAchievementCard } from "@/services/achievementShareService";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import type { AchievementSharePayload } from "@/types/achievement-share";
 
 interface ProfileAchievementsCardProps {
   snapshot: GamificationProgressSnapshot | null;
 }
 
-export function ProfileAchievementsCard({ snapshot }: ProfileAchievementsCardProps) {
-  const unlockedBadges = snapshot?.badges.filter((badge) => badge.unlocked) ?? [];
+export function ProfileAchievementsCard({
+  snapshot,
+}: ProfileAchievementsCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
+  const shareCardRef = useRef<View>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const unlockedBadges =
+    snapshot?.badges.filter((badge) => badge.unlocked) ?? [];
+  const sharePayload = useMemo<AchievementSharePayload | null>(() => {
+    if (!snapshot) {
+      return null;
+    }
+
+    return {
+      badgeTitles: unlockedBadges.map((badge) => badge.title),
+      language,
+      level: snapshot.level,
+      levelTitle: snapshot.levelTitle,
+      streakDays: snapshot.stats.streakDays,
+      totalXp: snapshot.profile.totalXp,
+    };
+  }, [language, snapshot, unlockedBadges]);
 
   const shareAchievements = async () => {
-    if (!snapshot) {
+    if (!sharePayload || isSharing) {
       return;
     }
 
-    const badgeText = unlockedBadges.length
-      ? unlockedBadges.map((badge) => badge.title).join(', ')
-      : 'A minha jornada começou agora';
+    setIsSharing(true);
+    setShareError(null);
+    setShareStatus(null);
 
-    await Share.share({
-      message: `No KYNIO alcancei o Nível ${snapshot.level} · ${snapshot.levelTitle}. Conquistas: ${badgeText}. A acompanhar hábitos ao meu ritmo.`,
-      title: 'As minhas conquistas no KYNIO',
-    });
+    try {
+      const result = await shareAchievementCard(shareCardRef, sharePayload);
+
+      if (result.mode !== "cancelled") {
+        setShareStatus(result.statusMessage);
+      }
+    } catch (error: unknown) {
+      setShareError(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível preparar a partilha.",
+      );
+    } finally {
+      setIsSharing(false);
+    }
   };
+
+  const isDisabled = !sharePayload || isSharing;
 
   return (
     <Card>
@@ -43,48 +84,56 @@ export function ProfileAchievementsCard({ snapshot }: ProfileAchievementsCardPro
         </View>
       </View>
 
-      <View className="mt-5 flex-row gap-2">
-        <View className="flex-1 rounded-xl bg-background p-3">
-          <Text className="font-headline text-xl text-foreground">{snapshot?.level ?? '—'}</Text>
-          <Text className="mt-1 font-label text-[9px] uppercase text-muted">Nível</Text>
-        </View>
-        <View className="flex-1 rounded-xl bg-background p-3">
-          <Text className="font-headline text-xl text-foreground">
-            {snapshot?.profile.totalXp ?? '—'}
-          </Text>
-          <Text className="mt-1 font-label text-[9px] uppercase text-muted">XP total</Text>
-        </View>
-        <View className="flex-1 rounded-xl bg-background p-3">
-          <Text className="font-headline text-xl text-foreground">
-            {snapshot?.stats.streakDays ?? '—'}
-          </Text>
-          <Text className="mt-1 font-label text-[9px] uppercase text-muted">Dias</Text>
-        </View>
-      </View>
-
-      <View className="mt-4 flex-row flex-wrap gap-2">
-        {unlockedBadges.length ? (
-          unlockedBadges.map((badge) => (
-            <View className="rounded-full bg-xp/10 px-3 py-2" key={badge.id}>
-              <Text className="font-label text-[9px] text-xp">{badge.title}</Text>
-            </View>
-          ))
+      <View className="mt-5">
+        {sharePayload ? (
+          <AchievementShareCard payload={sharePayload} ref={shareCardRef} />
         ) : (
-          <Text className="font-body text-xs leading-5 text-muted">
-            As insígnias desbloqueadas aparecerão aqui.
-          </Text>
+          <View className="h-64 items-center justify-center rounded-2xl bg-background">
+            <ActivityIndicator color={COLORS.xp} />
+          </View>
         )}
       </View>
 
       <Pressable
         accessibilityRole="button"
-        accessibilityState={{ disabled: !snapshot }}
+        accessibilityState={{ disabled: isDisabled }}
         className="mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-xl bg-xp px-4 active:opacity-80 disabled:opacity-50"
-        disabled={!snapshot}
-        onPress={() => void shareAchievements()}>
-        <Ionicons color={COLORS.surface} name="share-social-outline" size={19} />
-        <Text className="font-headline text-sm text-surface">Partilhar conquistas</Text>
+        disabled={isDisabled}
+        onPress={() => void shareAchievements()}
+      >
+        {isSharing ? (
+          <ActivityIndicator color={COLORS.surface} />
+        ) : (
+          <Ionicons
+            color={COLORS.surface}
+            name="share-social-outline"
+            size={19}
+          />
+        )}
+        <Text className="font-headline text-sm text-surface">
+          {isSharing ? "A preparar imagem…" : "Partilhar imagem e link"}
+        </Text>
       </Pressable>
+
+      <Text className="mt-3 text-center font-body text-[11px] leading-4 text-muted">
+        Escolhes o destino. Nada é publicado automaticamente.
+      </Text>
+      {shareStatus ? (
+        <Text
+          accessibilityLiveRegion="polite"
+          className="mt-2 text-center font-body text-xs text-success"
+        >
+          {shareStatus}
+        </Text>
+      ) : null}
+      {shareError ? (
+        <Text
+          accessibilityLiveRegion="polite"
+          className="mt-2 text-center font-body text-xs text-[#BE123C]"
+        >
+          {shareError}
+        </Text>
+      ) : null}
     </Card>
   );
 }

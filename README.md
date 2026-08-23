@@ -44,7 +44,28 @@ O fluxo de exportação fecha a folha nativa de partilha antes de validar a conf
 iOS, o seletor aceita os rótulos de sistema em inglês e português; em Android usa o botão nativo
 de voltar.
 
-Os dados da aplicação são guardados localmente com Expo SQLite e Drizzle ORM. Não existe um backend centralizado de utilizadores.
+Os dados da aplicação começam guardados localmente com Expo SQLite e Drizzle ORM. A sincronização
+remota só é ativada quando o utilizador liga voluntariamente uma conta Google.
+
+## Tema e idioma
+
+Em **Perfil → Definições** (e também no ecrã de Privacidade) é possível escolher modo Claro ou
+Escuro e Português ou English. As preferências ficam no armazenamento local do dispositivo. O
+onboarding permite escolher PT/EN antes de aceitar o aviso legal.
+
+## Partilha de conquistas
+
+O perfil gera um cartão PNG com nível, XP, streak e insígnias e partilha-o juntamente com um link.
+Defina o destino público quando existir uma landing page ou página nas lojas:
+
+```bash
+EXPO_PUBLIC_APP_SHARE_URL=https://exemplo.com/kynio
+```
+
+Sem essa variável, a app usa `https://github.com/sxnraku/KYNIO`. No browser, quando a Web Share API
+não aceita ficheiros, a imagem é descarregada e o texto com o link é copiado. A integração nativa
+usa `react-native-share`, por isso Android/iOS precisam de uma development build nova depois desta
+alteração; o Expo Go não contém este módulo nativo.
 
 ## Base de dados local
 

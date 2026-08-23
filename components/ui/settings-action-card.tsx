@@ -1,13 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { COLORS } from '@/constants/colors';
+import { COLORS } from "@/constants/colors";
 
 interface SettingsActionCardProps {
   description: string;
   destructive?: boolean;
   disabled?: boolean;
-  icon: 'download-outline' | 'trash-outline';
+  icon: "download-outline" | "trash-outline";
   isLoading: boolean;
   label: string;
   onPress: () => void;
@@ -24,20 +25,23 @@ export function SettingsActionCard({
   onPress,
   testID,
 }: SettingsActionCardProps) {
-  const accentColor = destructive ? '#FB7185' : COLORS.success;
+  const accentColor = destructive ? "#FB7185" : COLORS.success;
 
   return (
     <View className="rounded-2xl border border-border bg-surface p-5">
       <View className="flex-row items-start gap-4">
         <View
           className={`h-11 w-11 items-center justify-center rounded-xl ${
-            destructive ? 'bg-red-500/10' : 'bg-success/10'
-          }`}>
+            destructive ? "bg-red-500/10" : "bg-success/10"
+          }`}
+        >
           <Ionicons color={accentColor} name={icon} size={23} />
         </View>
         <View className="min-w-0 flex-1">
           <Text className="font-headline text-lg text-foreground">{label}</Text>
-          <Text className="mt-1 font-body text-sm leading-5 text-muted">{description}</Text>
+          <Text className="mt-1 font-body text-sm leading-5 text-muted">
+            {description}
+          </Text>
         </View>
       </View>
 
@@ -46,15 +50,19 @@ export function SettingsActionCard({
         accessibilityState={{ disabled: disabled || isLoading }}
         className={`mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-xl border px-4 active:opacity-70 ${
           destructive
-            ? 'border-red-400/40 bg-red-500/10'
-            : 'border-success/30 bg-success/10'
-        } ${disabled ? 'opacity-50' : ''}`}
+            ? "border-red-400/40 bg-red-500/10"
+            : "border-success/30 bg-success/10"
+        } ${disabled ? "opacity-50" : ""}`}
         disabled={disabled || isLoading}
         onPress={onPress}
-        testID={testID}>
-        {isLoading ? <ActivityIndicator color={accentColor} size="small" /> : null}
+        testID={testID}
+      >
+        {isLoading ? (
+          <ActivityIndicator color={accentColor} size="small" />
+        ) : null}
         <Text
-          className={`font-headline text-sm ${destructive ? 'text-red-300' : 'text-success'}`}>
+          className={`font-headline text-sm ${destructive ? "text-red-300" : "text-success"}`}
+        >
           {label}
         </Text>
       </Pressable>
