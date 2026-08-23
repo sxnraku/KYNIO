@@ -13,7 +13,6 @@
     },
     "android": {
       "package": "com.kynio.app",
-      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#10B981",
         "foregroundImage": "./assets/images/icon-kynio-v1.png"
