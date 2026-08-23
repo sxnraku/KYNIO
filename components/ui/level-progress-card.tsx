@@ -1,8 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { COLORS } from '@/constants/colors';
-import type { LevelProgress } from '@/services/gamificationService';
+import { COLORS } from "@/constants/colors";
+import type { LevelProgress } from "@/services/gamificationService";
 
 interface LevelProgressCardProps {
   level: number;
@@ -37,7 +38,9 @@ export function LevelProgressCard({
       </View>
 
       <View className="mt-6 flex-row items-end justify-between">
-        <Text className="font-headline text-3xl text-foreground">{totalXp} XP</Text>
+        <Text className="font-headline text-3xl text-foreground">
+          {totalXp} XP
+        </Text>
         <Text className="font-label text-[10px] text-muted">
           {remainingXp} XP PARA NÍVEL {level + 1}
         </Text>
@@ -51,7 +54,8 @@ export function LevelProgressCard({
           min: 0,
           now: levelProgress.xpIntoLevel,
         }}
-        className="mt-4 h-3 overflow-hidden rounded-full bg-background">
+        className="mt-4 h-3 overflow-hidden rounded-full bg-background"
+      >
         <View
           className="h-full rounded-full bg-xp"
           style={{ width: `${levelProgress.progress * 100}%` }}

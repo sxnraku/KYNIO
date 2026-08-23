@@ -1,7 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { COLORS } from '@/constants/colors';
+import { COLORS } from "@/constants/colors";
 
 interface AchievementRowProps {
   description: string;
@@ -18,7 +19,9 @@ export function AchievementRow({ description, title }: AchievementRowProps) {
         <Text className="font-headline text-base text-foreground">{title}</Text>
         <Text className="mt-1 font-body text-sm text-muted">{description}</Text>
       </View>
-      <Text className="font-label text-[9px] uppercase text-muted">Bloqueado</Text>
+      <Text className="font-label text-[9px] uppercase text-muted">
+        Bloqueado
+      </Text>
     </View>
   );
 }

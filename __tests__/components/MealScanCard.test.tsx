@@ -110,7 +110,7 @@ describe('MealScanCard', () => {
   it('abre a pré-visualização integrada da câmara em vez do seletor de ficheiros', async () => {
     await render(<MealsScreen />);
 
-    fireEvent.press(screen.getByText('Câmara'));
+    await fireEvent.press(screen.getByText('Câmara'));
 
     expect(await screen.findByText('Fotografar refeição')).toBeTruthy();
     expect(screen.getByText('Pré-visualização em direto')).toBeTruthy();

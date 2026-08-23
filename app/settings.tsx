@@ -1,16 +1,23 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert, Pressable, ScrollView, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { PrivacyNote } from '@/components/ui/privacy-note';
-import { SettingsActionCard } from '@/components/ui/settings-action-card';
-import { COLORS } from '@/constants/colors';
-import { deleteAllLocalData, exportAllLocalData } from '@/services/dataPrivacyService';
-import { useLegalConsentStore } from '@/store/legal-consent-store';
-import { useUserProgressStore } from '@/store/user-progress-store';
-import { useFastingStore } from '@/store/useFastingStore';
+import { PrivacyNote } from "@/components/ui/privacy-note";
+import { PreferenceControls } from "@/components/ui/preference-controls";
+import { SettingsActionCard } from "@/components/ui/settings-action-card";
+import { COLORS } from "@/constants/colors";
+import {
+  deleteAllLocalData,
+  exportAllLocalData,
+} from "@/services/dataPrivacyService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useLegalConsentStore } from "@/store/legal-consent-store";
+import { useUserProgressStore } from "@/store/user-progress-store";
+import { useFastingStore } from "@/store/useFastingStore";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback;
@@ -18,6 +25,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const language = useAppPreferencesStore((state) => state.language);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -36,7 +44,9 @@ export default function SettingsScreen() {
       const fileName = await exportAllLocalData();
       setSuccessMessage(`Exportação preparada: ${fileName}`);
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, 'Não foi possível exportar os dados locais.'));
+      setErrorMessage(
+        getErrorMessage(error, "Não foi possível exportar os dados locais."),
+      );
     } finally {
       setIsExporting(false);
     }
@@ -55,53 +65,77 @@ export default function SettingsScreen() {
       await deleteAllLocalData();
       useFastingStore.getState().resetFasting();
       useUserProgressStore.getState().resetProgress();
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
       useLegalConsentStore.getState().resetConsent();
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, 'Não foi possível eliminar todos os dados locais.'));
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          "Não foi possível eliminar todos os dados locais.",
+        ),
+      );
       setIsDeleting(false);
     }
   };
 
   const confirmDelete = () => {
     Alert.alert(
-      'Eliminar todos os dados?',
-      'Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.',
+      translateText("Eliminar todos os dados?", language),
+      translateText(
+        "Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.",
+        language,
+      ),
       [
-        { style: 'cancel', text: 'Cancelar' },
+        { style: "cancel", text: translateText("Cancelar", language) },
         {
           onPress: () => void handleDelete(),
-          style: 'destructive',
-          text: 'Eliminar definitivamente',
+          style: "destructive",
+          text: translateText("Eliminar definitivamente", language),
         },
       ],
     );
   };
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <View className="flex-row items-center border-b border-border px-5 pb-4 pt-3">
         <Pressable
           accessibilityLabel="Voltar"
           accessibilityRole="button"
           className="h-9 w-9 items-center justify-center rounded-full bg-surface active:opacity-70"
-          onPress={() => router.back()}>
+          onPress={() => router.back()}
+        >
           <Ionicons color={COLORS.foreground} name="arrow-back" size={20} />
         </Pressable>
-        <Text className="ml-3 font-headline text-xl text-foreground">Privacidade e dados</Text>
+        <Text className="ml-3 font-headline text-xl text-foreground">
+          Privacidade e dados
+        </Text>
       </View>
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 24, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}>
-        <View className="rounded-2xl border border-success/20 bg-success/5 p-5">
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 24,
+          paddingBottom: 40,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <PreferenceControls />
+
+        <View className="mt-5 rounded-2xl border border-success/20 bg-success/5 p-5">
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/10">
-              <Ionicons color={COLORS.success} name="phone-portrait-outline" size={22} />
+              <Ionicons
+                color={COLORS.success}
+                name="phone-portrait-outline"
+                size={22}
+              />
             </View>
             <View className="flex-1">
-              <Text className="font-headline text-lg text-foreground">Privacidade e controlo</Text>
+              <Text className="font-headline text-lg text-foreground">
+                Privacidade e controlo
+              </Text>
               <Text className="mt-1 font-body text-sm text-muted">
                 Local por defeito · cloud opcional
               </Text>
@@ -110,20 +144,22 @@ export default function SettingsScreen() {
 
           <View className="mt-5 gap-3">
             <Text className="font-body text-sm leading-5 text-muted">
-              • Jejuns, refeições, progresso e fotografias confirmadas ficam sempre disponíveis
-              neste dispositivo.
+              • Jejuns, refeições, progresso e fotografias confirmadas ficam
+              sempre disponíveis neste dispositivo.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • Ao ligares uma conta Google, perfil, amigos e registos são também sincronizados
-              para permitir utilização em vários dispositivos.
+              • Ao ligares uma conta Google, perfil, amigos e registos são
+              também sincronizados para permitir utilização em vários
+              dispositivos.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • A análise de refeição envia apenas a fotografia e/ou descrição escolhida para a
-              API; o restante histórico não acompanha esse pedido.
+              • A análise de refeição envia apenas a fotografia e/ou descrição
+              escolhida para a API; o restante histórico não acompanha esse
+              pedido.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • A exportação abre o seletor do sistema; só sai do dispositivo quando escolhes um
-              destino.
+              • A exportação abre o seletor do sistema; só sai do dispositivo
+              quando escolhes um destino.
             </Text>
           </View>
         </View>
@@ -131,8 +167,11 @@ export default function SettingsScreen() {
         {errorMessage ? (
           <View
             accessibilityLiveRegion="polite"
-            className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
-            <Text className="font-body text-sm leading-5 text-red-300">{errorMessage}</Text>
+            className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4"
+          >
+            <Text className="font-body text-sm leading-5 text-red-300">
+              {errorMessage}
+            </Text>
           </View>
         ) : null}
 
@@ -140,8 +179,11 @@ export default function SettingsScreen() {
           <View
             accessibilityLiveRegion="polite"
             className="mt-4 rounded-xl border border-success/20 bg-success/10 p-4"
-            testID="export-success-message">
-            <Text className="font-body text-sm leading-5 text-foreground">{successMessage}</Text>
+            testID="export-success-message"
+          >
+            <Text className="font-body text-sm leading-5 text-foreground">
+              {successMessage}
+            </Text>
           </View>
         ) : null}
 
@@ -174,8 +216,9 @@ export default function SettingsScreen() {
             Aviso legal
           </Text>
           <Text className="mt-3 font-body text-sm leading-6 text-muted">
-            Esta app é uma ferramenta de acompanhamento pessoal de estilo de vida e gamificação.
-            Não presta aconselhamento médico, nutricional ou de treino.
+            Esta app é uma ferramenta de acompanhamento pessoal de estilo de
+            vida e gamificação. Não presta aconselhamento médico, nutricional ou
+            de treino.
           </Text>
         </View>
 

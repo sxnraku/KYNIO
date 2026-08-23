@@ -1,13 +1,14 @@
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { BadgeCard } from '@/components/ui/badge-card';
-import { ConsistencyLine } from '@/components/ui/consistency-line';
-import { LevelProgressCard } from '@/components/ui/level-progress-card';
-import { PageTitle } from '@/components/ui/page-title';
-import { PrivacyNote } from '@/components/ui/privacy-note';
-import { Screen } from '@/components/ui/screen';
-import { COLORS } from '@/constants/colors';
-import { useGamificationProgress } from '@/hooks/use-gamification-progress';
+import { BadgeCard } from "@/components/ui/badge-card";
+import { ConsistencyLine } from "@/components/ui/consistency-line";
+import { LevelProgressCard } from "@/components/ui/level-progress-card";
+import { PageTitle } from "@/components/ui/page-title";
+import { PrivacyNote } from "@/components/ui/privacy-note";
+import { Screen } from "@/components/ui/screen";
+import { COLORS } from "@/constants/colors";
+import { useGamificationProgress } from "@/hooks/use-gamification-progress";
 
 export default function ProgressScreen() {
   const { error, isLoading, snapshot } = useGamificationProgress();
@@ -22,14 +23,20 @@ export default function ProgressScreen() {
       {isLoading && !snapshot ? (
         <View className="mt-16 items-center">
           <ActivityIndicator color={COLORS.xp} size="large" />
-          <Text className="mt-4 font-body text-sm text-muted">A calcular progresso local…</Text>
+          <Text className="mt-4 font-body text-sm text-muted">
+            A calcular progresso local…
+          </Text>
         </View>
       ) : null}
 
       {error ? (
         <View className="mt-7 rounded-2xl border border-[#FB7185]/40 bg-[#FB7185]/10 p-5">
-          <Text className="font-headline text-lg text-[#FDA4AF]">Progresso indisponível</Text>
-          <Text className="mt-2 font-body text-sm leading-5 text-[#FDA4AF]">{error}</Text>
+          <Text className="font-headline text-lg text-[#FDA4AF]">
+            Progresso indisponível
+          </Text>
+          <Text className="mt-2 font-body text-sm leading-5 text-[#FDA4AF]">
+            {error}
+          </Text>
         </View>
       ) : null}
 
@@ -51,13 +58,16 @@ export default function ProgressScreen() {
           <View className="mt-8">
             <View className="mb-4 flex-row items-end justify-between px-1">
               <View>
-                <Text className="font-headline text-xl text-foreground">Insígnias</Text>
+                <Text className="font-headline text-xl text-foreground">
+                  Insígnias
+                </Text>
                 <Text className="mt-1 font-body text-sm text-muted">
                   Desbloqueadas pelos teus registos locais.
                 </Text>
               </View>
               <Text className="font-label text-[10px] text-xp">
-                {snapshot.badges.filter((badge) => badge.unlocked).length}/{snapshot.badges.length}
+                {snapshot.badges.filter((badge) => badge.unlocked).length}/
+                {snapshot.badges.length}
               </Text>
             </View>
 

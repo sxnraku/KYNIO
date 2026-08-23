@@ -1,28 +1,29 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { FriendsPanel } from '@/components/ui/friends-panel';
-import { PageTitle } from '@/components/ui/page-title';
-import { ProfileAchievementsCard } from '@/components/ui/profile-achievements-card';
-import { ProfileHeroCard } from '@/components/ui/profile-hero-card';
+import { FriendsPanel } from "@/components/ui/friends-panel";
+import { PageTitle } from "@/components/ui/page-title";
+import { ProfileAchievementsCard } from "@/components/ui/profile-achievements-card";
+import { ProfileHeroCard } from "@/components/ui/profile-hero-card";
 import {
   type ProfileSection,
   ProfileSectionTabs,
-} from '@/components/ui/profile-section-tabs';
-import { ProfileSettingsPanel } from '@/components/ui/profile-settings-panel';
-import { Screen } from '@/components/ui/screen';
-import { COLORS } from '@/constants/colors';
-import { useGamificationProgress } from '@/hooks/use-gamification-progress';
-import { useLocalProfile } from '@/hooks/use-local-profile';
+} from "@/components/ui/profile-section-tabs";
+import { ProfileSettingsPanel } from "@/components/ui/profile-settings-panel";
+import { Screen } from "@/components/ui/screen";
+import { COLORS } from "@/constants/colors";
+import { useGamificationProgress } from "@/hooks/use-gamification-progress";
+import { useLocalProfile } from "@/hooks/use-local-profile";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const localProfile = useLocalProfile();
   const gamification = useGamificationProgress();
-  const [activeSection, setActiveSection] = useState<ProfileSection>('profile');
-  const [bio, setBio] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [activeSection, setActiveSection] = useState<ProfileSection>("profile");
+  const [bio, setBio] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
     if (localProfile.profile) {
@@ -43,29 +44,38 @@ export default function ProfileScreen() {
       />
 
       <View className="mt-6">
-        <ProfileSectionTabs activeSection={activeSection} onChange={setActiveSection} />
+        <ProfileSectionTabs
+          activeSection={activeSection}
+          onChange={setActiveSection}
+        />
       </View>
 
       {localProfile.error ? (
         <View className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
-          <Text className="font-body text-sm leading-5 text-red-500">{localProfile.error}</Text>
+          <Text className="font-body text-sm leading-5 text-red-500">
+            {localProfile.error}
+          </Text>
         </View>
       ) : null}
 
       {localProfile.success ? (
         <View className="mt-4 rounded-xl border border-success/20 bg-success/10 p-4">
-          <Text className="font-body text-sm leading-5 text-success">{localProfile.success}</Text>
+          <Text className="font-body text-sm leading-5 text-success">
+            {localProfile.success}
+          </Text>
         </View>
       ) : null}
 
       {localProfile.isLoading && !localProfile.profile ? (
         <View className="items-center py-20">
           <ActivityIndicator color={COLORS.success} size="large" />
-          <Text className="mt-4 font-body text-sm text-muted">A preparar o perfil…</Text>
+          <Text className="mt-4 font-body text-sm text-muted">
+            A preparar o perfil…
+          </Text>
         </View>
       ) : null}
 
-      {localProfile.profile && activeSection === 'profile' ? (
+      {localProfile.profile && activeSection === "profile" ? (
         <View className="mt-4 gap-4">
           <ProfileHeroCard
             avatarUri={localProfile.profile.avatarUri}
@@ -82,7 +92,7 @@ export default function ProfileScreen() {
         </View>
       ) : null}
 
-      {activeSection === 'friends' ? (
+      {activeSection === "friends" ? (
         <View className="mt-4">
           <FriendsPanel
             friends={localProfile.friends}
@@ -93,11 +103,11 @@ export default function ProfileScreen() {
         </View>
       ) : null}
 
-      {activeSection === 'settings' ? (
+      {activeSection === "settings" ? (
         <View className="mt-4">
           <ProfileSettingsPanel
             onLocalDataChanged={localProfile.reload}
-            onOpenPrivacy={() => router.push('/settings')}
+            onOpenPrivacy={() => router.push("/settings")}
           />
         </View>
       ) : null}

@@ -1,9 +1,11 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Image, Pressable, Text, TextInput, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, Image, Pressable, View } from "react-native";
+import { Text } from "@/components/ui/text";
+import { TextInput } from "@/components/ui/text-input";
 
-import { Card } from '@/components/ui/card';
-import { COLORS } from '@/constants/colors';
-import type { SelectedMealImage } from '@/types/meal';
+import { Card } from "@/components/ui/card";
+import { COLORS } from "@/constants/colors";
+import type { SelectedMealImage } from "@/types/meal";
 
 interface MealCaptureCardProps {
   canAnalyze: boolean;
@@ -18,7 +20,7 @@ interface MealCaptureCardProps {
 }
 
 interface SourceButtonProps {
-  icon: 'camera-outline' | 'images-outline';
+  icon: "camera-outline" | "images-outline";
   label: string;
   onPress: () => void;
 }
@@ -28,7 +30,8 @@ function SourceButton({ icon, label, onPress }: SourceButtonProps) {
     <Pressable
       accessibilityRole="button"
       className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-3.5 active:opacity-70"
-      onPress={onPress}>
+      onPress={onPress}
+    >
       <Ionicons color={COLORS.success} name={icon} size={19} />
       <Text className="font-headline text-sm text-foreground">{label}</Text>
     </Pressable>
@@ -51,14 +54,25 @@ export function MealCaptureCard({
       <Text className="font-label text-[10px] uppercase tracking-widest text-success">
         Nova análise
       </Text>
-      <Text className="mt-2 font-headline text-lg text-foreground">Mostra ou descreve a refeição</Text>
+      <Text className="mt-2 font-headline text-lg text-foreground">
+        Mostra ou descreve a refeição
+      </Text>
       <Text className="mt-1 font-body text-sm leading-5 text-muted">
-        Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.
+        Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que
+        comeste.
       </Text>
 
       <View className="mt-5 flex-row gap-3">
-        <SourceButton icon="camera-outline" label="Câmara" onPress={onTakePhoto} />
-        <SourceButton icon="images-outline" label="Galeria" onPress={onPickPhoto} />
+        <SourceButton
+          icon="camera-outline"
+          label="Câmara"
+          onPress={onTakePhoto}
+        />
+        <SourceButton
+          icon="images-outline"
+          label="Galeria"
+          onPress={onPickPhoto}
+        />
       </View>
 
       {selectedImage ? (
@@ -73,7 +87,8 @@ export function MealCaptureCard({
             accessibilityLabel="Remover fotografia"
             accessibilityRole="button"
             className="absolute right-3 top-3 h-9 w-9 items-center justify-center rounded-full bg-background/90 active:opacity-70"
-            onPress={onRemovePhoto}>
+            onPress={onRemovePhoto}
+          >
             <Ionicons color={COLORS.foreground} name="close" size={20} />
           </Pressable>
         </View>
@@ -98,25 +113,32 @@ export function MealCaptureCard({
         accessibilityRole="button"
         accessibilityState={{ disabled: !canAnalyze || isAnalyzing }}
         className={`mt-5 min-h-14 flex-row items-center justify-center gap-2 rounded-xl px-5 ${
-          canAnalyze && !isAnalyzing ? 'bg-success active:opacity-80' : 'bg-border opacity-60'
+          canAnalyze && !isAnalyzing
+            ? "bg-success active:opacity-80"
+            : "bg-border opacity-60"
         }`}
         disabled={!canAnalyze || isAnalyzing}
-        onPress={onAnalyze}>
+        onPress={onAnalyze}
+      >
         {isAnalyzing ? (
           <ActivityIndicator color={COLORS.background} size="small" />
         ) : (
           <Ionicons color={COLORS.background} name="sparkles" size={20} />
         )}
         <Text className="font-headline text-base text-background">
-          {isAnalyzing ? 'A analisar…' : 'Analisar refeição'}
+          {isAnalyzing ? "A analisar…" : "Analisar refeição"}
         </Text>
       </Pressable>
 
       <View className="mt-4 flex-row items-start gap-2">
-        <Ionicons color={COLORS.muted} name="shield-checkmark-outline" size={15} />
+        <Ionicons
+          color={COLORS.muted}
+          name="shield-checkmark-outline"
+          size={15}
+        />
         <Text className="flex-1 font-body text-xs leading-4 text-muted">
-          Só a fotografia e a descrição desta análise são enviadas à API. A resposta não é
-          armazenada remotamente pela app.
+          Só a fotografia e a descrição desta análise são enviadas à API. A
+          resposta não é armazenada remotamente pela app.
         </Text>
       </View>
     </Card>

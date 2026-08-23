@@ -1,17 +1,18 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 
-import { Card } from '@/components/ui/card';
-import { COLORS } from '@/constants/colors';
-import type { WorkoutRecord } from '@/db/schema';
-import type { WorkoutSummary } from '@/hooks/use-workout-tracker';
+import { Card } from "@/components/ui/card";
+import { COLORS } from "@/constants/colors";
+import type { WorkoutRecord } from "@/db/schema";
+import type { WorkoutSummary } from "@/hooks/use-workout-tracker";
 
 interface WorkoutSummaryCardProps {
   records: WorkoutRecord[];
   summary: WorkoutSummary;
 }
 
-const DAY_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const DAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 
 function getLastSevenDays(records: WorkoutRecord[]) {
   const today = new Date();
@@ -26,13 +27,18 @@ function getLastSevenDays(records: WorkoutRecord[]) {
       isToday: index === 6,
       label: DAY_LABELS[date.getDay()],
       minutes: records
-        .filter((record) => record.timestamp >= dayStart && record.timestamp < dayEnd)
+        .filter(
+          (record) => record.timestamp >= dayStart && record.timestamp < dayEnd,
+        )
         .reduce((total, record) => total + record.durationMinutes, 0),
     };
   });
 }
 
-export function WorkoutSummaryCard({ records, summary }: WorkoutSummaryCardProps) {
+export function WorkoutSummaryCard({
+  records,
+  summary,
+}: WorkoutSummaryCardProps) {
   const days = getLastSevenDays(records);
   const maxMinutes = Math.max(...days.map((day) => day.minutes), 30);
 
@@ -43,7 +49,9 @@ export function WorkoutSummaryCard({ records, summary }: WorkoutSummaryCardProps
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
             Últimos 7 dias
           </Text>
-          <Text className="mt-2 font-headline text-2xl text-foreground">O teu movimento</Text>
+          <Text className="mt-2 font-headline text-2xl text-foreground">
+            O teu movimento
+          </Text>
         </View>
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-success-dark">
           <Ionicons color={COLORS.success} name="fitness" size={25} />
@@ -60,27 +68,38 @@ export function WorkoutSummaryCard({ records, summary }: WorkoutSummaryCardProps
           </View>
           <Text className="mt-1 font-body text-xs text-muted">
             {summary.weekCount === 1
-              ? '1 atividade registada'
+              ? "1 atividade registada"
               : `${summary.weekCount} atividades registadas`}
           </Text>
         </View>
 
         <View className="h-[92px] flex-1 flex-row items-end justify-between gap-2">
           {days.map((day, index) => {
-            const barHeight = day.minutes === 0 ? 6 : Math.max(16, (day.minutes / maxMinutes) * 64);
+            const barHeight =
+              day.minutes === 0
+                ? 6
+                : Math.max(16, (day.minutes / maxMinutes) * 64);
 
             return (
-              <View className="flex-1 items-center" key={`${day.label}-${index}`}>
+              <View
+                className="flex-1 items-center"
+                key={`${day.label}-${index}`}
+              >
                 <View
-                  className={day.isToday ? 'w-full rounded-full bg-success' : 'w-full rounded-full bg-border'}
+                  className={
+                    day.isToday
+                      ? "w-full rounded-full bg-success"
+                      : "w-full rounded-full bg-border"
+                  }
                   style={{ height: barHeight, maxWidth: 12 }}
                 />
                 <Text
                   className={
                     day.isToday
-                      ? 'mt-2 font-label text-[9px] text-success'
-                      : 'mt-2 font-label text-[9px] text-muted'
-                  }>
+                      ? "mt-2 font-label text-[9px] text-success"
+                      : "mt-2 font-label text-[9px] text-muted"
+                  }
+                >
                   {day.label}
                 </Text>
               </View>
@@ -91,13 +110,19 @@ export function WorkoutSummaryCard({ records, summary }: WorkoutSummaryCardProps
 
       <View className="mt-6 flex-row gap-2 border-t border-border pt-4">
         <View className="flex-1">
-          <Text className="font-headline text-lg text-foreground">{summary.totalMinutes}</Text>
+          <Text className="font-headline text-lg text-foreground">
+            {summary.totalMinutes}
+          </Text>
           <Text className="font-body text-xs text-muted">minutos no total</Text>
         </View>
         <View className="h-9 w-px bg-border" />
         <View className="flex-1 pl-4">
-          <Text className="font-headline text-lg text-xp">+{summary.weekXp} XP</Text>
-          <Text className="font-body text-xs text-muted">ganhos esta semana</Text>
+          <Text className="font-headline text-lg text-xp">
+            +{summary.weekXp} XP
+          </Text>
+          <Text className="font-body text-xs text-muted">
+            ganhos esta semana
+          </Text>
         </View>
       </View>
     </Card>
