@@ -1,0 +1,276 @@
+:root {
+  color-scheme: light dark;
+  --accent: #10b981;
+  --accent-strong: #087f5b;
+  --background: #f3f6f4;
+  --border: #dce4df;
+  --foreground: #111713;
+  --muted: #68736c;
+  --surface: #ffffff;
+  --warning: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #34d399;
+    --accent-strong: #6ee7b7;
+    --background: #09090b;
+    --border: #3f3f46;
+    --foreground: #f4f4f5;
+    --muted: #a1a1aa;
+    --surface: #18181b;
+    --warning: #fbbf24;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+  margin: 0;
+}
+
+a {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+button,
+.button {
+  align-items: center;
+  background: var(--accent);
+  border: 0;
+  border-radius: 14px;
+  color: #07130e;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  text-decoration: none;
+}
+
+button.secondary,
+.button.secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+button.danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 18px 22px;
+}
+
+.nav {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 880px;
+}
+
+.brand {
+  align-items: center;
+  color: var(--foreground);
+  display: flex;
+  font-size: 18px;
+  font-weight: 900;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mark {
+  align-items: center;
+  background: var(--accent);
+  border-radius: 12px;
+  color: #07130e;
+  display: inline-flex;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+
+.languages {
+  display: flex;
+  gap: 6px;
+}
+
+.languages button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.languages button.active {
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+main {
+  margin: 0 auto;
+  max-width: 880px;
+  padding: 56px 22px 80px;
+}
+
+.eyebrow {
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(34px, 7vw, 58px);
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  margin: 14px 0 20px;
+}
+
+h2 {
+  font-size: 23px;
+  letter-spacing: -0.02em;
+  margin: 40px 0 10px;
+}
+
+h3 {
+  font-size: 17px;
+  margin: 24px 0 8px;
+}
+
+p,
+li {
+  color: var(--muted);
+}
+
+.lead {
+  font-size: 19px;
+  max-width: 720px;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 36px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 24px;
+}
+
+.card h2,
+.card h3 {
+  margin-top: 0;
+}
+
+.notice {
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 18px;
+  margin: 28px 0;
+  padding: 18px 20px;
+}
+
+.warning {
+  border-color: color-mix(in srgb, var(--warning) 40%, var(--border));
+  color: var(--warning);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.check-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.check-row input {
+  height: 20px;
+  margin-top: 3px;
+  width: 20px;
+}
+
+.status {
+  border-radius: 14px;
+  margin-top: 18px;
+  padding: 14px 16px;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status.error {
+  background: color-mix(in srgb, #ef4444 12%, var(--surface));
+  color: #ef4444;
+}
+
+.status.success {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent-strong);
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  padding: 28px 22px;
+  text-align: center;
+}
+
+[data-language] {
+  display: none;
+}
+
+html[data-active-language="pt"] [data-language="pt"],
+html[data-active-language="en"] [data-language="en"] {
+  display: block;
+}
+
+@media (max-width: 520px) {
+  main {
+    padding-top: 38px;
+  }
+
+  .actions,
+  .actions button,
+  .actions .button {
+    width: 100%;
+  }
+}

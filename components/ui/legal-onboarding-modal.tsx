@@ -1,10 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, View } from "react-native";
+import {
+  ActivityIndicator,
+  Linking,
+  Modal,
+  Pressable,
+  View,
+} from "react-native";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/colors";
+import { getLegalDocumentUrl } from "@/services/legalLinks";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 
@@ -31,18 +38,13 @@ export function LegalOnboardingModal() {
     }
   }, [hydrateConsent, isHydrated, isLoading]);
 
-  useEffect(() => {
-    if (!hasAcceptedTerms) {
-      setIsChecked(false);
-    }
-  }, [hasAcceptedTerms]);
-
   const isVisible = !isHydrated || !hasAcceptedTerms;
 
   return (
     <Modal
       animationType="fade"
       onRequestClose={() => undefined}
+      onShow={() => setIsChecked(false)}
       statusBarTranslucent
       transparent
       visible={isVisible}
@@ -118,8 +120,8 @@ export function LegalOnboardingModal() {
                     O histórico começa guardado no dispositivo. Se ligares uma
                     conta Google, perfil, amigos e registos serão também
                     sincronizados remotamente entre os teus dispositivos. Uma
-                    fotografia de refeição só é enviada à API quando pedes uma
-                    análise.
+                    fotografia de refeição só é enviada, através do KYNIO,
+                    para a Google Gemini quando pedes uma análise.
                   </Text>
                 </View>
               </View>
@@ -146,11 +148,32 @@ export function LegalOnboardingModal() {
                 </View>
               ) : null}
 
+              <View className="mt-4 flex-row items-center justify-center gap-4">
+                <Pressable
+                  accessibilityRole="link"
+                  className="min-h-10 justify-center active:opacity-70"
+                  onPress={() => void Linking.openURL(getLegalDocumentUrl("privacy"))}
+                >
+                  <Text className="font-headline text-sm text-success">
+                    Política de Privacidade
+                  </Text>
+                </Pressable>
+                <Pressable
+                  accessibilityRole="link"
+                  className="min-h-10 justify-center active:opacity-70"
+                  onPress={() => void Linking.openURL(getLegalDocumentUrl("terms"))}
+                >
+                  <Text className="font-headline text-sm text-success">
+                    Termos de Utilização
+                  </Text>
+                </Pressable>
+              </View>
+
               <Pressable
                 accessibilityLabel="Compreendo e aceito os termos"
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: isChecked }}
-                className="mt-5 flex-row items-center gap-3 rounded-2xl border border-border bg-surface-raised p-4 active:opacity-70"
+                className="mt-2 flex-row items-center gap-3 rounded-2xl border border-border bg-surface-raised p-4 active:opacity-70"
                 onPress={() => setIsChecked((current) => !current)}
                 testID="legal-terms-checkbox"
               >

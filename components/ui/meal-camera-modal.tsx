@@ -5,7 +5,7 @@ import {
   type CameraType,
   useCameraPermissions,
 } from "expo-camera";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -60,14 +60,13 @@ export function MealCameraModal({
     useState<CameraCapturedPicture | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!visible) {
-      setCapturedPhoto(null);
-      setCameraError(null);
-      setIsCameraReady(false);
-      setIsCapturing(false);
-    }
-  }, [visible]);
+  const resetAndClose = () => {
+    setCapturedPhoto(null);
+    setCameraError(null);
+    setIsCameraReady(false);
+    setIsCapturing(false);
+    onClose();
+  };
 
   const capturePhoto = async () => {
     if (!cameraRef.current || !isCameraReady || isCapturing) {
@@ -106,7 +105,7 @@ export function MealCameraModal({
     }
 
     onUsePhoto(selectedImage);
-    onClose();
+    resetAndClose();
   };
 
   const renderPermissionContent = () => {
@@ -260,7 +259,7 @@ export function MealCameraModal({
   return (
     <Modal
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={resetAndClose}
       presentationStyle="fullScreen"
       visible={visible}
     >
@@ -270,7 +269,7 @@ export function MealCameraModal({
             accessibilityLabel="Fechar câmara"
             accessibilityRole="button"
             className="h-10 w-10 items-center justify-center rounded-full bg-white/10"
-            onPress={onClose}
+            onPress={resetAndClose}
           >
             <Ionicons color="#FFFFFF" name="close" size={23} />
           </Pressable>

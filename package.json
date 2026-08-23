@@ -51,11 +51,15 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-preset-expo": "^57.0.7",
     "drizzle-kit": "^0.31.10",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.1",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "build:android:preview": "npx eas-cli build --platform android --profile preview",
+    "build:android:production": "npx eas-cli build --platform android --profile production",
     "start": "expo start",
     "android": "expo start --android",
     "db:generate": "drizzle-kit generate",
@@ -66,10 +70,13 @@
     "ios": "expo start --ios",
     "test": "jest --runInBand",
     "test:ai-contract": "node scripts/verify-ai-meal-service.cjs",
+    "test:legal-site": "node scripts/verify-legal-site.cjs",
     "test:coverage": "jest --coverage --runInBand",
     "test:watch": "jest --watch",
     "web": "expo start --web",
     "lint": "expo lint",
+    "release:check": "npm run typecheck && npm run lint && npm test && npm run test:ai-contract && npm run test:legal-site && npx expo-doctor && npx expo export --platform android --output-dir .expo-export-check",
+    "submit:android": "npx eas-cli submit --platform android --profile production",
     "typecheck": "tsc --noEmit"
   },
   "private": true
