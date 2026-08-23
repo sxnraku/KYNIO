@@ -1,56 +1,90 @@
-# Welcome to your Expo app 👋
+# KYNIO
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Tracker local e gamificado de jejum, refeições e treinos, criado com Expo, React Native e TypeScript.
 
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Executar
 
 ```bash
-npm run reset-project
+npm install
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Use `npm run android`, `npm run ios` ou `npm run web` para abrir diretamente uma plataforma.
 
-### Other setup steps
+## Verificação
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npm run typecheck
+npm test
+npx expo install --check
+```
 
-## Learn more
+Os testes unitários usam Jest com o preset `jest-expo`. `npm run test:watch` inicia o modo de
+desenvolvimento e `npm run test:coverage` gera o relatório de cobertura em `coverage/`. Os mocks
+manuais de Expo SQLite e Zustand impedem acesso à base real e repõem os stores entre testes.
+Os testes de componentes usam `@testing-library/react-native`; a integração da tab de Refeições
+substitui a API de IA e o serviço SQLite por mocks e verifica explicitamente que `fetch` não é
+chamado.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Testes E2E com Maestro
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Os fluxos em `.maestro/` testam o onboarding, o início do temporizador e a exportação RGPD num
+binário nativo com o identificador `com.kynio.app`. O Maestro é uma ferramenta externa e não
+adiciona dependências ao bundle React Native. Com a CLI instalada e uma development build aberta
+num emulador/simulador, execute:
 
-## Join the community
+```bash
+npm run e2e:onboarding
+npm run e2e:export
+# ou toda a suite
+npm run e2e
+```
 
-Join our community of developers creating universal apps.
+O fluxo de exportação fecha a folha nativa de partilha antes de validar a confirmação na app. Em
+iOS, o seletor aceita os rótulos de sistema em inglês e português; em Android usa o botão nativo
+de voltar.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Os dados da aplicação são guardados localmente com Expo SQLite e Drizzle ORM. Não existe um backend centralizado de utilizadores.
+
+## Base de dados local
+
+O schema encontra-se em `db/schema.ts` e as migrações empacotadas em `drizzle/`.
+
+```bash
+npm run db:generate
+npm run db:check
+```
+
+As migrações são aplicadas automaticamente no primeiro acesso à base de dados local.
+
+## Análise de refeições
+
+A tab de Refeições usa a API Gemini com entrada de texto/imagem e resposta em JSON estrito.
+Crie um ficheiro `.env.local` a partir de `.env.example` e adicione uma chave apenas no ambiente
+de desenvolvimento:
+
+```bash
+EXPO_PUBLIC_GEMINI_API_KEY=...
+```
+
+As variáveis `EXPO_PUBLIC_*` são incluídas no bundle da aplicação. Não distribua uma build de
+produção com uma chave secreta desta forma; substitua a origem da credencial por um mecanismo de
+autenticação adequado antes da publicação. A chamada usa `store: false`, a resposta é validada
+localmente como JSON estrito e os registos confirmados — incluindo uma cópia privada da imagem —
+ficam na SQLite e no diretório de documentos do dispositivo.
+
+## Privacidade, consentimento e RGPD
+
+No primeiro arranque, a navegação fica bloqueada até existir uma aceitação explícita do aviso
+legal. A data dessa aceitação é guardada apenas no perfil SQLite local.
+
+O ícone de escudo no cabeçalho abre `app/settings.tsx`, onde é possível:
+
+- exportar `fasts`, `meals` e `user_profile` para um ficheiro JSON;
+- eliminar a base SQLite, as imagens privadas, os ficheiros temporários de exportação e o estado
+  local em memória;
+- consultar novamente o aviso legal e o resumo de privacidade.
+
+A exportação não carrega dados para um servidor: em Android/iOS abre a folha nativa de partilha e
+na Web cria um download local. A única chamada de rede da app permanece a análise explícita de uma
+refeição, sem ID de utilizador e sem incluir o restante histórico local.

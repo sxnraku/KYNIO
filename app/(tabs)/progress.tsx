@@ -1,0 +1,76 @@
+import { ActivityIndicator, Text, View } from 'react-native';
+
+import { BadgeCard } from '@/components/ui/badge-card';
+import { ConsistencyLine } from '@/components/ui/consistency-line';
+import { LevelProgressCard } from '@/components/ui/level-progress-card';
+import { PageTitle } from '@/components/ui/page-title';
+import { PrivacyNote } from '@/components/ui/privacy-note';
+import { Screen } from '@/components/ui/screen';
+import { COLORS } from '@/constants/colors';
+import { useGamificationProgress } from '@/hooks/use-gamification-progress';
+
+export default function ProgressScreen() {
+  const { error, isLoading, snapshot } = useGamificationProgress();
+
+  return (
+    <Screen>
+      <PageTitle
+        description="Níveis, consistência e conquistas calculados apenas com os teus registos locais."
+        title="Progresso"
+      />
+
+      {isLoading && !snapshot ? (
+        <View className="mt-16 items-center">
+          <ActivityIndicator color={COLORS.xp} size="large" />
+          <Text className="mt-4 font-body text-sm text-muted">A calcular progresso local…</Text>
+        </View>
+      ) : null}
+
+      {error ? (
+        <View className="mt-7 rounded-2xl border border-[#FB7185]/40 bg-[#FB7185]/10 p-5">
+          <Text className="font-headline text-lg text-[#FDA4AF]">Progresso indisponível</Text>
+          <Text className="mt-2 font-body text-sm leading-5 text-[#FDA4AF]">{error}</Text>
+        </View>
+      ) : null}
+
+      {snapshot ? (
+        <>
+          <View className="mt-7">
+            <LevelProgressCard
+              level={snapshot.level}
+              levelProgress={snapshot.levelProgress}
+              levelTitle={snapshot.levelTitle}
+              totalXp={snapshot.profile.totalXp}
+            />
+          </View>
+
+          <View className="mt-5">
+            <ConsistencyLine stats={snapshot.stats} />
+          </View>
+
+          <View className="mt-8">
+            <View className="mb-4 flex-row items-end justify-between px-1">
+              <View>
+                <Text className="font-headline text-xl text-foreground">Insígnias</Text>
+                <Text className="mt-1 font-body text-sm text-muted">
+                  Desbloqueadas pelos teus registos locais.
+                </Text>
+              </View>
+              <Text className="font-label text-[10px] text-xp">
+                {snapshot.badges.filter((badge) => badge.unlocked).length}/{snapshot.badges.length}
+              </Text>
+            </View>
+
+            <View className="flex-row flex-wrap justify-between gap-y-3">
+              {snapshot.badges.map((badge) => (
+                <BadgeCard badge={badge} key={badge.id} />
+              ))}
+            </View>
+          </View>
+
+          <PrivacyNote />
+        </>
+      ) : null}
+    </Screen>
+  );
+}

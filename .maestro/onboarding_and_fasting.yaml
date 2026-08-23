@@ -1,0 +1,39 @@
+appId: com.kynio.app
+name: Onboarding legal e início de jejum
+---
+- launchApp:
+    clearState: true
+
+- assertVisible: "Antes de começar"
+- assertVisible: "Esta app é uma ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico, nutricional ou de treino."
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+
+- tapOn:
+    id: "legal-terms-checkbox"
+- assertVisible:
+    id: "legal-terms-checkbox"
+    checked: true
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Jejum"
+- assertVisible:
+    id: "fasting-timer"
+    text: ".*Jejum Inativo.*"
+
+- tapOn:
+    id: "start-fasting-button"
+    enabled: true
+- assertVisible:
+    id: "fasting-timer"
+    text: ".*Jejum Ativo.*"
+- extendedWaitUntil:
+    visible:
+      id: "fasting-timer"
+      text: ".*temporizador 00:00:(0[1-9]|[1-5][0-9]), Jejum Ativo.*"
+    timeout: 12000

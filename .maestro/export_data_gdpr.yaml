@@ -1,0 +1,48 @@
+appId: com.kynio.app
+name: Exportação local de dados RGPD
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+
+- tapOn:
+    id: "privacy-settings-button"
+- assertVisible: "Privacidade e dados"
+- tapOn:
+    id: "export-data-button"
+    enabled: true
+
+# A exportação abre a folha nativa de partilha. Espera por ela e regressa à app.
+- extendedWaitUntil:
+    notVisible:
+      id: "export-data-button"
+    timeout: 15000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          text: "(Close|Cancel|Fechar|Cancelar)"
+
+- extendedWaitUntil:
+    visible:
+      id: "export-success-message"
+    timeout: 15000
+- assertVisible: 'Exportação preparada: kynio-dados-.*\.json'
