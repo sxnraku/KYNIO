@@ -19,6 +19,23 @@ jest.mock('@/services/localMealImageService', () => ({
   persistMealImage: jest.fn(),
 }));
 
+jest.mock('@/components/ui/meal-camera-modal', () => {
+  const React = require('react') as typeof import('react');
+  const { Text } = require('react-native') as typeof import('react-native');
+
+  return {
+    MealCameraModal: ({ visible }: { visible: boolean }) =>
+      visible
+        ? React.createElement(
+            React.Fragment,
+            null,
+            React.createElement(Text, null, 'Fotografar refeição'),
+            React.createElement(Text, null, 'Pré-visualização em direto'),
+          )
+        : null,
+  };
+});
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     back: jest.fn(),
@@ -114,7 +131,7 @@ describe('MealScanCard', () => {
 
     expect(await screen.findByText('Fotografar refeição')).toBeTruthy();
     expect(screen.getByText('Pré-visualização em direto')).toBeTruthy();
-  }, 15_000);
+  });
 
   it('renderiza nome, tag e calorias de um payload JSON válido da IA', async () => {
     await renderAnalyzedMeal();
