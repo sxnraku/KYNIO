@@ -76,21 +76,22 @@ export function MealAnalysisCard({
       </View>
 
       <View className="mt-5 rounded-xl border border-success/20 bg-success/5 p-4">
-        <View className="flex-row items-center justify-between gap-4">
-          <View>
+        <View className="flex-row items-center gap-4">
+          <View className="min-w-0 flex-1">
             <Text className="font-label text-[10px] uppercase tracking-widest text-muted">
               Calorias estimadas
             </Text>
             <Text className="mt-1 font-body text-xs text-muted">Toca no valor para ajustar</Text>
           </View>
-          <View className="flex-row items-end">
+          <View className="flex-row items-end" style={{ flexShrink: 0 }}>
             <TextInput
               accessibilityLabel="Calorias estimadas, editável"
-              className="min-w-20 p-0 text-right font-headline text-3xl text-success"
+              className="p-0 text-right font-headline text-3xl text-success"
               inputMode="numeric"
               keyboardType="number-pad"
               onChangeText={(value) => onChangeNutrition('estimatedCalories', value)}
               selectTextOnFocus
+              style={{ width: 88 }}
               value={editableNutrition.estimatedCalories}
             />
             <Text className="mb-1 ml-1 font-body text-sm text-muted">kcal</Text>
