@@ -23,12 +23,12 @@ export function ProfileAchievementsCard({
   const [isSharing, setIsSharing] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
-  const unlockedBadges =
-    snapshot?.badges.filter((badge) => badge.unlocked) ?? [];
   const sharePayload = useMemo<AchievementSharePayload | null>(() => {
     if (!snapshot) {
       return null;
     }
+
+    const unlockedBadges = snapshot.badges.filter((badge) => badge.unlocked);
 
     return {
       badgeTitles: unlockedBadges.map((badge) => badge.title),
@@ -38,7 +38,7 @@ export function ProfileAchievementsCard({
       streakDays: snapshot.stats.streakDays,
       totalXp: snapshot.profile.totalXp,
     };
-  }, [language, snapshot, unlockedBadges]);
+  }, [language, snapshot]);
 
   const shareAchievements = async () => {
     if (!sharePayload || isSharing) {

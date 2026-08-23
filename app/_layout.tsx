@@ -1,13 +1,11 @@
 import "../global.css";
 
-import {
-  HankenGrotesk_400Regular,
-  HankenGrotesk_600SemiBold,
-  HankenGrotesk_700Bold,
-  HankenGrotesk_800ExtraBold,
-  useFonts,
-} from "@expo-google-fonts/hanken-grotesk";
-import { JetBrainsMono_500Medium } from "@expo-google-fonts/jetbrains-mono";
+import { HankenGrotesk_400Regular } from "@expo-google-fonts/hanken-grotesk/400Regular";
+import { HankenGrotesk_600SemiBold } from "@expo-google-fonts/hanken-grotesk/600SemiBold";
+import { HankenGrotesk_700Bold } from "@expo-google-fonts/hanken-grotesk/700Bold";
+import { HankenGrotesk_800ExtraBold } from "@expo-google-fonts/hanken-grotesk/800ExtraBold";
+import { JetBrainsMono_500Medium } from "@expo-google-fonts/jetbrains-mono/500Medium";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";

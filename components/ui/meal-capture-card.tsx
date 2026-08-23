@@ -137,8 +137,10 @@ export function MealCaptureCard({
           size={15}
         />
         <Text className="flex-1 font-body text-xs leading-4 text-muted">
-          Só a fotografia e a descrição desta análise são enviadas à API. A
-          resposta não é armazenada remotamente pela app.
+          Ao tocar em Analisar, autorizas o envio desta fotografia e/ou
+          descrição, através do KYNIO, para a Google Gemini. O restante
+          histórico e o ID da conta não são enviados. A app não guarda a
+          fotografia nem a resposta remotamente.
         </Text>
       </View>
     </Card>

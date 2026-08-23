@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 
 export type ProfileSection = "profile" | "friends" | "settings";
 
-const SECTIONS: Array<{ id: ProfileSection; label: string }> = [
+const SECTIONS: { id: ProfileSection; label: string }[] = [
   { id: "profile", label: "Perfil" },
   { id: "friends", label: "Amigos" },
   { id: "settings", label: "Definições" },

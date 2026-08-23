@@ -20,8 +20,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A tua jornada": "Your journey",
   "Acompanha o teu ritmo, sem pressão.": "Track your rhythm, without pressure.",
   "Acompanhar hábitos ao meu ritmo.": "Tracking habits at my own pace.",
-  "A análise de refeição envia apenas a fotografia e/ou descrição escolhida para a API; o restante histórico não acompanha esse pedido.":
-    "Meal analysis only sends the chosen photo and/or description to the API; the rest of your history is not included.",
+  "A análise de refeição envia apenas a fotografia e/ou descrição escolhida, através do KYNIO, para a Google Gemini; o restante histórico e o ID da conta não acompanham esse pedido.":
+    "Meal analysis only sends the chosen photo and/or description through KYNIO to Google Gemini; the rest of your history and account ID are not included.",
   "A cloud só é usada após ligares uma conta. A aplicação não substitui aconselhamento profissional.":
     "Cloud sync is only used after you connect an account. The app does not replace professional advice.",
   "A exportação abre o seletor do sistema; só sai do dispositivo quando escolhes um destino.":
@@ -33,6 +33,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Open the live camera, choose a gallery image or describe what you ate.",
   "Abrir definições": "Open settings",
   "Ainda sem atividades": "No activities yet",
+  "Ajuda e suporte": "Help and support",
   Amigos: "Friends",
   "Analisar refeição": "Analyse meal",
   "Antes de começar": "Before you begin",
@@ -81,6 +82,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Desbloqueadas pelos teus registos locais.":
     "Unlocked by your local records.",
   "Desligar conta Google": "Disconnect Google account",
+  "Documentos e suporte": "Documents and support",
   Digestão: "Digestion",
   "Dias seguidos": "Day streak",
   Disciplinado: "Disciplined",
@@ -88,6 +90,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Editar objetivo": "Edit target",
   Elevado: "High",
   "Eliminar definitivamente": "Delete permanently",
+  "Eliminar conta pela web": "Delete account on the web",
   "Eliminar Todos os Dados": "Delete All Data",
   "Eliminar todos os dados?": "Delete all data?",
   "Em Movimento": "On the Move",
@@ -163,6 +166,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Na tua lista privada": "In your private list",
   "Não são partilhados jejuns, refeições ou treinos automaticamente.":
     "Fasts, meals and workouts are not shared automatically.",
+  "Não foi possível abrir o documento. Tenta novamente.":
+    "The document could not be opened. Please try again.",
   "Nenhuma análise": "No analysis",
   Nível: "Level",
   "Nível atual": "Current level",
@@ -187,6 +192,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Perfil local privado": "Private local profile",
   "Permitir acesso à câmara": "Allow camera access",
   Português: "Portuguese",
+  "Política de Privacidade": "Privacy Policy",
   Preferências: "Preferences",
   "Primeiras 50h": "First 50h",
   "Primeiro Objetivo": "First Target",
@@ -218,6 +224,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Only this analysis photo and description are sent to the API. The response is not stored remotely by the app.",
   Sobre: "About",
   "Terminar Jejum": "End Fast",
+  "Termos de Utilização": "Terms of Use",
   "Toca no valor para ajustar": "Tap the value to adjust",
   Treinos: "Workouts",
   "Uma ferramenta de registo, não de prescrição":
@@ -246,8 +253,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Fasts, meals, progress and confirmed photos always remain available on this device.",
   "Notas opcionais: percurso, como te sentiste…":
     "Optional notes: route, how you felt…",
-  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada à API quando pedes uma análise.":
-    "History starts on your device. If you connect a Google account, profile, friends and logs are also synced remotely across your devices. A meal photo is only sent to the API when you request an analysis.",
+  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
+    "History starts on your device. If you connect a Google account, profile, friends and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
   "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.":
     "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Uma frase sobre o teu ritmo, objetivos ou motivação.":
@@ -257,6 +264,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Acumula 50 horas registadas.": "Accumulate 50 logged hours.",
   "Ao ligares uma conta Google, perfil, amigos e registos são também sincronizados para permitir utilização em vários dispositivos.":
     "When you connect a Google account, profile, friends and logs are also synced for use across multiple devices.",
+  "Ao tocar em Analisar, autorizas o envio desta fotografia e/ou descrição, através do KYNIO, para a Google Gemini. O restante histórico e o ID da conta não são enviados. A app não guarda a fotografia nem a resposta remotamente.":
+    "By tapping Analyse, you authorise KYNIO to send this photo and/or description to Google Gemini. Your other history and account ID are not sent. The app does not remotely store the photo or response.",
   "As categorias e o esforço percebido são descritivos. Não constituem aconselhamento médico ou de treino e não substituem orientação profissional adequada ao teu caso.":
     "Categories and perceived effort are descriptive. They are not medical or training advice and do not replace professional guidance suited to your situation.",
   "Confiança alta": "High confidence",

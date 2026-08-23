@@ -4,59 +4,17 @@ import type {
   MealAnalysisResult,
 } from '@/types/meal';
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const GEMINI_MODEL = 'gemini-3.7-flash';
-
-export const MEAL_ANALYSIS_SYSTEM_PROMPT = `Tu és um classificador descritivo de refeições para um tracker de hábitos.
-Não dês aconselhamento médico, nutricional ou prescritivo.
-Analisa apenas os alimentos fornecidos pelo utilizador e devolve estimativas prudentes.
-Responde EXCLUSIVAMENTE com JSON válido, sem Markdown, explicações ou texto adicional, exatamente neste formato:
-{
-  "dish_name": "Nome simples do prato",
-  "estimated_calories": 550,
-  "macros": { "protein_g": 35, "carbs_g": 50, "fat_g": 15 },
-  "tags": ["Proteico", "Quebra Suave"],
-  "confidence": "high"
-}
-Usa apenas "low", "medium" ou "high" em confidence. Todos os valores numéricos devem ser não negativos.`;
-
-const MEAL_ANALYSIS_JSON_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['dish_name', 'estimated_calories', 'macros', 'tags', 'confidence'],
-  properties: {
-    dish_name: { type: 'string' },
-    estimated_calories: { type: 'integer' },
-    macros: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['protein_g', 'carbs_g', 'fat_g'],
-      properties: {
-        protein_g: { type: 'number' },
-        carbs_g: { type: 'number' },
-        fat_g: { type: 'number' },
-      },
-    },
-    tags: {
-      type: 'array',
-      items: { type: 'string' },
-    },
-    confidence: { type: 'string', enum: ['low', 'medium', 'high'] },
-  },
-} as const;
-
-interface GeminiTextPart {
-  text: string;
-}
-
-interface GeminiImagePart {
-  inlineData: {
-    data: string;
-    mimeType: string;
-  };
-}
-
-type GeminiPart = GeminiImagePart | GeminiTextPart;
+const ANALYZE_MEAL_FUNCTION = 'analyze-meal';
+const ANALYSIS_TIMEOUT_MS = 45_000;
+const MAX_DESCRIPTION_LENGTH = 1_000;
+const MAX_IMAGE_BASE64_LENGTH = 11_200_000;
+const SUPPORTED_IMAGE_TYPES = new Set([
+  'image/heic',
+  'image/heif',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -74,7 +32,7 @@ function isConfidence(value: unknown): value is MealAnalysisConfidence {
   return value === 'low' || value === 'medium' || value === 'high';
 }
 
-function parseMealAnalysis(value: unknown): MealAnalysisResult {
+export function parseMealAnalysis(value: unknown): MealAnalysisResult {
   if (
     !isRecord(value) ||
     !hasOnlyKeys(value, ['dish_name', 'estimated_calories', 'macros', 'tags', 'confidence']) ||
@@ -108,103 +66,102 @@ function parseMealAnalysis(value: unknown): MealAnalysisResult {
   };
 }
 
-function getResponseOutputText(payload: unknown): string {
-  if (!isRecord(payload) || !Array.isArray(payload.candidates)) {
-    throw new Error('A API não devolveu uma análise. Tenta novamente.');
+function getFunctionConfiguration(): { publishableKey: string; url: string } {
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();
+  const publishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+
+  if (!supabaseUrl || !publishableKey) {
+    throw new Error('A análise de refeições ainda não está configurada neste ambiente.');
   }
 
-  for (const candidate of payload.candidates) {
-    if (!isRecord(candidate) || !isRecord(candidate.content) || !Array.isArray(candidate.content.parts)) {
-      continue;
-    }
-
-    for (const part of candidate.content.parts) {
-      if (isRecord(part) && typeof part.text === 'string' && part.text.trim().length > 0) {
-        return part.text;
-      }
-    }
-  }
-
-  throw new Error('A API não devolveu uma análise. Tenta novamente.');
+  return {
+    publishableKey,
+    url: `${supabaseUrl.replace(/\/$/, '')}/functions/v1/${ANALYZE_MEAL_FUNCTION}`,
+  };
 }
 
-function getApiKey(): string {
-  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY?.trim();
-
-  if (!apiKey) {
-    throw new Error('Configura EXPO_PUBLIC_GEMINI_API_KEY para analisar refeições.');
-  }
-
-  return apiKey;
-}
-
-function buildUserContent(input: AnalyzeMealInput): GeminiPart[] {
+function validateInput(input: AnalyzeMealInput): AnalyzeMealInput {
   const description = input.description?.trim();
-  const content: GeminiPart[] = [
-    {
-      text: description
-        ? `Descrição da refeição: ${description}`
-        : 'Identifica e estima a refeição visível na imagem.',
-    },
-  ];
 
-  if (input.image) {
-    content.push({
-      inlineData: {
-        data: input.image.base64,
-        mimeType: input.image.mimeType,
-      },
-    });
-  }
-
-  return content;
-}
-
-export async function analyzeMeal(input: AnalyzeMealInput): Promise<MealAnalysisResult> {
-  if (!input.description?.trim() && !input.image) {
+  if (!description && !input.image) {
     throw new Error('Adiciona uma fotografia ou descreve a refeição.');
   }
 
-  const response = await fetch(`${GEMINI_API_URL}/${GEMINI_MODEL}:generateContent`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-goog-api-key': getApiKey(),
-    },
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: buildUserContent(input) }],
-      generationConfig: {
-        maxOutputTokens: 300,
-        responseJsonSchema: MEAL_ANALYSIS_JSON_SCHEMA,
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-      },
-      store: false,
-      systemInstruction: { parts: [{ text: MEAL_ANALYSIS_SYSTEM_PROMPT }] },
-    }),
-  });
-
-  const payload: unknown = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      response.status === 401 || response.status === 403
-        ? 'A chave Gemini não é válida ou não tem acesso ao modelo.'
-        : response.status === 429
-          ? 'O limite gratuito da Gemini foi atingido. Tenta novamente mais tarde.'
-          : 'Não foi possível analisar a refeição neste momento. Tenta novamente.',
-    );
+  if (description && description.length > MAX_DESCRIPTION_LENGTH) {
+    throw new Error('A descrição é demasiado longa. Usa até 1000 caracteres.');
   }
 
-  const outputText = getResponseOutputText(payload);
+  if (input.image) {
+    if (!SUPPORTED_IMAGE_TYPES.has(input.image.mimeType.toLowerCase())) {
+      throw new Error('Usa uma imagem JPEG, PNG, WebP, HEIC ou HEIF.');
+    }
+
+    if (!input.image.base64 || input.image.base64.length > MAX_IMAGE_BASE64_LENGTH) {
+      throw new Error('A fotografia é demasiado grande. Escolhe uma imagem até 8 MB.');
+    }
+  }
+
+  return {
+    description: description || undefined,
+    image: input.image,
+  };
+}
+
+function getRemoteErrorMessage(status: number, payload: unknown): string {
+  if (isRecord(payload) && typeof payload.error === 'string' && payload.error.trim()) {
+    return payload.error.trim();
+  }
+
+  if (status === 413) {
+    return 'A fotografia é demasiado grande. Escolhe uma imagem até 8 MB.';
+  }
+
+  if (status === 429) {
+    return 'Foram feitas muitas análises. Tenta novamente dentro de alguns minutos.';
+  }
+
+  return 'Não foi possível analisar a refeição neste momento. Tenta novamente.';
+}
+
+async function readJsonResponse(response: Response): Promise<unknown> {
+  try {
+    return (await response.json()) as unknown;
+  } catch {
+    throw new Error('O serviço de análise devolveu uma resposta inválida. Tenta novamente.');
+  }
+}
+
+export async function analyzeMeal(input: AnalyzeMealInput): Promise<MealAnalysisResult> {
+  const safeInput = validateInput(input);
+  const { publishableKey, url } = getFunctionConfiguration();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ANALYSIS_TIMEOUT_MS);
 
   try {
-    return parseMealAnalysis(JSON.parse(outputText) as unknown);
+    const response = await fetch(url, {
+      body: JSON.stringify(safeInput),
+      headers: {
+        apikey: publishableKey,
+        Authorization: `Bearer ${publishableKey}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      signal: controller.signal,
+    });
+    const payload = await readJsonResponse(response);
+
+    if (!response.ok) {
+      throw new Error(getRemoteErrorMessage(response.status, payload));
+    }
+
+    return parseMealAnalysis(payload);
   } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new Error('A análise recebida não está em JSON válido. Tenta novamente.');
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('A análise demorou demasiado tempo. Tenta novamente.');
     }
 
     throw error;
+  } finally {
+    clearTimeout(timeout);
   }
 }

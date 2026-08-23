@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
@@ -14,27 +14,48 @@ import {
 import { ProfileSettingsPanel } from "@/components/ui/profile-settings-panel";
 import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
+import type { UserProfileRecord } from "@/db/schema";
 import { useGamificationProgress } from "@/hooks/use-gamification-progress";
 import { useLocalProfile } from "@/hooks/use-local-profile";
+
+interface ProfileEditorProps {
+  isSaving: boolean;
+  onPickAvatar: () => void;
+  onRemoveAvatar: () => void;
+  onSave: (input: { bio: string; displayName: string }) => void;
+  profile: UserProfileRecord;
+}
+
+function ProfileEditor({
+  isSaving,
+  onPickAvatar,
+  onRemoveAvatar,
+  onSave,
+  profile,
+}: ProfileEditorProps) {
+  const [bio, setBio] = useState(profile.bio);
+  const [displayName, setDisplayName] = useState(profile.displayName);
+
+  return (
+    <ProfileHeroCard
+      avatarUri={profile.avatarUri}
+      bio={bio}
+      displayName={displayName}
+      isSaving={isSaving}
+      onChangeBio={setBio}
+      onChangeDisplayName={setDisplayName}
+      onPickAvatar={onPickAvatar}
+      onRemoveAvatar={onRemoveAvatar}
+      onSave={() => onSave({ bio, displayName })}
+    />
+  );
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
   const localProfile = useLocalProfile();
   const gamification = useGamificationProgress();
   const [activeSection, setActiveSection] = useState<ProfileSection>("profile");
-  const [bio, setBio] = useState("");
-  const [displayName, setDisplayName] = useState("");
-
-  useEffect(() => {
-    if (localProfile.profile) {
-      setBio(localProfile.profile.bio);
-      setDisplayName(localProfile.profile.displayName);
-    }
-  }, [
-    localProfile.profile?.bio,
-    localProfile.profile?.displayName,
-    localProfile.profile?.id,
-  ]);
 
   return (
     <Screen>
@@ -77,16 +98,13 @@ export default function ProfileScreen() {
 
       {localProfile.profile && activeSection === "profile" ? (
         <View className="mt-4 gap-4">
-          <ProfileHeroCard
-            avatarUri={localProfile.profile.avatarUri}
-            bio={bio}
-            displayName={displayName}
+          <ProfileEditor
             isSaving={localProfile.isSaving}
-            onChangeBio={setBio}
-            onChangeDisplayName={setDisplayName}
+            key={`${localProfile.profile.id}:${localProfile.profile.profileUpdatedAt}:${localProfile.profile.avatarUri ?? "no-avatar"}`}
             onPickAvatar={() => void localProfile.pickAvatar()}
             onRemoveAvatar={() => void localProfile.removeAvatar()}
-            onSave={() => void localProfile.saveDetails({ bio, displayName })}
+            onSave={(input) => void localProfile.saveDetails(input)}
+            profile={localProfile.profile}
           />
           <ProfileAchievementsCard snapshot={gamification.snapshot} />
         </View>

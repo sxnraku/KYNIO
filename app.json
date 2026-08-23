@@ -6,18 +6,22 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon-kynio-v1.png",
     "scheme": "kynio",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.kynio.app",
       "icon": "./assets/images/icon-kynio-v1.png"
     },
     "android": {
       "package": "com.kynio.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#10B981",
         "foregroundImage": "./assets/images/icon-kynio-v1.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -72,6 +76,18 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "headers": {
+          "Cross-Origin-Embedder-Policy": "credentialless",
+          "Cross-Origin-Opener-Policy": "same-origin"
+        }
+      },
+      "eas": {
+        "projectId": "7e124bb7-7aee-4da9-a08b-672bee831b21"
+      }
+    },
+    "owner": "sxnraku"
   }
 }

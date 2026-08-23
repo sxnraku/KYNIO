@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, View } from "react-native";
+import { Alert, Linking, Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,6 +14,10 @@ import {
   exportAllLocalData,
 } from "@/services/dataPrivacyService";
 import { translateText } from "@/services/i18n";
+import {
+  getLegalDocumentUrl,
+  type LegalDocument,
+} from "@/services/legalLinks";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 import { useUserProgressStore } from "@/store/user-progress-store";
@@ -30,6 +34,15 @@ export default function SettingsScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const openLegalDocument = async (document: LegalDocument) => {
+    try {
+      setErrorMessage(null);
+      await Linking.openURL(getLegalDocumentUrl(document));
+    } catch {
+      setErrorMessage("Não foi possível abrir o documento. Tenta novamente.");
+    }
+  };
 
   const handleExport = async () => {
     if (isExporting || isDeleting) {
@@ -154,8 +167,8 @@ export default function SettingsScreen() {
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
               • A análise de refeição envia apenas a fotografia e/ou descrição
-              escolhida para a API; o restante histórico não acompanha esse
-              pedido.
+              escolhida, através do KYNIO, para a Google Gemini; o restante
+              histórico e o ID da conta não acompanham esse pedido.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
               • A exportação abre o seletor do sistema; só sai do dispositivo
@@ -220,6 +233,37 @@ export default function SettingsScreen() {
             vida e gamificação. Não presta aconselhamento médico, nutricional ou
             de treino.
           </Text>
+        </View>
+
+        <View className="mt-5 rounded-2xl border border-border bg-surface p-5">
+          <Text className="font-label text-[10px] uppercase tracking-widest text-success">
+            Documentos e suporte
+          </Text>
+          <View className="mt-3">
+            {(
+              [
+                ["Política de Privacidade", "privacy", "shield-checkmark-outline"],
+                ["Termos de Utilização", "terms", "document-text-outline"],
+                ["Eliminar conta pela web", "account-deletion", "person-remove-outline"],
+                ["Ajuda e suporte", "support", "help-circle-outline"],
+              ] as const
+            ).map(([label, document, icon], index) => (
+              <Pressable
+                accessibilityRole="link"
+                className={`min-h-14 flex-row items-center py-3 active:opacity-70 ${
+                  index > 0 ? "border-t border-border" : ""
+                }`}
+                key={document}
+                onPress={() => void openLegalDocument(document)}
+              >
+                <Ionicons color={COLORS.success} name={icon} size={21} />
+                <Text className="ml-3 flex-1 font-headline text-sm text-foreground">
+                  {label}
+                </Text>
+                <Ionicons color={COLORS.muted} name="open-outline" size={18} />
+              </Pressable>
+            ))}
+          </View>
         </View>
 
         <PrivacyNote />
