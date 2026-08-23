@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 
 import { COLORS } from '@/constants/colors';
 import { useUserProgress } from '@/hooks/use-user-progress';
@@ -16,9 +16,12 @@ export function AppHeader() {
         className="min-h-12 flex-row items-center justify-between"
         style={{ alignSelf: 'center', maxWidth: 560, width: '100%' }}>
         <View className="min-w-0 flex-1 flex-row items-center">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl border border-success/20 bg-success/10">
-            <Ionicons color={COLORS.success} name="sparkles" size={21} />
-          </View>
+          <Image
+            accessibilityLabel="Símbolo KYNIO"
+            resizeMode="cover"
+            source={require('../../assets/images/icon-kynio-v1.png')}
+            style={{ borderRadius: 16, height: 44, width: 44 }}
+          />
           <View className="ml-3 min-w-0 flex-1">
             <Text className="font-headline text-xl leading-6 text-foreground">KYNIO</Text>
             <Text className="mt-0.5 font-body text-xs text-muted">{formatLevelLabel(progress)}</Text>
