@@ -9,11 +9,12 @@ export function PrivacyNote() {
       <View className="flex-row items-center">
         <Ionicons color={COLORS.muted} name="lock-closed" size={13} />
         <Text className="ml-1.5 font-label text-[10px] text-muted">
-          Dados guardados neste dispositivo
+          Local por defeito · sincronização opcional
         </Text>
       </View>
       <Text className="mt-2 max-w-xs text-center font-body text-xs leading-4 text-muted opacity-70">
-        A aplicação acompanha hábitos e não substitui aconselhamento profissional.
+        A cloud só é usada após ligares uma conta. A aplicação não substitui aconselhamento
+        profissional.
       </Text>
     </View>
   );

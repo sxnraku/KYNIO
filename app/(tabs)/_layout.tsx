@@ -13,7 +13,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: COLORS.muted,
         tabBarLabelStyle: {
           fontFamily: 'HankenGrotesk_600SemiBold',
-          fontSize: 11,
+          fontSize: 10,
         },
         tabBarStyle: {
           alignSelf: 'center',
@@ -89,6 +89,22 @@ export default function TabsLayout() {
               color={color}
               focused={focused}
               inactiveName="medal-outline"
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Perfil',
+          tabBarActiveTintColor: COLORS.success,
+          tabBarIcon: ({ color, focused, size }) => (
+            <TabBarIcon
+              activeName="person-circle"
+              color={color}
+              focused={focused}
+              inactiveName="person-circle-outline"
               size={size}
             />
           ),

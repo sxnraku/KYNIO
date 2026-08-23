@@ -1,6 +1,8 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 
+import { PROFILE_IMAGES_DIRECTORY_NAME } from '@/services/localProfileImageService';
+
 const MEAL_IMAGES_DIRECTORY_NAME = 'meal-images';
 export const DATA_EXPORTS_DIRECTORY_NAME = 'data-exports';
 
@@ -42,6 +44,7 @@ export async function persistMealImage(sourceUri: string, mimeType: string): Pro
 export function deletePrivateLocalFiles(): void {
   const privateDirectories = [
     new Directory(Paths.document, MEAL_IMAGES_DIRECTORY_NAME),
+    new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME),
     new Directory(Paths.cache, DATA_EXPORTS_DIRECTORY_NAME),
   ];
 

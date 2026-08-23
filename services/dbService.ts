@@ -3,6 +3,8 @@ import { desc, eq } from 'drizzle-orm';
 import { getInitializedDatabase } from '@/db/client';
 import {
   fasts,
+  type FriendRecord,
+  friends,
   meals,
   type FastRecord,
   type MealRecord,
@@ -12,6 +14,7 @@ import {
   workouts,
 } from '@/db/schema';
 import { calculateLevel, getXpReward } from '@/services/gamificationService';
+import { requestCloudSync } from '@/services/cloudSyncScheduler';
 
 export interface SaveFastRecordInput {
   completed: boolean;
@@ -41,6 +44,20 @@ export interface SaveWorkoutRecordInput {
   xpEarned?: number;
 }
 
+export interface UpdateLocalProfileInput {
+  avatarRemotePath?: string | null;
+  avatarUri: string | null;
+  bio: string;
+  displayName: string;
+}
+
+export interface LinkCloudAccountInput {
+  avatarUrl: string | null;
+  displayName: string | null;
+  email: string | null;
+  userId: string;
+}
+
 function requireInsertedRecord<T>(record: T | undefined, entityName: string): T {
   if (!record) {
     throw new Error(`Não foi possível guardar o registo de ${entityName}.`);
@@ -53,7 +70,7 @@ export async function saveFastRecord(input: SaveFastRecordInput): Promise<FastRe
   const database = await getInitializedDatabase();
   const xpEarned = Math.max(0, Math.floor(input.xpEarned ?? 0));
 
-  return database.transaction(async (transaction) => {
+  const record = await database.transaction(async (transaction) => {
     const [savedRecord] = await transaction
       .insert(fasts)
       .values({ ...input, xpEarned })
@@ -79,6 +96,9 @@ export async function saveFastRecord(input: SaveFastRecordInput): Promise<FastRe
 
     return requireInsertedRecord(savedRecord, 'jejum');
   });
+
+  requestCloudSync();
+  return record;
 }
 
 export async function getFastRecords(): Promise<FastRecord[]> {
@@ -96,7 +116,7 @@ export async function saveMealRecord(input: SaveMealRecordInput): Promise<MealRe
   const database = await getInitializedDatabase();
   const xpEarned = Math.max(0, Math.floor(input.xpEarned ?? 0));
 
-  return database.transaction(async (transaction) => {
+  const record = await database.transaction(async (transaction) => {
     const [savedRecord] = await transaction
       .insert(meals)
       .values({ ...input, xpEarned })
@@ -122,6 +142,9 @@ export async function saveMealRecord(input: SaveMealRecordInput): Promise<MealRe
 
     return requireInsertedRecord(savedRecord, 'refeição');
   });
+
+  requestCloudSync();
+  return record;
 }
 
 export async function saveScannedMealRecord(
@@ -148,7 +171,7 @@ export async function saveWorkoutRecord(
   const xpEarned = Math.max(0, Math.floor(input.xpEarned ?? 0));
   const durationMinutes = Math.max(1, Math.floor(input.durationMinutes));
 
-  return database.transaction(async (transaction) => {
+  const record = await database.transaction(async (transaction) => {
     const [savedRecord] = await transaction
       .insert(workouts)
       .values({ ...input, durationMinutes, xpEarned })
@@ -174,6 +197,9 @@ export async function saveWorkoutRecord(
 
     return requireInsertedRecord(savedRecord, 'atividade');
   });
+
+  requestCloudSync();
+  return record;
 }
 
 export async function saveLoggedWorkoutRecord(
@@ -187,12 +213,126 @@ export async function getWorkoutRecords(): Promise<WorkoutRecord[]> {
   return database.select().from(workouts).orderBy(desc(workouts.timestamp));
 }
 
+export async function getFriendRecords(): Promise<FriendRecord[]> {
+  const database = await getInitializedDatabase();
+  return database.select().from(friends).orderBy(desc(friends.createdAt));
+}
+
+export async function saveFriendRecord(displayName: string): Promise<FriendRecord> {
+  const normalizedName = displayName.trim().slice(0, 40);
+
+  if (!normalizedName) {
+    throw new Error('Escreve o nome do amigo.');
+  }
+
+  const database = await getInitializedDatabase();
+  const [friend] = await database
+    .insert(friends)
+    .values({ createdAt: Date.now(), displayName: normalizedName })
+    .returning();
+
+  const record = requireInsertedRecord(friend, 'amigo');
+  requestCloudSync();
+  return record;
+}
+
+export async function deleteFriendRecord(id: number): Promise<void> {
+  const database = await getInitializedDatabase();
+  await database.delete(friends).where(eq(friends.id, id));
+  requestCloudSync();
+}
+
 export async function getUserProfile(): Promise<UserProfileRecord> {
   const database = await getInitializedDatabase();
   const [profile] = await database.select().from(userProfile).where(eq(userProfile.id, 1)).limit(1);
 
   if (!profile) {
     throw new Error('Não foi possível carregar o perfil local.');
+  }
+
+  return profile;
+}
+
+export async function updateLocalProfile(
+  input: UpdateLocalProfileInput,
+): Promise<UserProfileRecord> {
+  const displayName = input.displayName.trim().slice(0, 40);
+  const bio = input.bio.trim().slice(0, 160);
+
+  if (!displayName) {
+    throw new Error('O nome do perfil não pode ficar vazio.');
+  }
+
+  const database = await getInitializedDatabase();
+  const [profile] = await database
+    .update(userProfile)
+    .set({
+      ...(input.avatarRemotePath !== undefined
+        ? { avatarRemotePath: input.avatarRemotePath }
+        : {}),
+      avatarUri: input.avatarUri,
+      bio,
+      displayName,
+      profileUpdatedAt: Date.now(),
+    })
+    .where(eq(userProfile.id, 1))
+    .returning();
+
+  if (!profile) {
+    throw new Error('Não foi possível atualizar o perfil local.');
+  }
+
+  requestCloudSync(1_200);
+  return profile;
+}
+
+export async function linkCloudAccount(
+  input: LinkCloudAccountInput,
+): Promise<UserProfileRecord> {
+  const database = await getInitializedDatabase();
+  const currentProfile = await getUserProfile();
+  const shouldUseGoogleName = currentProfile.displayName === 'Utilizador KYNIO';
+  const [profile] = await database
+    .update(userProfile)
+    .set({
+      avatarUri: currentProfile.avatarUri ?? input.avatarUrl,
+      cloudLinkedAt: Date.now(),
+      cloudUserId: input.userId,
+      displayName:
+        shouldUseGoogleName && input.displayName ? input.displayName : currentProfile.displayName,
+      googleAvatarUrl: input.avatarUrl,
+      googleDisplayName: input.displayName,
+      googleEmail: input.email,
+      profileUpdatedAt:
+        shouldUseGoogleName && input.displayName ? Date.now() : currentProfile.profileUpdatedAt,
+    })
+    .where(eq(userProfile.id, 1))
+    .returning();
+
+  if (!profile) {
+    throw new Error('Não foi possível associar a conta Google ao perfil local.');
+  }
+
+  requestCloudSync();
+  return profile;
+}
+
+export async function unlinkCloudAccount(): Promise<UserProfileRecord> {
+  const database = await getInitializedDatabase();
+  const [profile] = await database
+    .update(userProfile)
+    .set({
+      cloudLinkedAt: null,
+      cloudUserId: null,
+      googleAvatarUrl: null,
+      googleDisplayName: null,
+      googleEmail: null,
+    })
+    .where(eq(userProfile.id, 1))
+    .returning();
+
+  if (!profile) {
+    throw new Error('Não foi possível desligar a conta Google.');
   }
 
   return profile;
@@ -211,6 +351,7 @@ export async function updateUserProfileStreak(streakDays: number): Promise<UserP
     throw new Error('Não foi possível atualizar a linha de consistência.');
   }
 
+  requestCloudSync();
   return profile;
 }
 
