@@ -1,7 +1,8 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_GEMINI_MODEL = 'gemini-3.7-flash';
+const GEMINI_API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models';
+const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
 const MAX_BODY_BYTES = 12_000_000;
 const MAX_DESCRIPTION_LENGTH = 1_000;
 const MAX_IMAGE_BASE64_LENGTH = 11_200_000;
@@ -69,7 +70,12 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isNumberInRange(value: unknown, maximum: number): value is number {
-  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= maximum;
+  return (
+    typeof value === 'number' &&
+    Number.isFinite(value) &&
+    value >= 0 &&
+    value <= maximum
+  );
 }
 
 function parseInput(value: unknown): AnalysisInput {
@@ -77,7 +83,10 @@ function parseInput(value: unknown): AnalysisInput {
     throw new Error('Pedido inválido.');
   }
 
-  const description = typeof value.description === 'string' ? value.description.trim() : undefined;
+  const description =
+    typeof value.description === 'string'
+      ? value.description.trim()
+      : undefined;
   let image: AnalysisInput['image'];
 
   if (value.image !== undefined) {
@@ -89,10 +98,15 @@ function parseInput(value: unknown): AnalysisInput {
       value.image.base64.length === 0 ||
       value.image.base64.length > MAX_IMAGE_BASE64_LENGTH
     ) {
-      throw new Error('A fotografia deve ser JPEG, PNG, WebP, HEIC ou HEIF e ter até 8 MB.');
+      throw new Error(
+        'A fotografia deve ser JPEG, PNG, WebP, HEIC ou HEIF e ter até 8 MB.',
+      );
     }
 
-    image = { base64: value.image.base64, mimeType: value.image.mimeType.toLowerCase() };
+    image = {
+      base64: value.image.base64,
+      mimeType: value.image.mimeType.toLowerCase(),
+    };
   }
 
   if (!description && !image) {
@@ -121,9 +135,14 @@ function parseAnalysis(value: unknown): MealAnalysis {
     !Array.isArray(value.tags) ||
     value.tags.length > 6 ||
     !value.tags.every(
-      (tag) => typeof tag === 'string' && tag.trim().length > 0 && tag.trim().length <= 32,
+      (tag) =>
+        typeof tag === 'string' &&
+        tag.trim().length > 0 &&
+        tag.trim().length <= 32,
     ) ||
-    (value.confidence !== 'low' && value.confidence !== 'medium' && value.confidence !== 'high')
+    (value.confidence !== 'low' &&
+      value.confidence !== 'medium' &&
+      value.confidence !== 'high')
   ) {
     throw new Error('A resposta da IA não respeita o contrato esperado.');
   }
@@ -147,7 +166,11 @@ function getOutputText(payload: unknown): string {
   }
 
   for (const candidate of payload.candidates) {
-    if (!isRecord(candidate) || !isRecord(candidate.content) || !Array.isArray(candidate.content.parts)) {
+    if (
+      !isRecord(candidate) ||
+      !isRecord(candidate.content) ||
+      !Array.isArray(candidate.content.parts)
+    ) {
       continue;
     }
 
@@ -180,7 +203,8 @@ function getCorsHeaders(request: Request): Record<string, string> | null {
   }
 
   return {
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers':
+      'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Origin': origin ?? '*',
     Vary: 'Origin',
@@ -193,17 +217,31 @@ function jsonResponse(
   corsHeaders: Record<string, string>,
 ): Response {
   return new Response(JSON.stringify(body), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+    },
     status,
   });
 }
 
-async function hashRateLimitKey(request: Request, salt: string, windowStart: number): Promise<string> {
-  const forwardedAddress = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  const address = forwardedAddress || request.headers.get('cf-connecting-ip') || 'unknown';
+async function hashRateLimitKey(
+  request: Request,
+  salt: string,
+  windowStart: number,
+): Promise<string> {
+  const forwardedAddress = request.headers
+    .get('x-forwarded-for')
+    ?.split(',')[0]
+    ?.trim();
+  const address =
+    forwardedAddress || request.headers.get('cf-connecting-ip') || 'unknown';
   const bytes = new TextEncoder().encode(`${salt}:${address}:${windowStart}`);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
 }
 
 async function consumeRateLimit(request: Request): Promise<boolean> {
@@ -216,8 +254,13 @@ async function consumeRateLimit(request: Request): Promise<boolean> {
   }
 
   const now = Date.now();
-  const windowStart = Math.floor(now / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS;
-  const requestKey = await hashRateLimitKey(request, rateLimitSalt, windowStart);
+  const windowStart =
+    Math.floor(now / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS;
+  const requestKey = await hashRateLimitKey(
+    request,
+    rateLimitSalt,
+    windowStart,
+  );
   const client = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
@@ -235,7 +278,9 @@ async function consumeRateLimit(request: Request): Promise<boolean> {
   return data === true;
 }
 
-function buildGeminiParts(input: AnalysisInput): Array<Record<string, unknown>> {
+function buildGeminiParts(
+  input: AnalysisInput,
+): Array<Record<string, unknown>> {
   const parts: Array<Record<string, unknown>> = [
     {
       text: input.description
@@ -245,7 +290,9 @@ function buildGeminiParts(input: AnalysisInput): Array<Record<string, unknown>> 
   ];
 
   if (input.image) {
-    parts.push({ inlineData: { data: input.image.base64, mimeType: input.image.mimeType } });
+    parts.push({
+      inlineData: { data: input.image.base64, mimeType: input.image.mimeType },
+    });
   }
 
   return parts;
@@ -269,13 +316,20 @@ Deno.serve(async (request) => {
   const contentLength = Number(request.headers.get('content-length') ?? '0');
 
   if (contentLength > MAX_BODY_BYTES) {
-    return jsonResponse({ error: 'A fotografia é demasiado grande.' }, 413, corsHeaders);
+    return jsonResponse(
+      { error: 'A fotografia é demasiado grande.' },
+      413,
+      corsHeaders,
+    );
   }
 
   try {
     if (!(await consumeRateLimit(request))) {
       return jsonResponse(
-        { error: 'Limite temporário de análises atingido. Tenta novamente mais tarde.' },
+        {
+          error:
+            'Limite temporário de análises atingido. Tenta novamente mais tarde.',
+        },
         429,
         corsHeaders,
       );
@@ -289,21 +343,28 @@ Deno.serve(async (request) => {
       throw new Error('O serviço de análise não está configurado.');
     }
 
-    const geminiResponse = await fetch(`${GEMINI_API_URL}/${model}:generateContent`, {
-      body: JSON.stringify({
-        contents: [{ parts: buildGeminiParts(input), role: 'user' }],
-        generationConfig: {
-          maxOutputTokens: 300,
-          responseJsonSchema: RESPONSE_SCHEMA,
-          responseMimeType: 'application/json',
-          temperature: 0.2,
+    const geminiResponse = await fetch(
+      `${GEMINI_API_URL}/${model}:generateContent`,
+      {
+        body: JSON.stringify({
+          contents: [{ parts: buildGeminiParts(input), role: 'user' }],
+          generationConfig: {
+            maxOutputTokens: 300,
+            responseJsonSchema: RESPONSE_SCHEMA,
+            responseMimeType: 'application/json',
+            temperature: 0.2,
+            thinkingConfig: { thinkingLevel: 'low' },
+          },
+          store: false,
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
         },
-        store: false,
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      }),
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      method: 'POST',
-    });
+        method: 'POST',
+      },
+    );
     const geminiPayload = (await geminiResponse.json()) as unknown;
 
     if (!geminiResponse.ok) {
@@ -311,15 +372,25 @@ Deno.serve(async (request) => {
       const message =
         status === 429
           ? 'O serviço de análise está temporariamente ocupado. Tenta novamente mais tarde.'
-          : 'O serviço de análise não respondeu corretamente.';
+          : geminiResponse.status === 401 || geminiResponse.status === 403
+            ? 'A credencial do serviço de análise precisa de ser atualizada.'
+            : 'O serviço de análise não respondeu corretamente.';
       return jsonResponse({ error: message }, status, corsHeaders);
     }
 
-    const analysis = parseAnalysis(JSON.parse(getOutputText(geminiPayload)) as unknown);
+    const analysis = parseAnalysis(
+      JSON.parse(getOutputText(geminiPayload)) as unknown,
+    );
     return jsonResponse(analysis, 200, corsHeaders);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Não foi possível analisar a refeição.';
-    const status = message.includes('fotografia') || message.includes('descrição') ? 400 : 500;
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Não foi possível analisar a refeição.';
+    const status =
+      message.includes('fotografia') || message.includes('descrição')
+        ? 400
+        : 500;
     return jsonResponse({ error: message }, status, corsHeaders);
   }
 });

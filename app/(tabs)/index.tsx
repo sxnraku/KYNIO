@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { FastingSummaryCard } from "@/components/ui/fasting-summary-card";
@@ -38,6 +38,7 @@ function getTodayLabel(language: "en" | "pt"): string {
 export default function HomeScreen() {
   const language = useAppPreferencesStore((state) => state.language);
   const goal = useFastingStore((state) => state.goal);
+  const hasHydrated = useFastingStore((state) => state.hasHydrated);
   const isActive = useFastingStore((state) => state.isActive);
   const isSaving = useFastingStore((state) => state.isSaving);
   const persistenceError = useFastingStore((state) => state.persistenceError);
@@ -46,6 +47,19 @@ export default function HomeScreen() {
   const currentPhase =
     ESTIMATED_METABOLIC_PHASES[getEstimatedPhaseIndex(elapsedHours)] ??
     ESTIMATED_METABOLIC_PHASES[0];
+
+  if (!hasHydrated) {
+    return (
+      <Screen>
+        <View className="flex-1 items-center justify-center py-24">
+          <ActivityIndicator color={COLORS.success} size="large" />
+          <Text className="mt-4 font-body text-sm text-muted">
+            A recuperar o jejum em curso…
+          </Text>
+        </View>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>

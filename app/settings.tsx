@@ -6,6 +6,7 @@ import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PrivacyNote } from "@/components/ui/privacy-note";
+import { CloudAccountCard } from "@/components/ui/cloud-account-card";
 import { PreferenceControls } from "@/components/ui/preference-controls";
 import { SettingsActionCard } from "@/components/ui/settings-action-card";
 import { COLORS } from "@/constants/colors";
@@ -14,10 +15,7 @@ import {
   exportAllLocalData,
 } from "@/services/dataPrivacyService";
 import { translateText } from "@/services/i18n";
-import {
-  getLegalDocumentUrl,
-  type LegalDocument,
-} from "@/services/legalLinks";
+import { getLegalDocumentUrl, type LegalDocument } from "@/services/legalLinks";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 import { useUserProgressStore } from "@/store/user-progress-store";
@@ -95,7 +93,7 @@ export default function SettingsScreen() {
     Alert.alert(
       translateText("Eliminar todos os dados?", language),
       translateText(
-        "Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.",
+        "Esta ação elimina permanentemente jejuns, refeições, peso, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.",
         language,
       ),
       [
@@ -121,7 +119,7 @@ export default function SettingsScreen() {
           <Ionicons color={COLORS.foreground} name="arrow-back" size={20} />
         </Pressable>
         <Text className="ml-3 font-headline text-xl text-foreground">
-          Privacidade e dados
+          Definições
         </Text>
       </View>
 
@@ -135,6 +133,10 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <PreferenceControls />
+
+        <View className="mt-5">
+          <CloudAccountCard onLocalDataChanged={() => undefined} />
+        </View>
 
         <View className="mt-5 rounded-2xl border border-success/20 bg-success/5 p-5">
           <View className="flex-row items-center gap-3">
@@ -157,11 +159,11 @@ export default function SettingsScreen() {
 
           <View className="mt-5 gap-3">
             <Text className="font-body text-sm leading-5 text-muted">
-              • Jejuns, refeições, progresso e fotografias confirmadas ficam
-              sempre disponíveis neste dispositivo.
+              • Jejuns, refeições, peso, progresso e fotografias confirmadas
+              ficam sempre disponíveis neste dispositivo.
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • Ao ligares uma conta Google, perfil, amigos e registos são
+              • Ao ligares uma conta Google, perfil, amigos, peso e registos são
               também sincronizados para permitir utilização em vários
               dispositivos.
             </Text>
@@ -242,9 +244,17 @@ export default function SettingsScreen() {
           <View className="mt-3">
             {(
               [
-                ["Política de Privacidade", "privacy", "shield-checkmark-outline"],
+                [
+                  "Política de Privacidade",
+                  "privacy",
+                  "shield-checkmark-outline",
+                ],
                 ["Termos de Utilização", "terms", "document-text-outline"],
-                ["Eliminar conta pela web", "account-deletion", "person-remove-outline"],
+                [
+                  "Eliminar conta pela web",
+                  "account-deletion",
+                  "person-remove-outline",
+                ],
                 ["Ajuda e suporte", "support", "help-circle-outline"],
               ] as const
             ).map(([label, document, icon], index) => (

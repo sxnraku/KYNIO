@@ -117,9 +117,9 @@ export function CloudAccountCard({
                 size={18}
               />
               <Text className="flex-1 font-body text-xs leading-5 text-muted">
-                Ao ligar a conta, nome, email, perfil, amigos e registos de
-                hábitos são guardados remotamente para sincronização. A ligação
-                é opcional e pode ser removida.
+                Ao ligar a conta, nome, email, perfil, amigos, peso e registos
+                de hábitos são guardados remotamente para sincronização. A
+                ligação é opcional e pode ser removida.
               </Text>
             </View>
           </View>

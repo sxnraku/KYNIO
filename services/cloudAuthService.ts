@@ -7,9 +7,29 @@ import type { CloudAccount } from '@/types/cloud';
 
 WebBrowser.maybeCompleteAuthSession();
 
-function getMetadataString(metadata: Record<string, unknown>, key: string): string | null {
+function getMetadataString(
+  metadata: Record<string, unknown>,
+  key: string,
+): string | null {
   const value = metadata[key];
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function getCloudAuthErrorMessage(message: string): string {
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('unsupported provider') ||
+    normalized.includes('provider is not enabled')
+  ) {
+    return 'O login Google ainda não está ativado no servidor KYNIO. Tenta novamente após a configuração do fornecedor.';
+  }
+
+  if (normalized.includes('redirect') || normalized.includes('callback')) {
+    return 'A ligação Google não reconheceu o endereço de regresso da app.';
+  }
+
+  return message;
 }
 
 export function toCloudAccount(user: {
@@ -47,7 +67,7 @@ export async function getCurrentCloudAccount(): Promise<CloudAccount | null> {
   const { data, error } = await client.auth.getSession();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(getCloudAuthErrorMessage(error.message));
   }
 
   if (!data.session?.user) {
@@ -61,14 +81,17 @@ export async function getCurrentCloudAccount(): Promise<CloudAccount | null> {
 
 export async function signInWithGoogle(): Promise<CloudAccount | null> {
   const client = requireSupabase();
-  const redirectTo = makeRedirectUri({ scheme: 'kynio', path: 'auth/callback' });
+  const redirectTo = makeRedirectUri({
+    scheme: 'kynio',
+    path: 'auth/callback',
+  });
   const { data, error } = await client.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo, skipBrowserRedirect: true },
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(getCloudAuthErrorMessage(error.message));
   }
 
   if (!data.url) {
@@ -91,7 +114,7 @@ export async function signInWithGoogle(): Promise<CloudAccount | null> {
   const exchange = await client.auth.exchangeCodeForSession(code);
 
   if (exchange.error) {
-    throw new Error(exchange.error.message);
+    throw new Error(getCloudAuthErrorMessage(exchange.error.message));
   }
 
   const user = exchange.data.session?.user;

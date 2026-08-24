@@ -1,12 +1,11 @@
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
-export type ProfileSection = "profile" | "friends" | "settings";
+export type ProfileSection = "profile" | "friends";
 
 const SECTIONS: { id: ProfileSection; label: string }[] = [
   { id: "profile", label: "Perfil" },
   { id: "friends", label: "Amigos" },
-  { id: "settings", label: "Definições" },
 ];
 
 interface ProfileSectionTabsProps {

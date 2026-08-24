@@ -118,7 +118,7 @@ export function LegalOnboardingModal() {
                   />
                   <Text className="flex-1 font-body text-sm leading-5 text-muted">
                     O histórico começa guardado no dispositivo. Se ligares uma
-                    conta Google, perfil, amigos e registos serão também
+                    conta Google, perfil, amigos, peso e registos serão também
                     sincronizados remotamente entre os teus dispositivos. Uma
                     fotografia de refeição só é enviada, através do KYNIO,
                     para a Google Gemini quando pedes uma análise.

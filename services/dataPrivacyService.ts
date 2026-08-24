@@ -2,7 +2,10 @@ import { File, Directory, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
-import { deleteAndReinitializeDatabase, getInitializedDatabase } from '@/db/client';
+import {
+  deleteAndReinitializeDatabase,
+  getInitializedDatabase,
+} from '@/db/client';
 import { deleteCloudAccountAndData } from '@/services/cloudAuthService';
 import {
   fasts,
@@ -13,6 +16,8 @@ import {
   type MealRecord,
   type UserProfileRecord,
   userProfile,
+  type WeightEntryRecord,
+  weightEntries,
   type WorkoutRecord,
   workouts,
 } from '@/db/schema';
@@ -21,15 +26,23 @@ import {
   deletePrivateLocalFiles,
 } from '@/services/localMealImageService';
 import { isCloudSyncConfigured } from '@/services/supabaseClient';
+import { useFastingStore } from '@/store/useFastingStore';
 
 export interface LocalDataExport {
+  activeFasting: {
+    goal: string;
+    isActive: boolean;
+    startedAt: number | null;
+    targetDurationMs: number;
+  };
   app: 'KYNIO';
   exportedAt: string;
   fasts: FastRecord[];
   friends: FriendRecord[];
   meals: MealRecord[];
   profile: UserProfileRecord | null;
-  schemaVersion: 3;
+  schemaVersion: 4;
+  weightEntries: WeightEntryRecord[];
   workouts: WorkoutRecord[];
 }
 
@@ -59,23 +72,44 @@ async function getWorkoutsForExport(): Promise<WorkoutRecord[]> {
   return database.select().from(workouts);
 }
 
+async function getWeightEntriesForExport(): Promise<WeightEntryRecord[]> {
+  const database = await getInitializedDatabase();
+  return database.select().from(weightEntries);
+}
+
 export async function collectLocalData(): Promise<LocalDataExport> {
-  const [fastRecords, friendRecords, mealRecords, profile, workoutRecords] = await Promise.all([
+  const [
+    fastRecords,
+    friendRecords,
+    mealRecords,
+    profile,
+    weightRecords,
+    workoutRecords,
+  ] = await Promise.all([
     getFastsForExport(),
     getFriendsForExport(),
     getMealsForExport(),
     getProfileForExport(),
+    getWeightEntriesForExport(),
     getWorkoutsForExport(),
   ]);
+  const fastingState = useFastingStore.getState();
 
   return {
+    activeFasting: {
+      goal: fastingState.goal.id,
+      isActive: fastingState.isActive,
+      startedAt: fastingState.startedAt,
+      targetDurationMs: fastingState.targetDurationMs,
+    },
     app: 'KYNIO',
     exportedAt: new Date().toISOString(),
     fasts: fastRecords,
     friends: friendRecords,
     meals: mealRecords,
     profile,
-    schemaVersion: 3,
+    schemaVersion: 4,
+    weightEntries: weightRecords,
     workouts: workoutRecords,
   };
 }
@@ -109,10 +143,15 @@ export async function exportAllLocalData(): Promise<string> {
   const sharingAvailable = await Sharing.isAvailableAsync();
 
   if (!sharingAvailable) {
-    throw new Error('A partilha de ficheiros não está disponível neste dispositivo.');
+    throw new Error(
+      'A partilha de ficheiros não está disponível neste dispositivo.',
+    );
   }
 
-  const exportDirectory = new Directory(Paths.cache, DATA_EXPORTS_DIRECTORY_NAME);
+  const exportDirectory = new Directory(
+    Paths.cache,
+    DATA_EXPORTS_DIRECTORY_NAME,
+  );
   exportDirectory.create({ idempotent: true, intermediates: true });
   const exportFile = new File(exportDirectory, fileName);
   exportFile.create({ overwrite: true });

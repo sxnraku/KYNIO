@@ -7,6 +7,7 @@ import { LevelProgressCard } from "@/components/ui/level-progress-card";
 import { PageTitle } from "@/components/ui/page-title";
 import { PrivacyNote } from "@/components/ui/privacy-note";
 import { Screen } from "@/components/ui/screen";
+import { WeightTrackingCard } from "@/components/ui/weight-tracking-card";
 import { COLORS } from "@/constants/colors";
 import { useGamificationProgress } from "@/hooks/use-gamification-progress";
 
@@ -53,6 +54,10 @@ export default function ProgressScreen() {
 
           <View className="mt-5">
             <ConsistencyLine stats={snapshot.stats} />
+          </View>
+
+          <View className="mt-5">
+            <WeightTrackingCard />
           </View>
 
           <View className="mt-8">

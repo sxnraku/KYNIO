@@ -3,7 +3,7 @@ import {
   formatElapsedTime,
   getEstimatedMetabolicPhase,
 } from '@/services/fasting';
-import { useFastingStore } from '@/store/useFastingStore';
+import { FASTING_STORAGE_KEY, useFastingStore } from '@/store/useFastingStore';
 
 jest.mock('@/services/dbService', () => ({
   getUserProfile: jest.fn(),
@@ -25,7 +25,9 @@ describe('useFastingStore', () => {
 
   it('calcula o tempo decorrido a partir do timestamp guardado no store', () => {
     useFastingStore.getState().startFasting();
-    jest.advanceTimersByTime(2 * HOUR_IN_MILLISECONDS + 5 * 60 * 1000 + 9 * 1000);
+    jest.advanceTimersByTime(
+      2 * HOUR_IN_MILLISECONDS + 5 * 60 * 1000 + 9 * 1000,
+    );
 
     const state = useFastingStore.getState();
     const now = Date.now();
@@ -37,10 +39,53 @@ describe('useFastingStore', () => {
     });
 
     expect(state.startedAt).toBe(START_TIME);
-    expect(timer.elapsedMs).toBe(2 * HOUR_IN_MILLISECONDS + 5 * 60 * 1000 + 9 * 1000);
+    expect(timer.elapsedMs).toBe(
+      2 * HOUR_IN_MILLISECONDS + 5 * 60 * 1000 + 9 * 1000,
+    );
     expect(timer.elapsedHours).toBeCloseTo(2.0858, 3);
     expect(formatElapsedTime(timer.elapsedMs)).toBe('02:05:09');
-    expect(timer.progress).toBeCloseTo(timer.elapsedMs / (16 * HOUR_IN_MILLISECONDS));
+    expect(timer.progress).toBeCloseTo(
+      timer.elapsedMs / (16 * HOUR_IN_MILLISECONDS),
+    );
+  });
+
+  it('retoma o jejum pelo timestamp depois de a app ser totalmente fechada', async () => {
+    await useFastingStore.persist.clearStorage();
+    useFastingStore.getState().startFasting();
+    await Promise.resolve();
+
+    const persistedState = await AsyncStorage.getItem(FASTING_STORAGE_KEY);
+    expect(persistedState).toContain(String(START_TIME));
+
+    useFastingStore.setState({ isActive: false, startedAt: null });
+    await AsyncStorage.setItem(FASTING_STORAGE_KEY, persistedState!);
+    jest.setSystemTime(START_TIME + 24 * HOUR_IN_MILLISECONDS);
+    await useFastingStore.persist.rehydrate();
+
+    const restored = useFastingStore.getState();
+    const timer = calculateFastingTimer({
+      isActive: restored.isActive,
+      now: Date.now(),
+      startedAt: restored.startedAt,
+      targetDurationMs: restored.targetDurationMs,
+    });
+
+    expect(restored.isActive).toBe(true);
+    expect(restored.startedAt).toBe(START_TIME);
+    expect(timer.elapsedMs).toBe(24 * HOUR_IN_MILLISECONDS);
+  });
+
+  it('disponibiliza o objetivo de jejum de 24 horas', () => {
+    useFastingStore.getState().setGoal('24:0');
+
+    expect(useFastingStore.getState().goal).toMatchObject({
+      eatingHours: 0,
+      fastingHours: 24,
+      id: '24:0',
+    });
+    expect(useFastingStore.getState().targetDurationMs).toBe(
+      24 * HOUR_IN_MILLISECONDS,
+    );
   });
 
   it.each([
@@ -56,9 +101,21 @@ describe('useFastingStore', () => {
       expectedId: 'glucose',
       expectedTitle: 'Início de Queima de Glicose',
     },
-    { elapsedHours: 12, expectedId: 'ketosis', expectedTitle: 'Cetose Estimada' },
-    { elapsedHours: 15.99, expectedId: 'ketosis', expectedTitle: 'Cetose Estimada' },
-    { elapsedHours: 16, expectedId: 'autophagy', expectedTitle: 'Autofagia Estimada' },
+    {
+      elapsedHours: 12,
+      expectedId: 'ketosis',
+      expectedTitle: 'Cetose Estimada',
+    },
+    {
+      elapsedHours: 15.99,
+      expectedId: 'ketosis',
+      expectedTitle: 'Cetose Estimada',
+    },
+    {
+      elapsedHours: 16,
+      expectedId: 'autophagy',
+      expectedTitle: 'Autofagia Estimada',
+    },
   ])(
     'determina $expectedTitle após $elapsedHours horas',
     ({ elapsedHours, expectedId, expectedTitle }) => {
@@ -72,3 +129,4 @@ describe('useFastingStore', () => {
     },
   );
 });
+import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -54,7 +54,7 @@ export function ProfileSettingsPanel({
           Sobre
         </Text>
         <Text className="mt-3 font-headline text-lg text-foreground">
-          KYNIO 1.0
+          KYNIO 1.1
         </Text>
         <Text className="mt-2 font-body text-sm leading-6 text-muted">
           Ferramenta de acompanhamento pessoal de estilo de vida e gamificação.
