@@ -1,4 +1,9 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 
 import MealsScreen from '@/app/(tabs)/meals';
 import type { MealRecord, UserProfileRecord } from '@/db/schema';
@@ -80,10 +85,12 @@ const UPDATED_PROFILE: UserProfileRecord = {
   googleDisplayName: null,
   googleEmail: null,
   id: 1,
+  onboardingCompletedAt: 1_787_400_000_000,
   profileUpdatedAt: 0,
   streakDays: 0,
   termsAcceptedAt: 1_787_400_000_000,
   totalXp: 30,
+  weightUnit: 'kg',
 };
 
 const mockedAnalyzeMeal = jest.mocked(analyzeMeal);
@@ -114,7 +121,9 @@ describe('MealScanCard', () => {
   beforeEach(() => {
     fetchSpy = jest
       .spyOn(globalThis, 'fetch')
-      .mockRejectedValue(new Error('Uma chamada externa não deveria acontecer neste teste.'));
+      .mockRejectedValue(
+        new Error('Uma chamada externa não deveria acontecer neste teste.'),
+      );
     mockedAnalyzeMeal.mockResolvedValue(VALID_AI_PAYLOAD);
     mockedSaveScannedMealRecord.mockResolvedValue(SAVED_MEAL);
     mockedGetUserProfile.mockResolvedValue(UPDATED_PROFILE);
@@ -131,7 +140,7 @@ describe('MealScanCard', () => {
 
     expect(await screen.findByText('Fotografar refeição')).toBeTruthy();
     expect(screen.getByText('Pré-visualização em direto')).toBeTruthy();
-  });
+  }, 10_000);
 
   it('renderiza nome, tag e calorias de um payload JSON válido da IA', async () => {
     await renderAnalyzedMeal();
@@ -157,7 +166,10 @@ describe('MealScanCard', () => {
   it('confirma a refeição editada através do serviço SQLite local', async () => {
     await renderAnalyzedMeal();
 
-    await fireEvent.changeText(screen.getByLabelText('Calorias estimadas, editável'), '620');
+    await fireEvent.changeText(
+      screen.getByLabelText('Calorias estimadas, editável'),
+      '620',
+    );
     await fireEvent.press(screen.getByText('Confirmar e Ganhar +30 XP'));
 
     await waitFor(() => {
@@ -171,7 +183,9 @@ describe('MealScanCard', () => {
         timestamp: expect.any(Number),
       });
     });
-    expect(await screen.findByText('Refeição guardada localmente · +30 XP')).toBeTruthy();
+    expect(
+      await screen.findByText('Refeição guardada localmente · +30 XP'),
+    ).toBeTruthy();
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

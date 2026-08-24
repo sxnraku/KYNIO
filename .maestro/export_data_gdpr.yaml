@@ -16,6 +16,14 @@ name: Exportação local de dados RGPD
     id: "legal-enter-button"
     enabled: true
 - assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
 
 - tapOn:
     id: "privacy-settings-button"

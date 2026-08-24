@@ -18,7 +18,7 @@ fornecedores.
 | --- | --- | --- | --- |
 | Nome, email e ID de utilizador | Liga conta Google | Supabase; autenticação e sincronização | Não |
 | Fotografia de perfil | Escolhe avatar com conta ligada | Bucket privado Supabase; perfil | Não |
-| Registos de jejum, refeições, atividade, XP e streak | Ativa sincronização | Supabase; uso em vários dispositivos | Não |
+| Registos de jejum, refeições, atividade, peso, XP e streak | Ativa sincronização | Supabase; uso em vários dispositivos | Não |
 | Contactos adicionados manualmente | Ativa sincronização | Supabase; círculo privado | Não |
 | Fotografia/descrição da refeição | Toca em Analisar | Proxy KYNIO e Google Gemini; análise pedida | Não |
 | Hash salgado temporário do endereço de rede | Usa análise | Supabase; segurança e limite de abuso | Necessário para essa função |
@@ -29,7 +29,7 @@ ID da conta.
 
 ## Pontos a confirmar no formulário
 
-1. Declara dados de **Health and fitness** se o formulário classificar jejuns, nutrição e treinos
+1. Declara dados de **Health and fitness** para jejuns, nutrição, treinos e peso
    nessa categoria, mesmo sendo registos de hábitos e não dados clínicos.
 2. Declara **Photos and videos** para avatar e análise opcional.
 3. Declara **Personal info** para nome, email e ID da conta Google.

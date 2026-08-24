@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 
 import { calculateFastingTimer } from '@/services/fasting';
 import { useFastingStore } from '@/store/useFastingStore';
@@ -25,8 +26,19 @@ export function useFastingTimer(): FastingTimerState {
     const intervalId = setInterval(() => {
       setNow(Date.now());
     }, 1000);
+    const appStateSubscription = AppState.addEventListener(
+      'change',
+      (state) => {
+        if (state === 'active') {
+          setNow(Date.now());
+        }
+      },
+    );
 
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      appStateSubscription.remove();
+    };
   }, [isActive, startedAt]);
 
   return calculateFastingTimer({ isActive, now, startedAt, targetDurationMs });

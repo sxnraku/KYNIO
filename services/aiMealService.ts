@@ -5,7 +5,7 @@ import type {
 } from '@/types/meal';
 
 const ANALYZE_MEAL_FUNCTION = 'analyze-meal';
-const ANALYSIS_TIMEOUT_MS = 45_000;
+const ANALYSIS_TIMEOUT_MS = 60_000;
 const MAX_DESCRIPTION_LENGTH = 1_000;
 const MAX_IMAGE_BASE64_LENGTH = 11_200_000;
 const SUPPORTED_IMAGE_TYPES = new Set([
@@ -20,7 +20,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function hasOnlyKeys(record: Record<string, unknown>, allowedKeys: string[]): boolean {
+function hasOnlyKeys(
+  record: Record<string, unknown>,
+  allowedKeys: string[],
+): boolean {
   return Object.keys(record).every((key) => allowedKeys.includes(key));
 }
 
@@ -35,7 +38,13 @@ function isConfidence(value: unknown): value is MealAnalysisConfidence {
 export function parseMealAnalysis(value: unknown): MealAnalysisResult {
   if (
     !isRecord(value) ||
-    !hasOnlyKeys(value, ['dish_name', 'estimated_calories', 'macros', 'tags', 'confidence']) ||
+    !hasOnlyKeys(value, [
+      'dish_name',
+      'estimated_calories',
+      'macros',
+      'tags',
+      'confidence',
+    ]) ||
     typeof value.dish_name !== 'string' ||
     value.dish_name.trim().length === 0 ||
     !Number.isInteger(value.estimated_calories) ||
@@ -47,10 +56,14 @@ export function parseMealAnalysis(value: unknown): MealAnalysisResult {
     !isNonNegativeNumber(value.macros.fat_g) ||
     !Array.isArray(value.tags) ||
     value.tags.length > 6 ||
-    !value.tags.every((tag) => typeof tag === 'string' && tag.trim().length > 0) ||
+    !value.tags.every(
+      (tag) => typeof tag === 'string' && tag.trim().length > 0,
+    ) ||
     !isConfidence(value.confidence)
   ) {
-    throw new Error('A análise recebida não corresponde ao formato esperado. Tenta novamente.');
+    throw new Error(
+      'A análise recebida não corresponde ao formato esperado. Tenta novamente.',
+    );
   }
 
   return {
@@ -68,10 +81,13 @@ export function parseMealAnalysis(value: unknown): MealAnalysisResult {
 
 function getFunctionConfiguration(): { publishableKey: string; url: string } {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();
-  const publishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+  const publishableKey =
+    process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
 
   if (!supabaseUrl || !publishableKey) {
-    throw new Error('A análise de refeições ainda não está configurada neste ambiente.');
+    throw new Error(
+      'A análise de refeições ainda não está configurada neste ambiente.',
+    );
   }
 
   return {
@@ -96,8 +112,13 @@ function validateInput(input: AnalyzeMealInput): AnalyzeMealInput {
       throw new Error('Usa uma imagem JPEG, PNG, WebP, HEIC ou HEIF.');
     }
 
-    if (!input.image.base64 || input.image.base64.length > MAX_IMAGE_BASE64_LENGTH) {
-      throw new Error('A fotografia é demasiado grande. Escolhe uma imagem até 8 MB.');
+    if (
+      !input.image.base64 ||
+      input.image.base64.length > MAX_IMAGE_BASE64_LENGTH
+    ) {
+      throw new Error(
+        'A fotografia é demasiado grande. Escolhe uma imagem até 8 MB.',
+      );
     }
   }
 
@@ -108,7 +129,11 @@ function validateInput(input: AnalyzeMealInput): AnalyzeMealInput {
 }
 
 function getRemoteErrorMessage(status: number, payload: unknown): string {
-  if (isRecord(payload) && typeof payload.error === 'string' && payload.error.trim()) {
+  if (
+    isRecord(payload) &&
+    typeof payload.error === 'string' &&
+    payload.error.trim()
+  ) {
     return payload.error.trim();
   }
 
@@ -127,11 +152,15 @@ async function readJsonResponse(response: Response): Promise<unknown> {
   try {
     return (await response.json()) as unknown;
   } catch {
-    throw new Error('O serviço de análise devolveu uma resposta inválida. Tenta novamente.');
+    throw new Error(
+      'O serviço de análise devolveu uma resposta inválida. Tenta novamente.',
+    );
   }
 }
 
-export async function analyzeMeal(input: AnalyzeMealInput): Promise<MealAnalysisResult> {
+export async function analyzeMeal(
+  input: AnalyzeMealInput,
+): Promise<MealAnalysisResult> {
   const safeInput = validateInput(input);
   const { publishableKey, url } = getFunctionConfiguration();
   const controller = new AbortController();

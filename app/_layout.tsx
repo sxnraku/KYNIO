@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { AppThemeProvider } from "@/components/app-theme-provider";
 import { CloudSyncBootstrap } from "@/components/cloud-sync-bootstrap";
 import { LegalOnboardingModal } from "@/components/ui/legal-onboarding-modal";
+import { ProfileOnboardingModal } from "@/components/ui/profile-onboarding-modal";
 import { getColorPalette } from "@/constants/colors";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
@@ -51,6 +52,7 @@ export default function RootLayout() {
       />
       <CloudSyncBootstrap />
       <LegalOnboardingModal />
+      <ProfileOnboardingModal />
     </AppThemeProvider>
   );
 }

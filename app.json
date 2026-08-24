@@ -2,7 +2,7 @@
   "expo": {
     "name": "KYNIO",
     "slug": "kynio",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon-kynio-v1.png",
     "scheme": "kynio",
@@ -71,7 +71,8 @@
           "ios": []
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-build-properties"
     ],
     "experiments": {
       "typedRoutes": true

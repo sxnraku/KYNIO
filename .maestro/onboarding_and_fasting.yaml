@@ -21,6 +21,14 @@ name: Onboarding legal e início de jejum
     enabled: true
 
 - assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
 - assertVisible: "Jejum"
 - assertVisible:
     id: "fasting-timer"

@@ -17,7 +17,10 @@ export const meals = sqliteTable('meals', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   imageUrl: text('image_url'),
   proteinGrams: real('protein_grams'),
-  tags: text('tags', { mode: 'json' }).$type<string[]>().notNull().default(sql`'[]'`),
+  tags: text('tags', { mode: 'json' })
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'`),
   timestamp: integer('timestamp').notNull(),
   xpEarned: integer('xp_earned').notNull().default(0),
 });
@@ -44,10 +47,14 @@ export const userProfile = sqliteTable('user_profile', {
   googleDisplayName: text('google_display_name'),
   googleEmail: text('google_email'),
   id: integer('id').primaryKey(),
+  onboardingCompletedAt: integer('onboarding_completed_at'),
   profileUpdatedAt: integer('profile_updated_at').notNull().default(0),
   streakDays: integer('streak_days').notNull().default(0),
   termsAcceptedAt: integer('terms_accepted_at'),
   totalXp: integer('total_xp').notNull().default(0),
+  weightUnit: text('weight_unit', { enum: ['kg', 'lb'] })
+    .notNull()
+    .default('kg'),
 });
 
 export const friends = sqliteTable('friends', {
@@ -56,12 +63,20 @@ export const friends = sqliteTable('friends', {
   id: integer('id').primaryKey({ autoIncrement: true }),
 });
 
+export const weightEntries = sqliteTable('weight_entries', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  timestamp: integer('timestamp').notNull(),
+  weightGrams: integer('weight_grams').notNull(),
+});
+
 export type FastRecord = typeof fasts.$inferSelect;
 export type MealRecord = typeof meals.$inferSelect;
 export type WorkoutRecord = typeof workouts.$inferSelect;
 export type FriendRecord = typeof friends.$inferSelect;
+export type WeightEntryRecord = typeof weightEntries.$inferSelect;
 export type NewFastRecord = typeof fasts.$inferInsert;
 export type NewMealRecord = typeof meals.$inferInsert;
 export type NewWorkoutRecord = typeof workouts.$inferInsert;
 export type NewFriendRecord = typeof friends.$inferInsert;
+export type NewWeightEntryRecord = typeof weightEntries.$inferInsert;
 export type UserProfileRecord = typeof userProfile.$inferSelect;

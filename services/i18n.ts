@@ -14,6 +14,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A preparar o perfil…": "Preparing your profile…",
   "A resposta não é armazenada remotamente pela app.":
     "The response is not stored remotely by the app.",
+  "A recuperar o jejum em curso…": "Restoring your active fast…",
   "A sincronizar…": "Syncing…",
   "A tua identidade, círculo e preferências, com controlo claro sobre a sincronização.":
     "Your identity, circle and preferences, with clear control over syncing.",
@@ -239,8 +240,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY to .env.local to enable Google sign-in.",
   "Adiciona o primeiro nome ao teu círculo.":
     "Add the first person to your circle.",
-  "Ao ligar a conta, nome, email, perfil, amigos e registos de hábitos são guardados remotamente para sincronização. A ligação é opcional e pode ser removida.":
-    "When you connect an account, your name, email, profile, friends and habit logs are stored remotely for syncing. The connection is optional and can be removed.",
+  "Ao ligar a conta, nome, email, perfil, amigos, peso e registos de hábitos são guardados remotamente para sincronização. A ligação é opcional e pode ser removida.":
+    "When you connect an account, your name, email, profile, friends, weight and habit logs are stored remotely for syncing. The connection is optional and can be removed.",
   "Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.":
     "Creates a JSON file with your full local SQLite history and opens the system options to save it.",
   "Esta ação elimina permanentemente jejuns, refeições, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.":
@@ -253,8 +254,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Fasts, meals, progress and confirmed photos always remain available on this device.",
   "Notas opcionais: percurso, como te sentiste…":
     "Optional notes: route, how you felt…",
-  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
-    "History starts on your device. If you connect a Google account, profile, friends and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
+  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos, peso e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
+    "History starts on your device. If you connect a Google account, profile, friends, weight and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
   "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.":
     "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Uma frase sobre o teu ritmo, objetivos ou motivação.":
@@ -282,6 +283,49 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Log your first completed activity.",
   "Remover amigo?": "Remove friend?",
   "Tentar novamente": "Try again",
+  "A tua identidade e o teu círculo, com controlo claro sobre o que partilhas.":
+    "Your identity and circle, with clear control over what you share.",
+  "Acompanhamento pessoal": "Personal tracking",
+  "Acompanhamento pessoal descritivo. Não avalia a saúde, não define um peso ideal e não substitui orientação profissional.":
+    "Descriptive personal tracking. It does not assess health, define an ideal weight or replace professional guidance.",
+  "Adiciona apenas se quiseres acompanhar esta medida ao longo do tempo.":
+    "Only add entries if you want to track this measurement over time.",
+  "Adicionar registo de peso": "Add weight entry",
+  "Dá identidade à tua jornada": "Give your journey an identity",
+  Continuar: "Continue",
+  "Escolhe o nome que aparece no teu perfil. Podes alterá-lo mais tarde.":
+    "Choose the name shown on your profile. You can change it later.",
+  "Escolhe um nome para o teu perfil.": "Choose a name for your profile.",
+  "Eliminar este registo?": "Delete this entry?",
+  "Guardar registo": "Save entry",
+  "Introduz um peso válido superior a zero.":
+    "Enter a valid weight greater than zero.",
+  "Introduz um peso válido ou deixa o campo vazio.":
+    "Enter a valid weight or leave the field empty.",
+  "Não foi possível carregar os registos de peso.":
+    "Weight entries could not be loaded.",
+  "Não foi possível eliminar este registo.": "This entry could not be deleted.",
+  "Não foi possível guardar o registo.": "The entry could not be saved.",
+  "Não foi possível guardar o perfil.": "The profile could not be saved.",
+  "Não foi possível preparar o perfil. Tenta novamente.":
+    "The profile could not be prepared. Please try again.",
+  "Nome do perfil": "Profile name",
+  "Novo registo": "New entry",
+  "O registo de peso serve apenas para acompanhamento pessoal. Não avalia a tua saúde, não define um peso ideal e não substitui orientação profissional.":
+    "Weight logging is only for personal tracking. It does not assess your health, define an ideal weight or replace professional guidance.",
+  "Opcional, descritivo e sem metas obrigatórias.":
+    "Optional, descriptive and without mandatory targets.",
+  Peso: "Weight",
+  "Peso atual (opcional)": "Current weight (optional)",
+  "Quero acompanhar o meu peso": "I want to track my weight",
+  "Registo opcional": "Optional log",
+  "Sem registos": "No entries",
+  "Ao ligares uma conta Google, perfil, amigos, peso e registos são também sincronizados para permitir utilização em vários dispositivos.":
+    "When you connect a Google account, profile, friends, weight and logs are also synced for use across multiple devices.",
+  "Jejuns, refeições, peso, progresso e fotografias confirmadas ficam sempre disponíveis neste dispositivo.":
+    "Fasts, meals, weight, progress and confirmed photos always remain available on this device.",
+  "Esta ação elimina permanentemente jejuns, refeições, peso, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.":
+    "This permanently deletes fasts, meals, weight, XP, profile, consent, private photos and any synced account. It does not delete files you already exported and cannot be undone.",
   "XP total": "Total XP",
 };
 
@@ -310,6 +354,9 @@ export function translateText(value: string, language: AppLanguage): string {
       /^(\d+)h de jejum · (\d+)h de janela$/,
     );
     const nextLevel = normalized.match(/^(\d+) XP PARA NÍVEL (\d+)$/);
+    const weightDelta = normalized.match(
+      /^([+-]?[\d.,]+) (kg|lb) desde o registo anterior$/,
+    );
 
     if (levelLabel) {
       translation = `Level ${levelLabel[1]} - ${translateText(levelLabel[2], language)}`;
@@ -329,6 +376,8 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `${fastingWindow[1]}h fasting · ${fastingWindow[2]}h eating window`;
     } else if (nextLevel) {
       translation = `${nextLevel[1]} XP TO LEVEL ${nextLevel[2]}`;
+    } else if (weightDelta) {
+      translation = `${weightDelta[1]} ${weightDelta[2]} since the previous entry`;
     }
   }
 

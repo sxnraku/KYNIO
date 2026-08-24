@@ -1,6 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { FriendsPanel } from "@/components/ui/friends-panel";
@@ -11,7 +12,6 @@ import {
   type ProfileSection,
   ProfileSectionTabs,
 } from "@/components/ui/profile-section-tabs";
-import { ProfileSettingsPanel } from "@/components/ui/profile-settings-panel";
 import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
 import type { UserProfileRecord } from "@/db/schema";
@@ -60,7 +60,22 @@ export default function ProfileScreen() {
   return (
     <Screen>
       <PageTitle
-        description="A tua identidade, círculo e preferências, com controlo claro sobre a sincronização."
+        action={
+          <Pressable
+            accessibilityLabel="Abrir definições"
+            accessibilityRole="button"
+            className="h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface active:opacity-70"
+            onPress={() => router.push("/settings")}
+            testID="profile-settings-button"
+          >
+            <Ionicons
+              color={COLORS.foreground}
+              name="settings-outline"
+              size={23}
+            />
+          </Pressable>
+        }
+        description="A tua identidade e o teu círculo, com controlo claro sobre o que partilhas."
         title="Perfil"
       />
 
@@ -117,15 +132,6 @@ export default function ProfileScreen() {
             isSaving={localProfile.isSaving}
             onAdd={localProfile.addFriend}
             onRemove={localProfile.removeFriend}
-          />
-        </View>
-      ) : null}
-
-      {activeSection === "settings" ? (
-        <View className="mt-4">
-          <ProfileSettingsPanel
-            onLocalDataChanged={localProfile.reload}
-            onOpenPrivacy={() => router.push("/settings")}
           />
         </View>
       ) : null}
