@@ -1,0 +1,19 @@
+{
+  "minimumVersionCode": 1,
+  "latestVersionCode": 11,
+  "latestVersionName": "1.1.5",
+
+
+  "forceUpdate": true,
+  "title": "Atualização Obrigatória",
+  "title_en": "Mandatory Update",
+  "message": "Uma nova versão do KYNIO é necessária para continuares a usar a IA, novas fases de jejum e manter os teus dados seguros.",
+  "message_en": "A new version of KYNIO is required to continue using AI meal analysis, metabolic phases, and secure data sync.",
+  "releaseNotes": [
+    "Google Play Billing 7.1.1 e subscrições Kynio Aura Pro",
+    "Fases metabólicas biológicas com animações",
+    "Jejum livre flexível e jejuns de 36h/48h",
+    "Recompensas e vantagens Aura por XP"
+  ],
+  "storeUrl": "market://details?id=com.kynio.app"
+}
