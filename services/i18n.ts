@@ -100,6 +100,27 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Preferences are stored only on this device.",
   "As reservas de glicogénio do fígado ficam significativamente reduzidas. O corpo faz a transição para oxidar ácidos gordos, convertendo lípidos em energia.":
     "Liver glycogen stores become significantly reduced. The body transitions to oxidising fatty acids, converting lipids into fuel.",
+  "Rotina de Jejum": "Fasting Routine",
+  "Agendamento automático e lembretes ADF": "Automated schedules & ADF reminders",
+  "Ativar Rotina Automática": "Enable Automatic Schedule",
+  "Recebe lembretes automáticos para começar e terminar.":
+    "Receive automatic reminders to start and stop fasts.",
+  "Selecionar Rotina": "Select Routine",
+  "ADF · 36h Alternado": "ADF · 36h Alternate",
+  "Diário · 16:8": "Daily · 16:8",
+  "Diário · 18:6": "Daily · 18:6",
+  "OMAD · 24h Diário": "OMAD · 24h Daily",
+  "Seg / Qua / Sex": "Mon / Wed / Fri",
+  "Dias de Jejum": "Fasting Days",
+  "Hora de Início": "Start Time",
+  "Duração Alvo": "Target Duration",
+  "Lembrete de Início": "Start Reminder",
+  "Guardar Rotina": "Save Routine",
+  "Rotina: Desativada": "Routine: Disabled",
+  "Configurar ↗": "Configure ↗",
+  "Alterar ↗": "Change ↗",
+  "Hora do Jejum ADF": "ADF Fasting Time",
+  "Hora do teu Jejum": "Time to Fast",
   "Ativa realces visuais esmeralda e micro-animações personalizadas.":
     "Enables emerald visual highlights and custom micro-animations.",
   "Ativar câmara": "Enable camera",
@@ -610,6 +631,9 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `Active plan (${activePlanTier[1]}) · Full access`;
     } else if (exportPrepared) {
       translation = `Export ready: ${exportPrepared[1]}`;
+    } else if (normalized.startsWith("Rotina: ")) {
+      const routineContent = normalized.replace(/^Rotina:\s*/i, "");
+      translation = `Routine: ${translateText(routineContent, language)}`;
     }
   }
 
