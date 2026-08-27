@@ -2,7 +2,7 @@
   "expo": {
     "name": "KYNIO",
     "slug": "kynio",
-    "version": "1.1.8",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon-kynio-v1.png",
     "scheme": "kynio",
@@ -13,13 +13,14 @@
     },
     "android": {
       "package": "com.kynio.app",
-      "versionCode": 14,
+      "versionCode": 16,
 
 
 
       "adaptiveIcon": {
-        "backgroundColor": "#10B981",
-        "foregroundImage": "./assets/images/icon-kynio-v1.png"
+        "backgroundColor": "#121214",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [

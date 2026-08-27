@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/text";
 
 import { BadgeCard } from "@/components/ui/badge-card";
 import { ConsistencyLine } from "@/components/ui/consistency-line";
+import { FastingStatsOverview } from "@/components/ui/fasting-stats-overview";
 import { LevelProgressCard } from "@/components/ui/level-progress-card";
 import { PageTitle } from "@/components/ui/page-title";
 import { PrivacyNote } from "@/components/ui/privacy-note";
@@ -47,7 +48,21 @@ export default function ProgressScreen() {
 
       {snapshot ? (
         <>
+          {/* 4 Hero Stats: Jejuns, Jejum mais longo, Tempo total, Dias com jejum */}
           <View className="mt-7">
+            <FastingStatsOverview />
+          </View>
+
+          {/* Gráfico de Peso com Filtros de Período e Objetivo */}
+          <View className="mt-5">
+            <WeightTrackingCard />
+          </View>
+
+          <View className="mt-5">
+            <WeeklyFastingChart />
+          </View>
+
+          <View className="mt-5">
             <LevelProgressCard
               level={snapshot.level}
               levelProgress={snapshot.levelProgress}
@@ -64,19 +79,11 @@ export default function ProgressScreen() {
           </View>
 
           <View className="mt-5">
-            <WeeklyFastingChart />
-          </View>
-
-          <View className="mt-5">
             <WeeklyChallengesCard />
           </View>
 
           <View className="mt-5">
             <ConsistencyLine stats={snapshot.stats} />
-          </View>
-
-          <View className="mt-5">
-            <WeightTrackingCard />
           </View>
 
 
