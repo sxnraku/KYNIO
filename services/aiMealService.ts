@@ -66,18 +66,32 @@ export function parseMealAnalysis(value: unknown): MealAnalysisResult {
     );
   }
 
+  const protein = Math.round(value.macros.protein_g);
+  const carbs = Math.round(value.macros.carbs_g);
+  const fat = Math.round(value.macros.fat_g);
+
+  // Cálculo biológico real de calorias: 4*proteína + 4*hidratos + 9*gordura
+  let calories = Math.round(value.estimated_calories);
+  const macroCalories = Math.round(4 * protein + 4 * carbs + 9 * fat);
+
+  // Se as calorias da IA forem um número redondo artificial e os macros forem específicos, calibra pelo macro real
+  if (macroCalories > 0 && (calories % 50 === 0 || Math.abs(calories - macroCalories) <= 50)) {
+    calories = macroCalories;
+  }
+
   return {
     confidence: value.confidence,
     dish_name: value.dish_name.trim(),
-    estimated_calories: value.estimated_calories,
+    estimated_calories: Math.max(1, calories),
     macros: {
-      carbs_g: value.macros.carbs_g,
-      fat_g: value.macros.fat_g,
-      protein_g: value.macros.protein_g,
+      carbs_g: carbs,
+      fat_g: fat,
+      protein_g: protein,
     },
     tags: value.tags.map((tag) => tag.trim()),
   };
 }
+
 
 function getFunctionConfiguration(): { publishableKey: string; url: string } {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();

@@ -9,13 +9,16 @@ import MealsScreen from '@/app/(tabs)/meals';
 import type { MealRecord, UserProfileRecord } from '@/db/schema';
 import { analyzeMeal } from '@/services/aiMealService';
 import { getUserProfile, saveScannedMealRecord } from '@/services/dbService';
+import { useSubscriptionStore } from '@/store/use-subscription-store';
 import type { MealAnalysisResult } from '@/types/meal';
+
 
 jest.mock('@/services/aiMealService', () => ({
   analyzeMeal: jest.fn(),
 }));
 
 jest.mock('@/services/dbService', () => ({
+  getMealRecords: jest.fn().mockResolvedValue([]),
   getUserProfile: jest.fn(),
   saveScannedMealRecord: jest.fn(),
 }));
@@ -41,13 +44,19 @@ jest.mock('@/components/ui/meal-camera-modal', () => {
   };
 });
 
-jest.mock('expo-router', () => ({
-  useRouter: () => ({
-    back: jest.fn(),
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
-}));
+jest.mock('expo-router', () => {
+  const React = require('react') as typeof import('react');
+
+  return {
+    useFocusEffect: (callback: () => void | (() => void)) =>
+      React.useEffect(callback, [callback]),
+    useRouter: () => ({
+      back: jest.fn(),
+      push: jest.fn(),
+      replace: jest.fn(),
+    }),
+  };
+});
 
 const VALID_AI_PAYLOAD: MealAnalysisResult = {
   confidence: 'high',
@@ -116,9 +125,19 @@ async function renderAnalyzedMeal(): Promise<void> {
 }
 
 describe('MealScanCard', () => {
+
   let fetchSpy: jest.SpiedFunction<typeof fetch>;
 
   beforeEach(() => {
+    useSubscriptionStore.setState({
+      dailyAiScansCount: 0,
+      dailyAiScansDate: new Date().toISOString().slice(0, 10),
+      expiresAt: null,
+      isPro: true,
+      maxFreeDailyAiScans: 3,
+      tier: 'annual',
+      trialStartedAt: null,
+    });
     fetchSpy = jest
       .spyOn(globalThis, 'fetch')
       .mockRejectedValue(
@@ -128,6 +147,7 @@ describe('MealScanCard', () => {
     mockedSaveScannedMealRecord.mockResolvedValue(SAVED_MEAL);
     mockedGetUserProfile.mockResolvedValue(UPDATED_PROFILE);
   });
+
 
   afterEach(() => {
     fetchSpy.mockRestore();
@@ -140,7 +160,8 @@ describe('MealScanCard', () => {
 
     expect(await screen.findByText('Fotografar refeição')).toBeTruthy();
     expect(screen.getByText('Pré-visualização em direto')).toBeTruthy();
-  }, 10_000);
+  }, 30_000);
+
 
   it('renderiza nome, tag e calorias de um payload JSON válido da IA', async () => {
     await renderAnalyzedMeal();

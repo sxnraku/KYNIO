@@ -22,35 +22,52 @@ function getImageExtension(mimeType: string): string {
   return extensionsByMimeType[mimeType.toLowerCase()] ?? 'jpg';
 }
 
-export async function persistMealImage(sourceUri: string, mimeType: string): Promise<string> {
+export async function persistMealImage(
+  sourceUri: string,
+  mimeType: string,
+  base64?: string | null,
+): Promise<string> {
   if (Platform.OS === 'web') {
     return sourceUri;
   }
 
-  const mealImagesDirectory = new Directory(Paths.document, MEAL_IMAGES_DIRECTORY_NAME);
-  mealImagesDirectory.create({ idempotent: true, intermediates: true });
+  try {
+    const mealImagesDirectory = new Directory(Paths.document, MEAL_IMAGES_DIRECTORY_NAME);
+    mealImagesDirectory.create({ idempotent: true, intermediates: true });
 
-  const uniqueSuffix = Math.random().toString(36).slice(2, 10);
-  const destination = new File(
-    mealImagesDirectory,
-    `meal-${Date.now()}-${uniqueSuffix}.${getImageExtension(mimeType)}`,
-  );
-  const source = new File(sourceUri);
+    const uniqueSuffix = Math.random().toString(36).slice(2, 10);
+    const destination = new File(
+      mealImagesDirectory,
+      `meal-${Date.now()}-${uniqueSuffix}.${getImageExtension(mimeType)}`,
+    );
 
-  await source.copy(destination);
-  return destination.uri;
+    if (base64) {
+      destination.write(base64);
+    } else {
+      const source = new File(sourceUri);
+      await source.copy(destination);
+    }
+
+    return destination.uri;
+  } catch {
+    return sourceUri;
+  }
 }
 
 export function deletePrivateLocalFiles(): void {
-  const privateDirectories = [
-    new Directory(Paths.document, MEAL_IMAGES_DIRECTORY_NAME),
-    new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME),
-    new Directory(Paths.cache, DATA_EXPORTS_DIRECTORY_NAME),
-  ];
+  try {
+    const privateDirectories = [
+      new Directory(Paths.document, MEAL_IMAGES_DIRECTORY_NAME),
+      new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME),
+      new Directory(Paths.cache, DATA_EXPORTS_DIRECTORY_NAME),
+    ];
 
-  for (const directory of privateDirectories) {
-    if (directory.exists) {
-      directory.delete();
+    for (const directory of privateDirectories) {
+      if (directory.exists) {
+        directory.delete();
+      }
     }
+  } catch {
+    // Silently ignore cleanup errors
   }
 }

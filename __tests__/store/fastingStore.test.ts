@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
   calculateFastingTimer,
   formatElapsedTime,
@@ -6,9 +8,14 @@ import {
 import { FASTING_STORAGE_KEY, useFastingStore } from '@/store/useFastingStore';
 
 jest.mock('@/services/dbService', () => ({
+  deleteFastRecord: jest.fn(),
+  getFastRecords: jest.fn().mockResolvedValue([]),
   getUserProfile: jest.fn(),
   saveFastRecord: jest.fn(),
+  updateUserProfileXp: jest.fn(),
 }));
+
+
 
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
 const START_TIME = new Date(2026, 7, 22, 8, 0, 0).getTime();
@@ -17,6 +24,7 @@ describe('useFastingStore', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.setSystemTime(START_TIME);
+    useFastingStore.getState().resetFasting();
   });
 
   afterEach(() => {
@@ -47,6 +55,41 @@ describe('useFastingStore', () => {
     expect(timer.progress).toBeCloseTo(
       timer.elapsedMs / (16 * HOUR_IN_MILLISECONDS),
     );
+  });
+
+  it('inicia um jejum com uma hora retroativa indicada pelo utilizador', () => {
+    const earlierStart = START_TIME - 5 * HOUR_IN_MILLISECONDS;
+
+    expect(useFastingStore.getState().startFasting(earlierStart)).toBe(true);
+
+    const state = useFastingStore.getState();
+    const timer = calculateFastingTimer({
+      isActive: state.isActive,
+      now: Date.now(),
+      startedAt: state.startedAt,
+      targetDurationMs: state.targetDurationMs,
+    });
+
+    expect(state.startedAt).toBe(earlierStart);
+    expect(timer.elapsedMs).toBe(5 * HOUR_IN_MILLISECONDS);
+  });
+
+  it('permite corrigir a hora de início durante um jejum ativo', () => {
+    const correctedStart = START_TIME - 2 * HOUR_IN_MILLISECONDS;
+    useFastingStore.getState().startFasting();
+
+    expect(useFastingStore.getState().setStartedAt(correctedStart)).toBe(true);
+    expect(useFastingStore.getState().startedAt).toBe(correctedStart);
+  });
+
+  it('rejeita uma hora de início futura', () => {
+    const futureStart = START_TIME + HOUR_IN_MILLISECONDS;
+
+    expect(useFastingStore.getState().startFasting(futureStart)).toBe(false);
+    expect(useFastingStore.getState()).toMatchObject({
+      isActive: false,
+      startedAt: null,
+    });
   });
 
   it('retoma o jejum pelo timestamp depois de a app ser totalmente fechada', async () => {
@@ -89,32 +132,50 @@ describe('useFastingStore', () => {
   });
 
   it.each([
-    { elapsedHours: 0, expectedId: 'digestion', expectedTitle: 'Digestão' },
-    { elapsedHours: 3.99, expectedId: 'digestion', expectedTitle: 'Digestão' },
+    {
+      elapsedHours: 0,
+      expectedId: 'digestion',
+      expectedTitle: 'Digestão & Absorção',
+    },
+    {
+      elapsedHours: 3.99,
+      expectedId: 'digestion',
+      expectedTitle: 'Digestão & Absorção',
+    },
     {
       elapsedHours: 4,
       expectedId: 'glucose',
-      expectedTitle: 'Início de Queima de Glicose',
+      expectedTitle: 'Queima de Glicose',
     },
     {
       elapsedHours: 11.99,
       expectedId: 'glucose',
-      expectedTitle: 'Início de Queima de Glicose',
+      expectedTitle: 'Queima de Glicose',
     },
     {
       elapsedHours: 12,
-      expectedId: 'ketosis',
-      expectedTitle: 'Cetose Estimada',
+      expectedId: 'fat_burning',
+      expectedTitle: 'Queima de Gordura',
     },
     {
-      elapsedHours: 15.99,
-      expectedId: 'ketosis',
-      expectedTitle: 'Cetose Estimada',
+      elapsedHours: 17.99,
+      expectedId: 'fat_burning',
+      expectedTitle: 'Queima de Gordura',
     },
     {
-      elapsedHours: 16,
+      elapsedHours: 18,
+      expectedId: 'ketosis',
+      expectedTitle: 'Cetose Ativa',
+    },
+    {
+      elapsedHours: 24,
       expectedId: 'autophagy',
-      expectedTitle: 'Autofagia Estimada',
+      expectedTitle: 'Autofagia Celular',
+    },
+    {
+      elapsedHours: 48,
+      expectedId: 'deep_renewal',
+      expectedTitle: 'Regeneração & Reset',
     },
   ])(
     'determina $expectedTitle após $elapsedHours horas',
@@ -128,5 +189,5 @@ describe('useFastingStore', () => {
       expect(phase.title).toBe(expectedTitle);
     },
   );
+
 });
-import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -8,7 +8,7 @@ interface SettingsActionCardProps {
   description: string;
   destructive?: boolean;
   disabled?: boolean;
-  icon: "download-outline" | "trash-outline";
+  icon: "compass-outline" | "download-outline" | "trash-outline";
   isLoading: boolean;
   label: string;
   onPress: () => void;

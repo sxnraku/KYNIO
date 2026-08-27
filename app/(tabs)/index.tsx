@@ -1,23 +1,30 @@
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
-import { Text } from "@/components/ui/text";
 
+import { FastingHistoryCard } from "@/components/ui/fasting-history-card";
 import { FastingSummaryCard } from "@/components/ui/fasting-summary-card";
+import { MetabolicPhaseDetailModal } from "@/components/ui/metabolic-phase-detail-modal";
 import { MetabolicPhases } from "@/components/ui/metabolic-phases";
 import { Screen } from "@/components/ui/screen";
+import { Text } from "@/components/ui/text";
+import { WaterTrackerCard } from "@/components/ui/water-tracker-card";
 import { COLORS } from "@/constants/colors";
 import { useFastingTimer } from "@/hooks/use-fasting-timer";
-import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
   ESTIMATED_METABOLIC_PHASES,
   getEstimatedPhaseIndex,
+  type EstimatedMetabolicPhase,
   type EstimatedMetabolicPhaseId,
 } from "@/services/fasting";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useFastingStore } from "@/store/useFastingStore";
 
 const PHASE_SHORT_LABELS: Record<EstimatedMetabolicPhaseId, string> = {
   autophagy: "Autofagia",
+  deep_renewal: "Renovação",
   digestion: "Digestão",
+  fat_burning: "Queima de Gordura",
   glucose: "Glicose",
   ketosis: "Cetose",
 };
@@ -44,9 +51,13 @@ export default function HomeScreen() {
   const persistenceError = useFastingStore((state) => state.persistenceError);
   const targetDurationMs = useFastingStore((state) => state.targetDurationMs);
   const { elapsedHours, elapsedMs, progress } = useFastingTimer();
+  const currentPhaseIndex = getEstimatedPhaseIndex(elapsedHours);
   const currentPhase =
-    ESTIMATED_METABOLIC_PHASES[getEstimatedPhaseIndex(elapsedHours)] ??
+    ESTIMATED_METABOLIC_PHASES[currentPhaseIndex] ??
     ESTIMATED_METABOLIC_PHASES[0];
+
+  const [selectedPhase, setSelectedPhase] =
+    useState<EstimatedMetabolicPhase | null>(null);
 
   if (!hasHydrated) {
     return (
@@ -84,6 +95,7 @@ export default function HomeScreen() {
         goal={goal}
         isActive={isActive}
         isSaving={isSaving}
+        onPressPhase={() => setSelectedPhase(currentPhase)}
         progress={progress}
         targetDurationMs={targetDurationMs}
       />
@@ -96,7 +108,16 @@ export default function HomeScreen() {
         </View>
       ) : null}
 
+      {/* Rastreador de Água & Eletrólitos */}
+      <View className="mt-5">
+        <WaterTrackerCard />
+      </View>
+
       <MetabolicPhases elapsedHours={elapsedHours} isActive={isActive} />
+
+      <View className="mt-5">
+        <FastingHistoryCard />
+      </View>
 
       <View className="mt-6 flex-row items-start rounded-2xl border border-border bg-surface px-4 py-4">
         <View className="h-8 w-8 items-center justify-center rounded-xl bg-background">
@@ -107,10 +128,25 @@ export default function HomeScreen() {
           />
         </View>
         <Text className="ml-3 flex-1 font-body text-xs leading-5 text-muted">
-          Fases metabólicas estimadas com base em literatura geral. Varia de
-          pessoa para pessoa.
+          Fases metabólicas estimadas com base em literatura científica de jejum. Varia de pessoa para pessoa. Toca nas fases para ver todos os detalhes biológicos.
         </Text>
       </View>
+
+      {/* Modal de Detalhes da Fase */}
+      <MetabolicPhaseDetailModal
+        currentPhaseIndex={currentPhaseIndex}
+        isActive={isActive}
+        onClose={() => setSelectedPhase(null)}
+        phase={selectedPhase}
+        phaseIndex={
+          selectedPhase
+            ? ESTIMATED_METABOLIC_PHASES.findIndex(
+                (p) => p.id === selectedPhase.id,
+              )
+            : 0
+        }
+      />
     </Screen>
   );
 }
+

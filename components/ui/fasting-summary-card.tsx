@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
+
 
 import { FastingControls } from "@/components/ui/fasting-controls";
 import { FastingTimer } from "@/components/ui/fasting-timer";
@@ -13,6 +14,7 @@ interface FastingSummaryCardProps {
   goal: FastingGoal;
   isActive: boolean;
   isSaving: boolean;
+  onPressPhase?: () => void;
   progress: number;
   targetDurationMs: number;
 }
@@ -31,15 +33,16 @@ function formatCompactDuration(durationMs: number): string {
 
 interface SummaryMetricProps {
   label: string;
+  onPress?: () => void;
   value: string;
 }
 
-function SummaryMetric({ label, value }: SummaryMetricProps) {
-  return (
+function SummaryMetric({ label, onPress, value }: SummaryMetricProps) {
+  const content = (
     <View className="flex-1 items-center px-2">
       <Text
         adjustsFontSizeToFit
-        className="font-headline text-base text-foreground"
+        className={`font-headline text-base ${onPress ? "text-success underline" : "text-foreground"}`}
         minimumFontScale={0.68}
         numberOfLines={1}
       >
@@ -48,6 +51,16 @@ function SummaryMetric({ label, value }: SummaryMetricProps) {
       <Text className="mt-0.5 font-body text-xs text-muted">{label}</Text>
     </View>
   );
+
+  if (onPress) {
+    return (
+      <Pressable className="flex-1 items-center active:opacity-60" onPress={onPress}>
+        {content}
+      </Pressable>
+    );
+  }
+
+  return content;
 }
 
 export function FastingSummaryCard({
@@ -56,6 +69,7 @@ export function FastingSummaryCard({
   goal,
   isActive,
   isSaving,
+  onPressPhase,
   progress,
   targetDurationMs,
 }: FastingSummaryCardProps) {
@@ -103,10 +117,12 @@ export function FastingSummaryCard({
         />
         <View className="w-px bg-border" />
         <SummaryMetric
-          label="Fase"
+          label="Fase (Ver ↗)"
+          onPress={onPressPhase}
           value={isActive ? currentPhaseTitle : "—"}
         />
       </View>
+
 
       <FastingControls
         currentGoalId={goal.id}

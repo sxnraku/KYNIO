@@ -13,11 +13,14 @@ interface MealCaptureCardProps {
   isAnalyzing: boolean;
   onAnalyze: () => void;
   onChangeDescription: (value: string) => void;
+  onChangePortionQuantity?: (value: string) => void;
   onPickPhoto: () => void;
   onRemovePhoto: () => void;
   onTakePhoto: () => void;
+  portionQuantity?: string;
   selectedImage: SelectedMealImage | null;
 }
+
 
 interface SourceButtonProps {
   icon: "camera-outline" | "images-outline";
@@ -44,9 +47,11 @@ export function MealCaptureCard({
   isAnalyzing,
   onAnalyze,
   onChangeDescription,
+  onChangePortionQuantity,
   onPickPhoto,
   onRemovePhoto,
   onTakePhoto,
+  portionQuantity = "",
   selectedImage,
 }: MealCaptureCardProps) {
   return (
@@ -99,7 +104,7 @@ export function MealCaptureCard({
       </Text>
       <TextInput
         accessibilityLabel="Descrição da refeição"
-        className="min-h-28 rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
+        className="min-h-24 rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
         maxLength={500}
         multiline
         onChangeText={onChangeDescription}
@@ -108,6 +113,20 @@ export function MealCaptureCard({
         textAlignVertical="top"
         value={description}
       />
+
+      <Text className="mb-2 mt-4 font-label text-[10px] uppercase tracking-widest text-muted">
+        Quantidade / Porção (opcional)
+      </Text>
+      <TextInput
+        accessibilityLabel="Quantidade ou porção da refeição"
+        className="rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
+        maxLength={100}
+        onChangeText={onChangePortionQuantity}
+        placeholder="Ex.: 250g, 1 prato cheio, 2 fatias, 1 taça"
+        placeholderTextColor={COLORS.muted}
+        value={portionQuantity}
+      />
+
 
       <Pressable
         accessibilityRole="button"

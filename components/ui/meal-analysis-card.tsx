@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { TextInput } from "@/components/ui/text-input";
+
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
@@ -15,10 +17,13 @@ import type {
 interface MealAnalysisCardProps {
   analysis: MealAnalysisResult;
   editableNutrition: EditableMealNutrition;
+  isAnalyzing?: boolean;
   isSaving: boolean;
   onChangeNutrition: (field: EditableMealNutritionField, value: string) => void;
   onConfirm: () => void;
+  onRefine?: (clarificationText: string) => void;
 }
+
 
 interface NutritionInputProps {
   field: EditableMealNutritionField;
@@ -65,10 +70,17 @@ function NutritionInput({
 export function MealAnalysisCard({
   analysis,
   editableNutrition,
+  isAnalyzing = false,
   isSaving,
   onChangeNutrition,
   onConfirm,
+  onRefine,
 }: MealAnalysisCardProps) {
+  const [clarificationText, setClarificationText] = useState("");
+  const [showRefineInput, setShowRefineInput] = useState(
+    analysis.confidence === "low",
+  );
+
   return (
     <Card>
       <View className="flex-row items-start justify-between gap-4">
@@ -157,13 +169,74 @@ export function MealAnalysisCard({
         </View>
       ) : null}
 
+      {/* Clarification / Refine Section */}
+      {onRefine ? (
+        <View className="mt-5 rounded-xl border border-border bg-background/80 p-3.5">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2">
+              <Ionicons
+                color={analysis.confidence === "low" ? "#F59E0B" : COLORS.success}
+                name={analysis.confidence === "low" ? "help-circle-outline" : "sparkles-outline"}
+                size={16}
+              />
+              <Text className="font-headline text-xs text-foreground">
+                {analysis.confidence === "low"
+                  ? "A imagem não ficou clara? Clarifica aqui:"
+                  : "Queres ajustar ingredientes ou porção?"}
+              </Text>
+            </View>
+            {!showRefineInput && analysis.confidence !== "low" ? (
+              <Pressable
+                onPress={() => setShowRefineInput(true)}
+                className="rounded-md bg-surface px-2 py-1 border border-border"
+              >
+                <Text className="font-label text-[10px] text-muted">Ajustar</Text>
+              </Pressable>
+            ) : null}
+          </View>
+
+          {showRefineInput || analysis.confidence === "low" ? (
+            <View className="mt-2.5">
+              <TextInput
+                accessibilityLabel="Clarificação dos alimentos"
+                className="rounded-lg border border-border bg-surface px-3 py-2 font-body text-sm text-foreground"
+                onChangeText={setClarificationText}
+                placeholder="Ex.: é tofu com arroz integral, cerca de 300g"
+                placeholderTextColor={COLORS.muted}
+                value={clarificationText}
+              />
+              <Pressable
+                accessibilityRole="button"
+                disabled={!clarificationText.trim() || isAnalyzing}
+                onPress={() => onRefine(clarificationText)}
+                className={`mt-2 flex-row items-center justify-center gap-2 rounded-lg py-2.5 ${
+                  clarificationText.trim() && !isAnalyzing
+                    ? "bg-success active:opacity-80"
+                    : "bg-border opacity-50"
+                }`}
+              >
+                {isAnalyzing ? (
+                  <ActivityIndicator color={COLORS.background} size="small" />
+                ) : (
+                  <Ionicons color={COLORS.background} name="refresh-outline" size={15} />
+                )}
+                <Text className="font-headline text-xs text-background">
+                  {isAnalyzing ? "A recalcular…" : "Recalcular com estes detalhes"}
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+        </View>
+      ) : null}
+
       <Pressable
         accessibilityRole="button"
-        accessibilityState={{ disabled: isSaving }}
+        accessibilityState={{ disabled: isSaving || isAnalyzing }}
         className="mt-6 min-h-14 flex-row items-center justify-center gap-2 rounded-xl bg-xp px-5 active:opacity-80 disabled:opacity-60"
-        disabled={isSaving}
+        disabled={isSaving || isAnalyzing}
         onPress={onConfirm}
       >
+
         {isSaving ? (
           <ActivityIndicator color={COLORS.foreground} size="small" />
         ) : (

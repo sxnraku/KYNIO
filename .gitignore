@@ -36,6 +36,10 @@ yarn-error.*
 supabase/.env.functions
 supabase/.temp/
 
+# local EAS signing credentials
+/credentials.json
+/credentials/
+
 # typescript
 *.tsbuildinfo
 

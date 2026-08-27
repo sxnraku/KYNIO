@@ -3,35 +3,95 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { getUserProfile, saveFastRecord } from '@/services/dbService';
+import {
+  cancelFastingNotifications,
+  scheduleFastingPhaseNotifications,
+} from '@/services/fastingNotificationService';
 import { getXpReward } from '@/services/gamificationService';
 import { useUserProgressStore } from '@/store/user-progress-store';
 
-export type FastingGoalId = '16:8' | '18:6' | '20:4' | '24:0';
+export type FastingGoalId =
+  | '16:8'
+  | '18:6'
+  | '20:4'
+  | '24:0'
+  | '36:0'
+  | '48:0'
+  | 'open';
 
 export interface FastingGoal {
+  description?: string;
   eatingHours: number;
   fastingHours: number;
   id: FastingGoalId;
+  label: string;
 }
 
 export const FASTING_GOALS: readonly FastingGoal[] = [
-  { eatingHours: 8, fastingHours: 16, id: '16:8' },
-  { eatingHours: 6, fastingHours: 18, id: '18:6' },
-  { eatingHours: 4, fastingHours: 20, id: '20:4' },
-  { eatingHours: 0, fastingHours: 24, id: '24:0' },
+  {
+    description: 'Popular & Equilibrado',
+    eatingHours: 8,
+    fastingHours: 16,
+    id: '16:8',
+    label: '16:8',
+  },
+  {
+    description: 'Queima Acelerada',
+    eatingHours: 6,
+    fastingHours: 18,
+    id: '18:6',
+    label: '18:6',
+  },
+  {
+    description: 'Jejum Guerreiro',
+    eatingHours: 4,
+    fastingHours: 20,
+    id: '20:4',
+    label: '20:4',
+  },
+  {
+    description: 'Uma Refeição por Dia (OMAD)',
+    eatingHours: 0,
+    fastingHours: 24,
+    id: '24:0',
+    label: '24:0 (OMAD)',
+  },
+  {
+    description: 'Jejum Monge',
+    eatingHours: 0,
+    fastingHours: 36,
+    id: '36:0',
+    label: '36h Monge',
+  },
+  {
+    description: 'Reset Metabólico Prolongado',
+    eatingHours: 0,
+    fastingHours: 48,
+    id: '48:0',
+    label: '48h Reset',
+  },
+  {
+    description: 'Sem limite fixo (>1 dia / livre)',
+    eatingHours: 0,
+    fastingHours: 0,
+    id: 'open',
+    label: 'Jejum Livre',
+  },
 ];
 
 interface FastingState {
   endFasting: () => Promise<void>;
   goal: FastingGoal;
   hasHydrated: boolean;
+  historyRevision: number;
   isActive: boolean;
   isSaving: boolean;
   persistenceError: string | null;
   resetFasting: () => void;
   setGoal: (goalId: FastingGoalId) => void;
   setHydrated: () => void;
-  startFasting: () => void;
+  setStartedAt: (startedAt: number) => boolean;
+  startFasting: (startedAt?: number) => boolean;
   startedAt: number | null;
   targetDurationMs: number;
 }
@@ -45,15 +105,31 @@ export const useFastingStore = create<FastingState>()(
   persist(
     (set, get) => ({
       endFasting: async () => {
-        const { goal, isActive, isSaving, startedAt, targetDurationMs } = get();
+        const { goal, historyRevision, isActive, isSaving, startedAt, targetDurationMs } = get();
 
         if (!isActive || isSaving || startedAt === null) {
           return;
         }
 
         const endTime = Date.now();
-        const completed = endTime - startedAt >= targetDurationMs;
-        const xpEarned = completed ? getXpReward('fastGoalCompleted') : 0;
+        const elapsedMs = Math.max(0, endTime - startedAt);
+        const elapsedHours = elapsedMs / HOURS_TO_MILLISECONDS;
+
+        let completed = false;
+        let xpEarned = 0;
+
+        if (goal.id === 'open') {
+          completed = elapsedHours >= 12;
+          if (completed) {
+            const additionalTiers = Math.floor(
+              Math.max(0, elapsedHours - 12) / 6,
+            );
+            xpEarned = getXpReward('fastGoalCompleted') + additionalTiers * 25;
+          }
+        } else {
+          completed = elapsedMs >= targetDurationMs;
+          xpEarned = completed ? getXpReward('fastGoalCompleted') : 0;
+        }
 
         set({ isSaving: true, persistenceError: null });
 
@@ -62,10 +138,17 @@ export const useFastingStore = create<FastingState>()(
             completed,
             endTime,
             startTime: startedAt,
-            targetHours: goal.fastingHours,
+            targetHours:
+              goal.id === 'open' ? Math.round(elapsedHours) : goal.fastingHours,
             xpEarned,
           });
-          set({ isActive: false, isSaving: false, startedAt: null });
+          void cancelFastingNotifications();
+          set({
+            historyRevision: (historyRevision || 0) + 1,
+            isActive: false,
+            isSaving: false,
+            startedAt: null,
+          });
 
           try {
             const profile = await getUserProfile();
@@ -83,10 +166,13 @@ export const useFastingStore = create<FastingState>()(
       },
       goal: DEFAULT_GOAL,
       hasHydrated: false,
+      historyRevision: 0,
       isActive: false,
       isSaving: false,
+
       persistenceError: null,
-      resetFasting: () =>
+      resetFasting: () => {
+        void cancelFastingNotifications();
         set({
           goal: DEFAULT_GOAL,
           isActive: false,
@@ -94,7 +180,8 @@ export const useFastingStore = create<FastingState>()(
           persistenceError: null,
           startedAt: null,
           targetDurationMs: DEFAULT_GOAL.fastingHours * HOURS_TO_MILLISECONDS,
-        }),
+        });
+      },
       setGoal: (goalId) => {
         const nextGoal = FASTING_GOALS.find((goal) => goal.id === goalId);
 
@@ -108,8 +195,29 @@ export const useFastingStore = create<FastingState>()(
         });
       },
       setHydrated: () => set({ hasHydrated: true }),
-      startFasting: () =>
-        set({ isActive: true, persistenceError: null, startedAt: Date.now() }),
+      setStartedAt: (startedAt) => {
+        if (
+          !get().isActive ||
+          !Number.isFinite(startedAt) ||
+          startedAt > Date.now()
+        ) {
+          return false;
+        }
+
+        set({ persistenceError: null, startedAt });
+        void scheduleFastingPhaseNotifications(startedAt, get().goal.fastingHours);
+        return true;
+      },
+      startFasting: (startedAt = Date.now()) => {
+        if (!Number.isFinite(startedAt) || startedAt > Date.now()) {
+          return false;
+        }
+
+        set({ isActive: true, persistenceError: null, startedAt });
+        void scheduleFastingPhaseNotifications(startedAt, get().goal.fastingHours);
+        return true;
+      },
+
       startedAt: null,
       targetDurationMs: DEFAULT_GOAL.fastingHours * HOURS_TO_MILLISECONDS,
     }),
@@ -129,3 +237,4 @@ export const useFastingStore = create<FastingState>()(
     },
   ),
 );
+

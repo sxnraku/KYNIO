@@ -2,9 +2,13 @@ import type { FastRecord } from '@/db/schema';
 import {
   calculateLevel,
   calculateLevelProgress,
+  getGamificationBadges,
+  getLevelTitle,
   getXpReward,
+  getXpRewardTiers,
   summarizeLocalGamificationStats,
 } from '@/services/gamificationService';
+
 
 const FIXED_NOW = new Date(2026, 7, 22, 12, 0, 0).getTime();
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
@@ -69,4 +73,68 @@ describe('gamificationService', () => {
     expect(withOneMissedDay.streakIntensity).toBeCloseTo(0.8);
     expect(withOneMissedDay.streakIntensity).toBeGreaterThan(0.25);
   });
+
+  it('retorna os títulos corretos de acordo com o nível', () => {
+
+    expect(getLevelTitle(1)).toBe('Aprendiz');
+    expect(getLevelTitle(2)).toBe('Iniciado');
+    expect(getLevelTitle(3)).toBe('Consistente');
+    expect(getLevelTitle(5)).toBe('Disciplinado');
+    expect(getLevelTitle(10)).toBe('Mestre da Consistência');
+  });
+
+  it('retorna os escalões de recompensas XP com desbloqueios corretos', () => {
+    const tiersLevel1 = getXpRewardTiers(0, 1);
+    expect(tiersLevel1[0].isUnlocked).toBe(true);
+    expect(tiersLevel1[1].isUnlocked).toBe(false);
+
+    const tiersLevel7 = getXpRewardTiers(3600, 7);
+    expect(tiersLevel7.every((t) => t.isUnlocked)).toBe(true);
+  });
+
+  it('calcula estatísticas incluindo refeições e treinos', () => {
+    const emptyStats = summarizeLocalGamificationStats([], []);
+    expect(emptyStats.activeDays).toBe(0);
+    expect(emptyStats.daysSinceLastActivity).toBeNull();
+    expect(emptyStats.streakDays).toBe(0);
+
+    const badgesEmpty = getGamificationBadges(emptyStats);
+    expect(badgesEmpty.every((b) => !b.unlocked)).toBe(true);
+
+    const fast = createFastRecord(1, 0);
+    const meal = {
+      carbsGrams: 20,
+      estimatedCalories: 450,
+      fatGrams: 15,
+      id: 1,
+      imageUrl: null,
+      proteinGrams: 30,
+      tags: ['ovo'],
+      timestamp: FIXED_NOW,
+      xpEarned: 30,
+    };
+    const workout = {
+      durationMinutes: 45,
+      effort: 'moderate' as const,
+      id: 1,
+      notes: null,
+      timestamp: FIXED_NOW,
+      type: 'Corrida',
+      xpEarned: 50,
+    };
+
+
+    const fullStats = summarizeLocalGamificationStats([fast], [meal], [workout]);
+    expect(fullStats.completedFasts).toBe(1);
+    expect(fullStats.mealScans).toBe(1);
+    expect(fullStats.workoutLogs).toBe(1);
+
+    const badgesFull = getGamificationBadges({
+      ...fullStats,
+      streakDays: 7,
+      totalFastingHours: 55,
+    });
+    expect(badgesFull.every((b) => b.unlocked)).toBe(true);
+  });
 });
+
