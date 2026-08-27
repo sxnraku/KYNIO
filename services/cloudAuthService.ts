@@ -10,8 +10,8 @@ import type { CloudAccount } from '@/types/cloud';
 WebBrowser.maybeCompleteAuthSession();
 
 const GOOGLE_WEB_CLIENT_ID =
-  process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim() ||
-  '590155512529-0r43ejrr20iousklkjvkjtqmr3l1kmm7.apps.googleusercontent.com';
+  process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim() ?? '';
+
 
 if (Platform.OS !== 'web') {
   try {
