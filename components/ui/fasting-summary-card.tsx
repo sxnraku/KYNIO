@@ -4,9 +4,12 @@ import { Text } from "@/components/ui/text";
 
 
 import { FastingControls } from "@/components/ui/fasting-controls";
+import { FastingScheduleModal } from "@/components/ui/fasting-schedule-modal";
 import { FastingTimer } from "@/components/ui/fasting-timer";
 import { COLORS } from "@/constants/colors";
+import { useFastingScheduleStore } from "@/store/use-fasting-schedule-store";
 import type { FastingGoal } from "@/store/useFastingStore";
+import { useState } from "react";
 
 interface FastingSummaryCardProps {
   currentPhaseTitle: string;
@@ -74,6 +77,15 @@ export function FastingSummaryCard({
   targetDurationMs,
 }: FastingSummaryCardProps) {
   const remainingMs = Math.max(0, targetDurationMs - elapsedMs);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const scheduleStore = useFastingScheduleStore();
+
+  const isScheduleActive = scheduleStore.enabled && scheduleStore.mode !== 'none';
+  const scheduleLabel = scheduleStore.mode === 'adf'
+    ? `ADF · ${scheduleStore.targetHours}h`
+    : scheduleStore.mode === 'daily'
+    ? `Diário · ${scheduleStore.targetHours}h`
+    : `Personalizado · ${scheduleStore.targetHours}h`;
 
   return (
     <View className="overflow-hidden rounded-[32px] border border-border bg-surface p-5">
@@ -91,12 +103,35 @@ export function FastingSummaryCard({
             Acompanha o teu ritmo, sem pressão.
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-success/10">
-          <Ionicons color={COLORS.success} name="timer-outline" size={21} />
-        </View>
+        <Pressable
+          accessibilityLabel="Configurar Rotina de Jejum"
+          accessibilityRole="button"
+          className="h-10 w-10 items-center justify-center rounded-2xl bg-success/10 active:opacity-70"
+          onPress={() => setIsScheduleModalOpen(true)}
+        >
+          <Ionicons color={COLORS.success} name="calendar-outline" size={20} />
+        </Pressable>
       </View>
 
-      <View className="mt-5">
+      {/* Routine Status Pill */}
+      <View className="mt-3 flex-row items-center justify-between rounded-xl border border-border/80 bg-background/60 px-3 py-2">
+        <View className="flex-row items-center gap-2">
+          <View className={`h-2 w-2 rounded-full ${isScheduleActive ? 'bg-success' : 'bg-muted'}`} />
+          <Text className="font-body text-xs text-muted">
+            {isScheduleActive ? `Rotina: ${scheduleLabel}` : "Rotina: Desativada"}
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setIsScheduleModalOpen(true)}
+        >
+          <Text className="font-headline text-xs text-success">
+            {isScheduleActive ? "Alterar ↗" : "Configurar ↗"}
+          </Text>
+        </Pressable>
+      </View>
+
+      <View className="mt-4">
         <FastingTimer
           elapsedMs={elapsedMs}
           goalLabel={goal.id}
@@ -123,11 +158,15 @@ export function FastingSummaryCard({
         />
       </View>
 
-
       <FastingControls
         currentGoalId={goal.id}
         isActive={isActive}
         isSaving={isSaving}
+      />
+
+      <FastingScheduleModal
+        onClose={() => setIsScheduleModalOpen(false)}
+        visible={isScheduleModalOpen}
       />
     </View>
   );

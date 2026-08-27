@@ -137,3 +137,48 @@ export async function scheduleFastingPhaseNotifications(
     // Non-blocking notification failure
   }
 }
+
+export async function scheduleRoutineReminderNotification(
+  nextFastDate: Date,
+  targetHours: number,
+  remindBeforeMinutes: number,
+): Promise<void> {
+  if (Platform.OS === 'web') {
+    return;
+  }
+
+  try {
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    const now = Date.now();
+    const reminderTimeMs = nextFastDate.getTime() - remindBeforeMinutes * 60 * 1000;
+    const delaySeconds = Math.floor((reminderTimeMs - now) / 1000);
+
+    if (delaySeconds > 10) {
+      const isAdf = targetHours >= 36;
+      const title = isAdf ? 'Hora do Jejum ADF' : 'Hora do teu Jejum';
+      const body = remindBeforeMinutes > 0
+        ? `O teu jejum de ${targetHours}h começa em ${remindBeforeMinutes} minutos. Prepara a tua última refeição!`
+        : `Está na hora de iniciar o teu jejum de ${targetHours}h. Toca para começar!`;
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title,
+          body,
+          data: { type: 'fasting_routine_reminder', targetHours },
+          sound: true,
+        },
+        trigger: {
+          seconds: delaySeconds,
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        },
+      });
+    }
+  } catch {
+    // Silently ignore notification failure
+  }
+}
+

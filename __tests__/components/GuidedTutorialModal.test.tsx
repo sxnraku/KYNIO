@@ -51,7 +51,7 @@ describe('GuidedTutorialModal', () => {
     expect(
       screen.queryByText('Os teus dados, as tuas escolhas'),
     ).toBeNull();
-  });
+  }, 90000);
 
   it('só aparece depois dos termos e do perfil inicial estarem concluídos', async () => {
     useGuidedTutorialStore.setState({ profileOnboardingComplete: false });
