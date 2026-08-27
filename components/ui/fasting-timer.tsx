@@ -3,7 +3,11 @@ import { Text } from "@/components/ui/text";
 import Svg, { Circle } from "react-native-svg";
 
 import { COLORS } from "@/constants/colors";
-import { formatElapsedTime } from "@/services/fasting";
+import {
+  ESTIMATED_METABOLIC_PHASES,
+  formatElapsedTime,
+  getEstimatedPhaseIndex,
+} from "@/services/fasting";
 
 interface FastingTimerProps {
   elapsedMs: number;
@@ -23,7 +27,20 @@ export function FastingTimer({
   const center = size / 2;
   const radius = center - 12;
   const circumference = 2 * Math.PI * radius;
-  const progressOffset = circumference * (1 - progress);
+
+  const isOpenGoal = goalLabel.toLowerCase().includes("livre");
+  const elapsedHours = elapsedMs / (60 * 60 * 1000);
+  const currentPhase =
+    ESTIMATED_METABOLIC_PHASES[getEstimatedPhaseIndex(elapsedHours)];
+
+  // No modo livre, o anel reflete o ciclo de 24h ou o progresso da fase atual
+  const effectiveProgress = isOpenGoal
+    ? isActive
+      ? Math.max(0.08, (elapsedMs % (24 * 60 * 60 * 1000)) / (24 * 60 * 60 * 1000))
+      : 0
+    : progress;
+
+  const progressOffset = circumference * (1 - effectiveProgress);
 
   return (
     <View className="items-center py-1">
@@ -58,7 +75,7 @@ export function FastingTimer({
 
         <View className="absolute inset-0 items-center justify-center px-5">
           <Text className="font-body text-xs text-muted">
-            Objetivo de jejum
+            {isOpenGoal ? "Jejum livre" : "Objetivo de jejum"}
           </Text>
           <Text
             className="mt-1 font-label tracking-tighter text-foreground"
@@ -86,11 +103,16 @@ export function FastingTimer({
         </View>
       </View>
 
-      <Text className="mt-3 font-body text-sm text-muted">
+      <Text className="mt-3 text-center font-body text-sm text-muted">
         {isActive
-          ? `${Math.round(progress * 100)}% do objetivo ${goalLabel}`
-          : `Pronto para o objetivo ${goalLabel}`}
+          ? isOpenGoal
+            ? `Fase: ${currentPhase.title} · Sem limite pré-fixado`
+            : `${Math.round(progress * 100)}% do objetivo ${goalLabel}`
+          : isOpenGoal
+            ? "Pronto para iniciar jejum livre"
+            : `Pronto para o objetivo ${goalLabel}`}
       </Text>
     </View>
   );
 }
+

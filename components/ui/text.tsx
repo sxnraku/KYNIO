@@ -36,3 +36,6 @@ export const Text = forwardRef<NativeText, TextProps>(function Text(
     </NativeText>
   );
 });
+
+export const AppText = Text;
+

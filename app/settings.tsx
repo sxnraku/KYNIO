@@ -7,7 +7,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PrivacyNote } from "@/components/ui/privacy-note";
 import { CloudAccountCard } from "@/components/ui/cloud-account-card";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { PreferenceControls } from "@/components/ui/preference-controls";
+import { ProBadge } from "@/components/ui/pro-badge";
 import { SettingsActionCard } from "@/components/ui/settings-action-card";
 import { COLORS } from "@/constants/colors";
 import {
@@ -17,7 +19,9 @@ import {
 import { translateText } from "@/services/i18n";
 import { getLegalDocumentUrl, type LegalDocument } from "@/services/legalLinks";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useGuidedTutorialStore } from "@/store/guided-tutorial-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 import { useUserProgressStore } from "@/store/user-progress-store";
 import { useFastingStore } from "@/store/useFastingStore";
 
@@ -28,10 +32,14 @@ function getErrorMessage(error: unknown, fallback: string): string {
 export default function SettingsScreen() {
   const router = useRouter();
   const language = useAppPreferencesStore((state) => state.language);
+  const isPro = useSubscriptionStore((state) => state.isPro);
+  const tier = useSubscriptionStore((state) => state.tier);
+  const [paywallOpen, setPaywallOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
 
   const openLegalDocument = async (document: LegalDocument) => {
     try {
@@ -76,6 +84,7 @@ export default function SettingsScreen() {
       await deleteAllLocalData();
       useFastingStore.getState().resetFasting();
       useUserProgressStore.getState().resetProgress();
+      useGuidedTutorialStore.getState().resetTutorial();
       router.replace("/(tabs)");
       useLegalConsentStore.getState().resetConsent();
     } catch (error) {
@@ -123,6 +132,11 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
+      <PaywallModal
+        onClose={() => setPaywallOpen(false)}
+        visible={paywallOpen}
+      />
+
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
@@ -132,7 +146,54 @@ export default function SettingsScreen() {
         }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Subscription / Pro Card */}
+        <View className="mb-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center gap-2.5">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 border border-emerald-500/30">
+                <Text className="text-xl">👑</Text>
+              </View>
+              <View>
+                <View className="flex-row items-center gap-1.5">
+                  <Text className="font-headline text-base text-foreground">
+                    KYNIO AURA PRO
+                  </Text>
+                  {isPro ? <ProBadge size="small" /> : null}
+                </View>
+                <Text className="font-body text-xs text-muted">
+                  {isPro
+                    ? `Plano ativo (${tier}) · Acesso total`
+                    : "IA ilimitada, todos os jejuns e temas exclusivos"}
+                </Text>
+              </View>
+            </View>
+
+            <Pressable
+              onPress={() => setPaywallOpen(true)}
+              className="rounded-xl bg-emerald-500 px-3.5 py-2 active:opacity-80"
+            >
+              <Text className="font-label text-xs font-bold text-black">
+                {isPro ? "Gerir" : "Desbloquear"}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
         <PreferenceControls />
+
+
+        <View className="mt-5">
+          <SettingsActionCard
+            description="Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade."
+            icon="compass-outline"
+            isLoading={false}
+            label="Rever tutorial guiado"
+            onPress={() =>
+              useGuidedTutorialStore.getState().restartTutorial()
+            }
+            testID="replay-tutorial-button"
+          />
+        </View>
 
         <View className="mt-5">
           <CloudAccountCard onLocalDataChanged={() => undefined} />

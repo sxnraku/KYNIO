@@ -78,10 +78,10 @@ export function ConsistencyLine({ stats }: ConsistencyLineProps) {
       </View>
 
       <View className="mt-3 flex-row items-center justify-between">
-        <Text className="font-body text-xs text-muted">
+        <Text className="min-w-0 flex-1 pr-3 font-body text-xs text-muted">
           A intensidade suaviza quando há uma pausa; o histórico permanece.
         </Text>
-        <Text className="ml-3 font-label text-[10px] text-success">
+        <Text className="shrink-0 font-label text-[10px] text-success">
           {Math.round(stats.streakIntensity * 100)}%
         </Text>
       </View>

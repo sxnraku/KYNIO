@@ -28,28 +28,38 @@ export async function persistProfileImage(
     return `data:${mimeType};base64,${base64}`;
   }
 
-  const profileImagesDirectory = new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME);
-  profileImagesDirectory.create({ idempotent: true, intermediates: true });
+  try {
+    const profileImagesDirectory = new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME);
+    profileImagesDirectory.create({ idempotent: true, intermediates: true });
 
-  const destination = new File(
-    profileImagesDirectory,
-    `avatar-${Date.now()}.${getImageExtension(mimeType)}`,
-  );
-  const source = new File(sourceUri);
+    const filename = `avatar-${Date.now()}.${getImageExtension(mimeType)}`;
+    const destination = new File(profileImagesDirectory, filename);
 
-  await source.copy(destination);
+    if (base64) {
+      // Write base64 directly to file - avoids URI scheme issues with content://
+      destination.write(base64);
+    } else {
+      const source = new File(sourceUri);
+      await source.copy(destination);
+    }
 
-  return destination.uri;
+    return destination.uri;
+  } catch {
+    return sourceUri;
+  }
 }
 
 export function deleteProfileImage(uri: string | null): void {
-  if (!uri || Platform.OS === 'web') {
+  if (!uri || Platform.OS === 'web' || uri.startsWith('data:') || uri.startsWith('http')) {
     return;
   }
 
-  const image = new File(uri);
-
-  if (image.exists) {
-    image.delete();
+  try {
+    const image = new File(uri);
+    if (image.exists) {
+      image.delete();
+    }
+  } catch {
+    // Silently ignore deletion errors
   }
 }

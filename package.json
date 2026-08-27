@@ -1,7 +1,8 @@
 {
   "name": "kynio",
   "main": "expo-router/entry",
-  "version": "1.1.0",
+  "version": "1.1.8",
+
   "packageManager": "npm@10.9.8",
   "engines": {
     "node": "22.23.x",
@@ -12,6 +13,7 @@
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-google-signin/google-signin": "^16.1.4",
     "@supabase/supabase-js": "^2.112.3",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "29.5.14",
@@ -24,8 +26,10 @@
     "expo-crypto": "~57.0.2",
     "expo-file-system": "~57.0.5",
     "expo-font": "~57.0.1",
+    "expo-haptics": "~57.0.1",
     "expo-image-picker": "~57.0.13",
     "expo-linking": "~57.0.7",
+    "expo-notifications": "~57.0.14",
     "expo-router": "~57.0.16",
     "expo-sharing": "~57.0.15",
     "expo-splash-screen": "~57.0.8",
@@ -63,6 +67,8 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "build:android:local-apk": "cmd /c android\\build-apk.bat",
+    "build:android:local-aab": "cmd /c android\\build-aab.bat",
     "build:android:preview": "npx eas-cli build --platform android --profile preview",
     "build:android:production": "npx eas-cli build --platform android --profile production",
     "start": "expo start",

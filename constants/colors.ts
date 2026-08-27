@@ -16,6 +16,7 @@ interface ColorPalette {
   surfaceRaised: string;
   surfaceRaisedRgb: string;
   surfaceRgb: string;
+  warning: string;
   xp: string;
 }
 
@@ -35,6 +36,7 @@ const LIGHT_COLORS: ColorPalette = {
   success: "#10B981",
   successDark: "#D9F7EA",
   successDarkRgb: "217 247 234",
+  warning: "#F59E0B",
   xp: "#6366F1",
 };
 
@@ -54,8 +56,10 @@ const DARK_COLORS: ColorPalette = {
   surfaceRaised: "#27272A",
   surfaceRaisedRgb: "39 39 42",
   surfaceRgb: "24 24 27",
+  warning: "#FBBF24",
   xp: "#818CF8",
 };
+
 
 let activeColorMode: AppThemeMode = "light";
 

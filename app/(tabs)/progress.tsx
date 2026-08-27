@@ -7,7 +7,11 @@ import { LevelProgressCard } from "@/components/ui/level-progress-card";
 import { PageTitle } from "@/components/ui/page-title";
 import { PrivacyNote } from "@/components/ui/privacy-note";
 import { Screen } from "@/components/ui/screen";
+import { WeeklyChallengesCard } from "@/components/ui/weekly-challenges-card";
+import { WeeklyFastingChart } from "@/components/ui/weekly-fasting-chart";
 import { WeightTrackingCard } from "@/components/ui/weight-tracking-card";
+
+import { XpRewardsCard } from "@/components/ui/xp-rewards-card";
 import { COLORS } from "@/constants/colors";
 import { useGamificationProgress } from "@/hooks/use-gamification-progress";
 
@@ -53,12 +57,29 @@ export default function ProgressScreen() {
           </View>
 
           <View className="mt-5">
+            <XpRewardsCard
+              level={snapshot.level}
+              totalXp={snapshot.profile.totalXp}
+            />
+          </View>
+
+          <View className="mt-5">
+            <WeeklyFastingChart />
+          </View>
+
+          <View className="mt-5">
+            <WeeklyChallengesCard />
+          </View>
+
+          <View className="mt-5">
             <ConsistencyLine stats={snapshot.stats} />
           </View>
 
           <View className="mt-5">
             <WeightTrackingCard />
           </View>
+
+
 
           <View className="mt-8">
             <View className="mb-4 flex-row items-end justify-between px-1">

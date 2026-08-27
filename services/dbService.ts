@@ -155,6 +155,13 @@ export async function getFastRecordById(
   return record ?? null;
 }
 
+export async function deleteFastRecord(id: number): Promise<void> {
+  const database = await getInitializedDatabase();
+  await database.delete(fasts).where(eq(fasts.id, id));
+  requestCloudSync();
+}
+
+
 export async function saveMealRecord(
   input: SaveMealRecordInput,
 ): Promise<MealRecord> {
@@ -347,6 +354,30 @@ export async function getUserProfile(): Promise<UserProfileRecord> {
 
   return profile;
 }
+
+export async function updateUserProfileXp(
+  totalXp: number,
+): Promise<UserProfileRecord> {
+  const database = await getInitializedDatabase();
+  const safeXp = Math.max(0, Math.floor(totalXp));
+  const [profile] = await database
+    .update(userProfile)
+    .set({
+      currentLevel: calculateLevel(safeXp),
+      profileUpdatedAt: Date.now(),
+      totalXp: safeXp,
+    })
+    .where(eq(userProfile.id, 1))
+    .returning();
+
+  if (!profile) {
+    throw new Error('Não foi possível atualizar o XP do perfil.');
+  }
+
+  requestCloudSync();
+  return profile;
+}
+
 
 export async function updateLocalProfile(
   input: UpdateLocalProfileInput,

@@ -35,6 +35,16 @@ export interface GamificationBadge {
   unlocked: boolean;
 }
 
+export interface XpRewardTier {
+  description: string;
+  id: string;
+  isUnlocked: boolean;
+  levelRequired: number;
+  perkBadge: string;
+  title: string;
+  xpRequired: number;
+}
+
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
 export function getXpReward(event: GamificationEvent): number {
@@ -81,6 +91,75 @@ export function calculateLevelProgress(totalXp: number): LevelProgress {
     xpRequiredInLevel,
   };
 }
+
+export function getXpRewardTiers(
+  currentTotalXp: number,
+  currentLevel: number,
+): XpRewardTier[] {
+  return [
+    {
+      description:
+        'Acesso total aos temporizadores de jejum e registo local ilimitado.',
+      id: 'tier-1-base',
+      isUnlocked: true,
+      levelRequired: 1,
+      perkBadge: 'BASE',
+      title: 'Aura Essencial',
+      xpRequired: 0,
+    },
+    {
+      description:
+        'Ativa realces visuais esmeralda e micro-animações personalizadas.',
+      id: 'tier-2-visuals',
+      isUnlocked: currentLevel >= 2,
+      levelRequired: 2,
+      perkBadge: 'VISUAL',
+      title: 'Tema Aura Glow',
+      xpRequired: 100,
+    },
+    {
+      description:
+        'Acesso a análises aprofundadas de macronutrientes e tendências de cetose.',
+      id: 'tier-3-analytics',
+      isUnlocked: currentLevel >= 3,
+      levelRequired: 3,
+      perkBadge: 'ANALYTICS',
+      title: 'Métricas Avançadas',
+      xpRequired: 400,
+    },
+    {
+      description:
+        'Prioridade e precisão aumentada no modelo Gemini de análise de refeições.',
+      id: 'tier-4-ai-boost',
+      isUnlocked: currentLevel >= 4,
+      levelRequired: 4,
+      perkBadge: 'IA BOOST',
+      title: 'Modo IA Pro Turbo',
+      xpRequired: 900,
+    },
+    {
+      description:
+        'Passe Premium Kynio Aura: todas as ferramentas de longevidade e exportação avançada.',
+      id: 'tier-5-pro-pass',
+      isUnlocked: currentLevel >= 5,
+      levelRequired: 5,
+      perkBadge: 'PREMIUM PASS',
+      title: 'Kynio Aura Pass Pro',
+      xpRequired: 1600,
+    },
+    {
+      description:
+        'Insígnia de Prestígio Mestre e estatuto honorário permanente de pioneiro Kynio.',
+      id: 'tier-7-prestige',
+      isUnlocked: currentLevel >= 7,
+      levelRequired: 7,
+      perkBadge: 'PRESTÍGIO',
+      title: 'Mestre da Longevidade',
+      xpRequired: 3600,
+    },
+  ];
+}
+
 
 function getLocalDayOrdinal(timestamp: number): number {
   const date = new Date(timestamp);

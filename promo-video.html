@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KYNIO — Gravação 100% Real do App</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    body {
+      background-color: #050608;
+      color: #F4F4F5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* 9:16 Pure Native Device Enclosure */
+    .phone-device {
+      width: 390px;
+      height: 800px;
+      background: #000;
+      border-radius: 54px;
+      border: 4px solid #27272A;
+      box-shadow: 0 35px 100px -20px rgba(0, 0, 0, 0.95), 0 0 50px rgba(16, 185, 129, 0.14);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status Bar & Dynamic Island */
+    .status-bar {
+      height: 44px;
+      padding: 0 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #A1A1AA;
+      z-index: 50;
+      background: #09090B;
+    }
+
+    .island {
+      width: 105px;
+      height: 25px;
+      background: #000;
+      border-radius: 20px;
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .island-dot {
+      width: 8px;
+      height: 8px;
+      background: #10B981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px #10B981;
+    }
+
+    .island-text {
+      font-size: 9px;
+      font-weight: 800;
+      color: #10B981;
+    }
+
+    /* App Viewport */
+    .app-screen {
+      flex: 1;
+      background: #09090B;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 1:1 REAL APP HEADER */
+    .app-header {
+      background: #09090B;
+      padding: 8px 20px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(63, 63, 70, 0.2);
+      z-index: 40;
+    }
+
+    .header-user-side {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-icon-real {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      object-fit: cover;
+    }
+
+    .user-info-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text {
+      font-size: 20px;
+      font-weight: 800;
+      color: #F4F4F5;
+      line-height: 1.1;
+    }
+
+    .pro-tag-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #10B981;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .level-label {
+      font-size: 12px;
+      color: #A1A1AA;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .xp-track {
+      width: 96px;
+      height: 4px;
+      background: #3F3F46;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .xp-fill-live {
+      width: 65%;
+      height: 100%;
+      background: #818CF8;
+      border-radius: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-pro-unlock {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 7px 11px;
+      border-radius: 14px;
+    }
+
+    .btn-pro-unlock span {
+      font-size: 11px;
+      font-weight: 800;
+      color: #34D399;
+    }
+
+    .btn-shield-icon {
+      width: 40px;
+      height: 40px;
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #F4F4F5;
+      font-size: 16px;
+    }
+
+    /* Screen Tab Scroll Area */
+    .tab-content {
+      position: absolute;
+      inset: 70px 0 82px;
+      padding: 16px 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .tab-content.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* 1:1 FASTING SUMMARY CARD */
+    .fasting-card-1to1 {
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      border-radius: 32px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .ambient-card-bg {
+      position: absolute;
+      top: -80px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: rgba(16, 185, 129, 0.08);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+
+    .card-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #F4F4F5;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: #A1A1AA;
+      margin-top: 2px;
+    }
+
+    .icon-box-timer {
+      width: 40px;
+      height: 40px;
+      background: rgba(16, 185, 129, 0.12);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #10B981;
+      font-size: 18px;
+    }
+
+    /* Circular Timer Widget */
+    .ring-wrapper {
+      width: 190px;
+      height: 190px;
+      margin: 10px auto 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-wrapper svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .circle-track {
+      fill: none;
+      stroke: #27272A;
+      stroke-width: 10;
+    }
+
+    .circle-bar {
+      fill: none;
+      stroke: #10B981;
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-dasharray: 534;
+      stroke-dashoffset: 133;
+      filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.6));
+    }
+
+    .time-digits-main {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #F4F4F5;
+    }
+
+    .phase-badge-pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #10B981;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* 3 Metrics Row */
+    .metrics-3-col {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #27272A;
+      padding-top: 14px;
+      margin-bottom: 18px;
+    }
+
+    .met-box {
+      flex: 1;
+      text-align: center;
+    }
+
+    .met-v {
+      font-size: 14px;
+      font-weight: 800;
+      color: #F4F4F5;
+    }
+
+    .met-l {
+      font-size: 11px;
+      color: #A1A1AA;
+      margin-top: 2px;
+    }
+
+    /* Action Buttons */
+    .btn-main-green {
+      width: 100%;
+      height: 52px;
+      background: #10B981;
+      color: #000;
+      font-weight: 800;
+      font-size: 15px;
+      border-radius: 16px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn-dark-secondary {
+      width: 100%;
+      height: 46px;
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      border-radius: 16px;
+      color: #A1A1AA;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* 1:1 MEALS TAB */
+    .scanner-view-1to1 {
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      border-radius: 28px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cam-box {
+      width: 100%;
+      height: 210px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 14px;
+      background: #000;
+    }
+
+    .cam-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .laser-scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #38BDF8, #10B981, transparent);
+      box-shadow: 0 0 15px #38BDF8;
+      animation: laserSweep 2s infinite ease-in-out;
+    }
+
+    @keyframes laserSweep {
+      0% { top: 10%; opacity: 0.2; }
+      50% { opacity: 1; }
+      100% { top: 90%; opacity: 0.2; }
+    }
+
+    .nutrition-card-1to1 {
+      background: #27272A;
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .n-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .n-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .n-kcal {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38BDF8;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .macro-3-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .macro-card-cell {
+      background: #18181B;
+      padding: 8px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .m-gram {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .m-label-txt {
+      font-size: 10px;
+      color: #A1A1AA;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* 1:1 PROGRESS / WATER TAB */
+    .water-card-1to1 {
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      border-radius: 28px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .water-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .w-tag-cyan {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38BDF8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .w-title-txt {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    .w-cups-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .cup-cell {
+      height: 32px;
+      background: #27272A;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .cup-cell.full {
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid #38BDF8;
+    }
+
+    .w-buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-quick-water {
+      flex: 1;
+      height: 44px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38BDF8;
+      font-weight: 800;
+      font-size: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    /* 1:1 REAL BOTTOM TAB BAR (EXACT DESIGN) */
+    .tab-bar-1to1 {
+      height: 82px;
+      background: #18181B;
+      border-top: 1px solid #3F3F46;
+      border-top-left-radius: 26px;
+      border-top-right-radius: 26px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding-bottom: 10px;
+      padding-top: 7px;
+      z-index: 40;
+    }
+
+    .tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #A1A1AA;
+      font-size: 10px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .tab-btn.active-tab {
+      color: #10B981;
+    }
+
+    .tab-btn.active-xp {
+      color: #818CF8;
+    }
+
+    .tab-icon-svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* OUTRO PROMO OVERLAY */
+    .outro-screen {
+      position: absolute;
+      inset: 0;
+      background: #09090B;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .outro-screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .outro-logo-big {
+      width: 84px;
+      height: 84px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.45);
+    }
+
+    .outro-title-h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .outro-p {
+      font-size: 14px;
+      color: #A1A1AA;
+      line-height: 1.4;
+      margin-bottom: 28px;
+    }
+
+    .outro-btn-cta {
+      width: 100%;
+      height: 56px;
+      background: #10B981;
+      color: #000;
+      font-weight: 900;
+      font-size: 15px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+    }
+
+    .outro-cancel-hint {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #71717A;
+      font-weight: 600;
+    }
+
+    /* Timeline Indicator Bars (Top-Float) */
+    .timeline-strip {
+      position: absolute;
+      top: 50px;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      display: flex;
+      gap: 6px;
+      z-index: 65;
+    }
+
+    .t-cell {
+      flex: 1;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .t-fill-live {
+      width: 0%;
+      height: 100%;
+      background: #10B981;
+    }
+
+    /* Floating Feature Flag */
+    .floating-flag {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 185, 129, 0.95);
+      color: #000;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 5px 14px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+      z-index: 70;
+    }
+
+    /* Control Bar */
+    .control-deck {
+      margin-top: 20px;
+    }
+
+    .btn-replay-loop {
+      background: #18181B;
+      border: 1px solid #3F3F46;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-device">
+    <!-- Status Bar & Dynamic Island -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="island">
+        <div class="island-dot"></div>
+        <span class="island-text">16:8 ATIVO</span>
+      </div>
+      <span>100%</span>
+    </div>
+
+    <!-- Timeline Progress -->
+    <div class="timeline-strip">
+      <div class="t-cell"><div class="t-fill-live" id="f0"></div></div>
+      <div class="t-cell"><div class="t-fill-live" id="f1"></div></div>
+      <div class="t-cell"><div class="t-fill-live" id="f2"></div></div>
+      <div class="t-cell"><div class="t-fill-live" id="f3"></div></div>
+    </div>
+
+    <!-- Feature Label -->
+    <div class="floating-flag" id="flagTxt">⏱️ Jejum Intermitente 16:8</div>
+
+    <!-- App Screen -->
+    <div class="app-screen">
+
+      <!-- 1:1 REAL HEADER -->
+      <div class="app-header">
+        <div class="header-user-side">
+          <img class="app-icon-real" src="store/google-play/assets/app-icon-512x512.png" alt="KYNIO">
+          <div class="user-info-col">
+            <div class="brand-title-row">
+              <span class="brand-text">KYNIO</span>
+              <span class="pro-tag-badge">★ PRO</span>
+            </div>
+            <span class="level-label">Nível 1 · Aprendiz</span>
+            <div class="xp-track"><div class="xp-fill-live"></div></div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="btn-pro-unlock">
+            <span>👑 PRO</span>
+          </div>
+          <div class="btn-shield-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: FASTING (EXACT REAL UI 1:1) -->
+      <div class="tab-content active" id="sceneFasting">
+        <div class="fasting-card-1to1">
+          <div class="ambient-card-bg"></div>
+
+          <div class="card-top-row">
+            <div>
+              <div class="card-h1">Resumo do jejum</div>
+              <div class="card-sub">Acompanha o teu ritmo, sem pressão.</div>
+            </div>
+            <div class="icon-box-timer">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+
+          <!-- Circular Live Timer -->
+          <div class="ring-wrapper">
+            <svg viewBox="0 0 190 190">
+              <circle class="circle-track" cx="95" cy="95" r="85"></circle>
+              <circle class="circle-bar" cx="95" cy="95" r="85"></circle>
+            </svg>
+            <div class="time-digits-main">16:00:00</div>
+            <div class="phase-badge-pill">
+              <span>🔥 Queima de Gordura</span>
+            </div>
+          </div>
+
+          <div class="metrics-3-col">
+            <div class="met-box">
+              <div class="met-v">16h 00m</div>
+              <div class="met-l">Decorrido</div>
+            </div>
+            <div class="met-box">
+              <div class="met-v">0 min</div>
+              <div class="met-l">Restante</div>
+            </div>
+            <div class="met-box">
+              <div class="met-v" style="color: #10B981; text-decoration: underline;">Cetose</div>
+              <div class="met-l">Fase</div>
+            </div>
+          </div>
+
+          <button class="btn-main-green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Iniciar Jejum</span>
+          </button>
+          <div class="btn-dark-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Já comecei antes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MEALS & SCANNER (EXACT REAL UI 1:1) -->
+      <div class="tab-content" id="sceneMeals">
+        <div class="scanner-view-1to1">
+          <div class="cam-box">
+            <img class="cam-img" src="store/google-play/screenshots/diretos_1080x1920/01_refeicoes_nutricao_ia.png" alt="Meal Scan">
+            <div class="laser-scan-line"></div>
+          </div>
+
+          <div class="nutrition-card-1to1">
+            <div class="n-title-row">
+              <span class="n-name">Prato Identificado</span>
+              <span class="n-kcal">540 kcal</span>
+            </div>
+            <div class="macro-3-grid">
+              <div class="macro-card-cell">
+                <div class="m-gram" style="color: #38BDF8;">42g</div>
+                <div class="m-label-txt">Proteína</div>
+              </div>
+              <div class="macro-card-cell">
+                <div class="m-gram" style="color: #FBBF24;">16g</div>
+                <div class="m-label-txt">Hidratos</div>
+              </div>
+              <div class="macro-card-cell">
+                <div class="m-gram" style="color: #F87171;">34g</div>
+                <div class="m-label-txt">Gordura</div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-main-green" style="background: #38BDF8;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Registar Refeição</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: PROGRESS & WATER (EXACT REAL UI 1:1) -->
+      <div class="tab-content" id="sceneProgress">
+        <div class="water-card-1to1">
+          <div class="water-header-row">
+            <div>
+              <div class="w-tag-cyan">Hidratação & Jejum</div>
+              <div class="w-title-txt">Água & Eletrólitos</div>
+            </div>
+            <div style="font-size: 14px; font-weight: 800; color: #fff;">1500 / 2000 ml</div>
+          </div>
+
+          <div class="w-cups-grid">
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell full">💧</div>
+            <div class="cup-cell">💧</div>
+            <div class="cup-cell">💧</div>
+          </div>
+
+          <div class="w-buttons-row">
+            <div class="btn-quick-water">+250 ml (Copo)</div>
+            <div class="btn-quick-water">+500 ml (Garrafa)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTRO OVERLAY -->
+      <div class="outro-screen" id="sceneOutro">
+        <img class="outro-logo-big" src="store/google-play/assets/app-icon-512x512.png" alt="KYNIO">
+        <div class="outro-title-h1">KYNIO</div>
+        <div class="outro-p">Jejum intermitente e nutrição com IA ao teu ritmo.</div>
+        <div class="outro-btn-cta">7 DIAS GRÁTIS NA PLAY STORE</div>
+        <div class="outro-cancel-hint">Cancela quando quiseres na Google Play</div>
+      </div>
+
+      <!-- 1:1 REAL BOTTOM TAB BAR -->
+      <div class="tab-bar-1to1">
+        <div class="tab-btn active-tab" id="bTab0">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Jejum</span>
+        </div>
+        <div class="tab-btn" id="bTab1">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Refeições</span>
+        </div>
+        <div class="tab-btn" id="bTab2">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="12" r="3"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+          <span>Treinos</span>
+        </div>
+        <div class="tab-btn" id="bTab3">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          <span>Progresso</span>
+        </div>
+        <div class="tab-btn" id="bTab4">
+          <svg class="tab-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Perfil</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="control-deck">
+    <button class="btn-replay-loop" onclick="replayMasterLoop()">▶ Reiniciar Demonstração 1:1</button>
+  </div>
+
+  <script>
+    const durations = [3800, 3800, 3800, 4200];
+    const flags = [
+      "⏱️ Jejum Intermitente 16:8",
+      "📸 Scanner de Refeição por IA",
+      "💧 Hidratação & Eletrólitos",
+      "✨ Teste Grátis de 7 Dias"
+    ];
+
+    let currentStep = 0;
+    let sequenceTimer = null;
+
+    function renderStep(idx) {
+      document.getElementById('flagTxt').innerText = flags[idx];
+
+      // Tab pages
+      document.getElementById('sceneFasting').classList.toggle('active', idx === 0);
+      document.getElementById('sceneMeals').classList.toggle('active', idx === 1);
+      document.getElementById('sceneProgress').classList.toggle('active', idx === 2);
+      document.getElementById('sceneOutro').classList.toggle('active', idx === 3);
+
+      // Bottom Tabs
+      document.getElementById('bTab0').classList.toggle('active-tab', idx === 0);
+      document.getElementById('bTab1').classList.toggle('active-tab', idx === 1);
+      document.getElementById('bTab3').classList.toggle('active-xp', idx === 2);
+
+      // Progress bars
+      document.querySelectorAll('.t-fill-live').forEach((bar, i) => {
+        if (i < idx) {
+          bar.style.transition = 'none';
+          bar.style.width = '100%';
+        } else if (i === idx) {
+          bar.style.transition = `width ${durations[idx]}ms linear`;
+          bar.style.width = '100%';
+        } else {
+          bar.style.transition = 'none';
+          bar.style.width = '0%';
+        }
+      });
+    }
+
+    function runMasterLoop() {
+      renderStep(currentStep);
+      sequenceTimer = setTimeout(() => {
+        currentStep = (currentStep + 1) % durations.length;
+        runMasterLoop();
+      }, durations[currentStep]);
+    }
+
+    function replayMasterLoop() {
+      clearTimeout(sequenceTimer);
+      currentStep = 0;
+      document.querySelectorAll('.t-fill-live').forEach(b => {
+        b.style.transition = 'none';
+        b.style.width = '0%';
+      });
+      setTimeout(runMasterLoop, 50);
+    }
+
+    runMasterLoop();
+  </script>
+</body>
+</html>

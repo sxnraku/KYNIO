@@ -1,7 +1,10 @@
 {
   "minimumVersionCode": 1,
-  "latestVersionCode": 11,
-  "latestVersionName": "1.1.5",
+  "latestVersionCode": 14,
+  "latestVersionName": "1.1.8",
+
+
+
 
 
   "forceUpdate": true,

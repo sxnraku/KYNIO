@@ -29,6 +29,22 @@ name: Onboarding legal e início de jejum
     id: "profile-onboarding-continue"
     enabled: true
 - assertNotVisible: "Dá identidade à tua jornada"
+- assertVisible:
+    id: "guided-tutorial-modal"
+- assertVisible: "Jejum que acompanha a vida real"
+- tapOn:
+    id: "tutorial-next-button"
+- assertVisible: "Refeições com revisão humana"
+- tapOn:
+    id: "tutorial-next-button"
+- assertVisible: "Progresso sem pressão"
+- tapOn:
+    id: "tutorial-next-button"
+- assertVisible: "Os teus dados, as tuas escolhas"
+- tapOn:
+    id: "tutorial-finish-button"
+- assertNotVisible:
+    id: "guided-tutorial-modal"
 - assertVisible: "Jejum"
 - assertVisible:
     id: "fasting-timer"

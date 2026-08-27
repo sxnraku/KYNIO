@@ -1,25 +1,29 @@
-import * as ImagePicker from 'expo-image-picker';
-import { useCallback, useState } from 'react';
+import * as ImagePicker from "expo-image-picker";
+import { useCallback, useState } from "react";
 
-import { getUserProfile, saveScannedMealRecord } from '@/services/dbService';
-import { analyzeMeal } from '@/services/aiMealService';
-import { persistMealImage } from '@/services/localMealImageService';
-import { useUserProgressStore } from '@/store/user-progress-store';
+import { getUserProfile, saveScannedMealRecord } from "@/services/dbService";
+import { analyzeMeal } from "@/services/aiMealService";
+import { persistMealImage } from "@/services/localMealImageService";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
+import { useUserProgressStore } from "@/store/user-progress-store";
 import type {
   EditableMealNutrition,
   EditableMealNutritionField,
   MealAnalysisResult,
   SelectedMealImage,
-} from '@/types/meal';
+} from "@/types/meal";
+
 
 const EMPTY_NUTRITION: EditableMealNutrition = {
-  carbsGrams: '',
-  estimatedCalories: '',
-  fatGrams: '',
-  proteinGrams: '',
+  carbsGrams: "",
+  estimatedCalories: "",
+  fatGrams: "",
+  proteinGrams: "",
 };
 
-function toEditableNutrition(result: MealAnalysisResult): EditableMealNutrition {
+function toEditableNutrition(
+  result: MealAnalysisResult,
+): EditableMealNutrition {
   return {
     carbsGrams: String(result.macros.carbs_g),
     estimatedCalories: String(result.estimated_calories),
@@ -33,52 +37,73 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 function parseNonNegativeValue(value: string, label: string): number {
-  const normalizedValue = value.trim().replace(',', '.');
+  const normalizedValue = value.trim().replace(",", ".");
   const parsedValue = Number(normalizedValue);
 
-  if (normalizedValue.length === 0 || !Number.isFinite(parsedValue) || parsedValue < 0) {
+  if (
+    normalizedValue.length === 0 ||
+    !Number.isFinite(parsedValue) ||
+    parsedValue < 0
+  ) {
     throw new Error(`Introduz um valor válido para ${label}.`);
   }
 
   return parsedValue;
 }
 
-export function useMealAnalysis() {
+interface UseMealAnalysisOptions {
+  onMealSaved?: () => void | Promise<void>;
+}
+
+export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
   const [analysis, setAnalysis] = useState<MealAnalysisResult | null>(null);
   const [cameraVisible, setCameraVisible] = useState(false);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
+  const [portionQuantity, setPortionQuantity] = useState("");
   const [editableNutrition, setEditableNutrition] =
     useState<EditableMealNutrition>(EMPTY_NUTRITION);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const [selectedImage, setSelectedImage] = useState<SelectedMealImage | null>(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedMealImage | null>(
+    null,
+  );
+  const [paywallVisible, setPaywallVisible] = useState(false);
   const syncProfile = useUserProgressStore((state) => state.syncProfile);
+  const canPerformAiScan = useSubscriptionStore((state) => state.canPerformAiScan);
+  const consumeAiScan = useSubscriptionStore((state) => state.consumeAiScan);
+  const isPro = useSubscriptionStore((state) => state.isPro);
+  const remainingScans = useSubscriptionStore((state) => state.getRemainingAiScans());
 
-  const setPickedImage = useCallback((result: ImagePicker.ImagePickerResult) => {
-    if (result.canceled) {
-      return;
-    }
+  const setPickedImage = useCallback(
+    (result: ImagePicker.ImagePickerResult) => {
+      if (result.canceled) {
+        return;
+      }
 
-    const asset = result.assets[0];
+      const asset = result.assets[0];
 
-    if (!asset?.base64) {
-      setErrorMessage('Não foi possível preparar a imagem. Escolhe outra fotografia.');
-      return;
-    }
+      if (!asset?.base64) {
+        setErrorMessage(
+          "Não foi possível preparar a imagem. Escolhe outra fotografia.",
+        );
+        return;
+      }
 
-    setSelectedImage({
-      base64: asset.base64,
-      mimeType: 'image/jpeg',
-      sourceMimeType: asset.mimeType ?? 'image/jpeg',
-      uri: asset.uri,
-    });
-    setAnalysis(null);
-    setEditableNutrition(EMPTY_NUTRITION);
-    setErrorMessage(null);
-    setSavedMessage(null);
-  }, []);
+      setSelectedImage({
+        base64: asset.base64,
+        mimeType: "image/jpeg",
+        sourceMimeType: asset.mimeType ?? "image/jpeg",
+        uri: asset.uri,
+      });
+      setAnalysis(null);
+      setEditableNutrition(EMPTY_NUTRITION);
+      setErrorMessage(null);
+      setSavedMessage(null);
+    },
+    [],
+  );
 
   const openCamera = useCallback(() => {
     setErrorMessage(null);
@@ -101,22 +126,25 @@ export function useMealAnalysis() {
   const pickPhoto = useCallback(async () => {
     try {
       setErrorMessage(null);
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permission.granted) {
-        setErrorMessage('Autoriza o acesso às fotografias para escolher uma imagem.');
+        setErrorMessage(
+          "Autoriza o acesso às fotografias para escolher uma imagem.",
+        );
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
         base64: true,
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         quality: 0.7,
       });
 
       setPickedImage(result);
     } catch {
-      setErrorMessage('Não foi possível abrir a galeria. Tenta novamente.');
+      setErrorMessage("Não foi possível abrir a galeria. Tenta novamente.");
     }
   }, [setPickedImage]);
 
@@ -136,9 +164,30 @@ export function useMealAnalysis() {
     setSavedMessage(null);
   }, []);
 
+  const updatePortionQuantity = useCallback((value: string) => {
+    setPortionQuantity(value);
+    setAnalysis(null);
+    setEditableNutrition(EMPTY_NUTRITION);
+    setErrorMessage(null);
+    setSavedMessage(null);
+  }, []);
+
+  const closePaywall = useCallback(() => {
+    setPaywallVisible(false);
+  }, []);
+
+  const openPaywall = useCallback(() => {
+    setPaywallVisible(true);
+  }, []);
+
   const runAnalysis = useCallback(async () => {
-    if (!description.trim() && !selectedImage) {
-      setErrorMessage('Adiciona uma fotografia ou descreve a refeição.');
+    if (!description.trim() && !portionQuantity.trim() && !selectedImage) {
+      setErrorMessage("Adiciona uma fotografia ou descreve a refeição.");
+      return;
+    }
+
+    if (!canPerformAiScan()) {
+      setPaywallVisible(true);
       return;
     }
 
@@ -146,29 +195,89 @@ export function useMealAnalysis() {
     setSavedMessage(null);
     setIsAnalyzing(true);
 
+    const fullDescription = [
+      description.trim(),
+      portionQuantity.trim() ? `Quantidade/Porção: ${portionQuantity.trim()}` : "",
+    ]
+      .filter(Boolean)
+      .join(" - ");
+
     try {
       const result = await analyzeMeal({
-        description: description.trim() || undefined,
+        description: fullDescription || undefined,
         image: selectedImage
           ? { base64: selectedImage.base64, mimeType: selectedImage.mimeType }
           : undefined,
       });
 
+      consumeAiScan();
       setAnalysis(result);
       setEditableNutrition(toEditableNutrition(result));
     } catch (error) {
       setAnalysis(null);
       setEditableNutrition(EMPTY_NUTRITION);
-      setErrorMessage(getErrorMessage(error, 'Não foi possível analisar a refeição.'));
+      setErrorMessage(
+        getErrorMessage(error, "Não foi possível analisar a refeição."),
+      );
     } finally {
       setIsAnalyzing(false);
     }
-  }, [description, selectedImage]);
+  }, [canPerformAiScan, consumeAiScan, description, portionQuantity, selectedImage]);
 
-  const updateNutrition = useCallback((field: EditableMealNutritionField, value: string) => {
-    setEditableNutrition((current) => ({ ...current, [field]: value }));
-    setErrorMessage(null);
-  }, []);
+  const refineAnalysis = useCallback(
+    async (clarificationText: string) => {
+      if (!clarificationText.trim()) {
+        return;
+      }
+
+      if (!canPerformAiScan()) {
+        setPaywallVisible(true);
+        return;
+      }
+
+      const refinedDescription = [
+        description.trim(),
+        portionQuantity.trim() ? `Porção: ${portionQuantity.trim()}` : "",
+        `Clarificação/Ingredientes: ${clarificationText.trim()}`,
+      ]
+        .filter(Boolean)
+        .join(" - ");
+
+      setDescription(refinedDescription);
+      setErrorMessage(null);
+      setSavedMessage(null);
+      setIsAnalyzing(true);
+
+      try {
+        const result = await analyzeMeal({
+          description: refinedDescription,
+          image: selectedImage
+            ? { base64: selectedImage.base64, mimeType: selectedImage.mimeType }
+            : undefined,
+        });
+
+        consumeAiScan();
+        setAnalysis(result);
+        setEditableNutrition(toEditableNutrition(result));
+      } catch (error) {
+        setErrorMessage(
+          getErrorMessage(error, "Não foi possível refinar a análise."),
+        );
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    [canPerformAiScan, consumeAiScan, description, portionQuantity, selectedImage],
+  );
+
+
+  const updateNutrition = useCallback(
+    (field: EditableMealNutritionField, value: string) => {
+      setEditableNutrition((current) => ({ ...current, [field]: value }));
+      setErrorMessage(null);
+    },
+    [],
+  );
 
   const confirmMeal = useCallback(async () => {
     if (!analysis) {
@@ -180,13 +289,25 @@ export function useMealAnalysis() {
 
     try {
       const estimatedCalories = Math.round(
-        parseNonNegativeValue(editableNutrition.estimatedCalories, 'calorias'),
+        parseNonNegativeValue(editableNutrition.estimatedCalories, "calorias"),
       );
-      const proteinGrams = parseNonNegativeValue(editableNutrition.proteinGrams, 'proteína');
-      const carbsGrams = parseNonNegativeValue(editableNutrition.carbsGrams, 'hidratos');
-      const fatGrams = parseNonNegativeValue(editableNutrition.fatGrams, 'gordura');
+      const proteinGrams = parseNonNegativeValue(
+        editableNutrition.proteinGrams,
+        "proteína",
+      );
+      const carbsGrams = parseNonNegativeValue(
+        editableNutrition.carbsGrams,
+        "hidratos",
+      );
+      const fatGrams = parseNonNegativeValue(
+        editableNutrition.fatGrams,
+        "gordura",
+      );
       const imageUrl = selectedImage
-        ? await persistMealImage(selectedImage.uri, selectedImage.sourceMimeType)
+        ? await persistMealImage(
+            selectedImage.uri,
+            selectedImage.sourceMimeType,
+          )
         : null;
 
       await saveScannedMealRecord({
@@ -201,21 +322,34 @@ export function useMealAnalysis() {
 
       syncProfile(await getUserProfile());
       setAnalysis(null);
-      setDescription('');
+      setDescription("");
       setEditableNutrition(EMPTY_NUTRITION);
       setSelectedImage(null);
-      setSavedMessage('Refeição guardada localmente · +30 XP');
+      setSavedMessage("Refeição guardada localmente · +30 XP");
+      await options.onMealSaved?.();
     } catch (error) {
-      setErrorMessage(getErrorMessage(error, 'Não foi possível guardar a refeição.'));
+      setErrorMessage(
+        getErrorMessage(error, "Não foi possível guardar a refeição."),
+      );
     } finally {
       setIsSaving(false);
     }
-  }, [analysis, editableNutrition, selectedImage?.uri, syncProfile]);
+  }, [
+    analysis,
+    editableNutrition,
+    options.onMealSaved,
+    selectedImage?.sourceMimeType,
+    selectedImage?.uri,
+    syncProfile,
+  ]);
 
   return {
     analysis,
     cameraVisible,
-    canAnalyze: description.trim().length > 0 || selectedImage !== null,
+    canAnalyze:
+      description.trim().length > 0 ||
+      portionQuantity.trim().length > 0 ||
+      selectedImage !== null,
     closeCamera,
     confirmMeal,
     description,
@@ -225,12 +359,22 @@ export function useMealAnalysis() {
     isSaving,
     openCamera,
     pickPhoto,
+    portionQuantity,
+    refineAnalysis,
     removePhoto,
     runAnalysis,
     savedMessage,
     selectedImage,
     setDescription: updateDescription,
+    setPortionQuantity: updatePortionQuantity,
     useCapturedPhoto,
     updateNutrition,
+    isPro,
+    remainingScans,
+    paywallVisible,
+    openPaywall,
+    closePaywall,
   };
 }
+
+

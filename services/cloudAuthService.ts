@@ -1,11 +1,28 @@
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 
 import { linkCloudAccount, unlinkCloudAccount } from '@/services/dbService';
 import { requireSupabase } from '@/services/supabaseClient';
 import type { CloudAccount } from '@/types/cloud';
 
 WebBrowser.maybeCompleteAuthSession();
+
+const GOOGLE_WEB_CLIENT_ID =
+  process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID?.trim() ||
+  '590155512529-0r43ejrr20iousklkjvkjtqmr3l1kmm7.apps.googleusercontent.com';
+
+if (Platform.OS !== 'web') {
+  try {
+    GoogleSignin.configure({
+      webClientId: GOOGLE_WEB_CLIENT_ID,
+      scopes: ['profile', 'email'],
+    });
+  } catch {
+    // Silently ignore configure errors
+  }
+}
 
 function getMetadataString(
   metadata: Record<string, unknown>,
@@ -79,7 +96,7 @@ export async function getCurrentCloudAccount(): Promise<CloudAccount | null> {
   return account;
 }
 
-export async function signInWithGoogle(): Promise<CloudAccount | null> {
+async function signInWithWebOAuth(): Promise<CloudAccount | null> {
   const client = requireSupabase();
   const redirectTo = makeRedirectUri({
     scheme: 'kynio',
@@ -128,8 +145,55 @@ export async function signInWithGoogle(): Promise<CloudAccount | null> {
   return account;
 }
 
+export async function signInWithGoogle(): Promise<CloudAccount | null> {
+  const client = requireSupabase();
+
+  // 1. Tentar Fluxo Nativo no Android e iOS
+  if (Platform.OS !== 'web') {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data?.idToken ?? (response as any).idToken;
+
+      if (idToken) {
+        const { data, error } = await client.auth.signInWithIdToken({
+          provider: 'google',
+          token: idToken,
+        });
+
+        if (!error && data.session?.user) {
+          const account = toCloudAccount(data.session.user);
+          await persistLinkedAccount(account);
+          return account;
+        }
+      }
+    } catch (nativeError: any) {
+      if (
+        nativeError.code === statusCodes.SIGN_IN_CANCELLED ||
+        nativeError.message?.includes('CANCELLED')
+      ) {
+        return null;
+      }
+      // Se der DEVELOPER_ERROR (ex: SHA-1 ainda não registada na Google Cloud),
+      // faz fallback automático para o Web OAuth sem quebrar para o utilizador!
+    }
+  }
+
+  // 2. Fallback fiável para Web OAuth
+  return await signInWithWebOAuth();
+}
+
 export async function signOutCloudAccount(): Promise<void> {
   const client = requireSupabase();
+
+  if (Platform.OS !== 'web') {
+    try {
+      await GoogleSignin.signOut();
+    } catch {
+      // Ignorar se não estava conectado nativamente
+    }
+  }
+
   const { error } = await client.auth.signOut();
 
   if (error) {
