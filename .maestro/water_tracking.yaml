@@ -1,0 +1,56 @@
+# NÃO VERIFICADO: fluxo criado sem execução (não há emulador/dispositivo disponível).
+# Seletores baseados em texto visível e accessibilityLabels existentes no cartão de água.
+appId: com.kynio.app
+name: Registo de água (adicionar e remover)
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
+
+# O tutorial guiado aparece após o onboarding; salta-o se estiver visível.
+- runFlow:
+    when:
+      visible:
+        id: "guided-tutorial-modal"
+    commands:
+      - tapOn:
+          id: "tutorial-skip-button"
+
+# O cartão de água fica no ecrã inicial (tab Jejum).
+- scrollUntilVisible:
+    element: "Água & Eletrólitos"
+    direction: DOWN
+- assertVisible: "0 / 2000 ml"
+
+- tapOn:
+    text: "Adicionar 250ml de água"
+- assertVisible: "250 / 2000 ml"
+
+- tapOn:
+    text: "Adicionar 500ml de água"
+- assertVisible: "750 / 2000 ml"
+
+# O botão de remover só aparece com o contador acima de zero (remove 250 ml).
+- tapOn:
+    text: "Remover 250ml de água"
+- assertVisible: "500 / 2000 ml"

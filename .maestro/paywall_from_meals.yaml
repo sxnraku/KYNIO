@@ -1,0 +1,60 @@
+# NÃO VERIFICADO: fluxo criado sem execução (não há emulador/dispositivo disponível).
+# Cobre apenas a parte local: abre o paywall a partir de Refeições, valida planos/preços
+# (valores de fallback offline) e fecha sem comprar. Não submete análise de IA.
+appId: com.kynio.app
+name: Paywall a partir de Refeições (sem compra)
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
+
+# O tutorial guiado aparece após o onboarding; salta-o se estiver visível.
+- runFlow:
+    when:
+      visible:
+        id: "guided-tutorial-modal"
+    commands:
+      - tapOn:
+          id: "tutorial-skip-button"
+
+- tapOn: "Refeições"
+- assertVisible: "Refeições"
+
+# Quota gratuita visível antes de abrir o paywall (conta nova, sem Pro).
+- assertVisible: ".*análises grátis hoje"
+
+- tapOn: "Desbloquear Pro →"
+- assertVisible: "KYNIO AURA PRO"
+- assertVisible: "ESCOLHE O TEU PLANO"
+- assertVisible: "Plano Anual"
+- assertVisible: "Plano Mensal"
+- assertVisible: "Acesso Vitalício"
+# Preços de fallback apresentados offline (sem resposta da Play Store).
+- assertVisible: "34,99 €"
+- assertVisible: "4,99 €"
+- assertVisible: "69,99 €"
+
+# Fecha sem comprar: o botão de fecho é o "✕" no canto superior do sheet.
+- tapOn: "✕"
+- assertNotVisible: "KYNIO AURA PRO"
+- assertVisible: ".*análises grátis hoje"

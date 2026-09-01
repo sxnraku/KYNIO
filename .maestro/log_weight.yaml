@@ -1,0 +1,60 @@
+# NÃO VERIFICADO: fluxo criado sem execução (não há emulador/dispositivo disponível).
+# Assume a unidade de peso por defeito do perfil novo (kg).
+appId: com.kynio.app
+name: Registo de peso no cartão de Progresso
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
+
+# O tutorial guiado aparece após o onboarding; salta-o se estiver visível.
+- runFlow:
+    when:
+      visible:
+        id: "guided-tutorial-modal"
+    commands:
+      - tapOn:
+          id: "tutorial-skip-button"
+
+- tapOn: "Progresso"
+- assertVisible: "Sem registos de peso"
+
+# Abre o modal de registo de peso (accessibilityLabel do botão +).
+- tapOn:
+    text: "Adicionar registo de peso"
+- assertVisible: "Registar Peso"
+
+# O campo de peso abre com foco (autoFocus); escreve um valor inteiro válido.
+- inputText: "72"
+- tapOn: "Guardar"
+
+- extendedWaitUntil:
+    notVisible: "Registar Peso"
+    timeout: 10000
+- assertNotVisible: "Sem registos de peso"
+
+# Confirma no histórico que o valor guardado aparece.
+- tapOn:
+    text: "Ver todos os registos"
+- assertVisible: "Histórico de Peso"
+- assertVisible: "72 kg"

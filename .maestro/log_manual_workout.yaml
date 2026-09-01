@@ -1,0 +1,56 @@
+# NÃO VERIFICADO: fluxo criado sem execução (não há emulador/dispositivo disponível).
+# Seletores baseados apenas em texto visível (PT) e accessibilityLabels existentes.
+appId: com.kynio.app
+name: Registo manual de treino
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
+
+# O tutorial guiado aparece após o onboarding; salta-o se estiver visível.
+- runFlow:
+    when:
+      visible:
+        id: "guided-tutorial-modal"
+    commands:
+      - tapOn:
+          id: "tutorial-skip-button"
+
+- tapOn: "Treinos"
+- assertVisible: "Registar atividade"
+- assertVisible: "Ainda sem atividades"
+
+- tapOn: "Corrida"
+- tapOn: "45"
+- tapOn: "Guardar atividade · +50 XP"
+
+- extendedWaitUntil:
+    visible: "Atividade guardada no dispositivo. +50 XP"
+    timeout: 10000
+- assertNotVisible: "Ainda sem atividades"
+
+# O histórico mostra o tipo, a duração e o esforço do registo mais recente.
+- scrollUntilVisible:
+    element: "Atividade recente"
+    direction: DOWN
+- assertVisible: "45 min · Moderado"

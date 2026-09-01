@@ -1,0 +1,71 @@
+# NÃO VERIFICADO: fluxo criado sem execução (não há emulador/dispositivo disponível).
+# Valida a mudança de idioma através dos rótulos das tabs (PT→EN→PT) e a seleção de tema
+# através do estado "checked" dos botões segmentados. Repõe PT/Escuro no fim.
+appId: com.kynio.app
+name: Alternar tema e idioma nas Definições
+---
+- launchApp:
+    clearState: true
+
+# Prepara uma instalação limpa para este fluxo poder correr isoladamente.
+- assertVisible: "Antes de começar"
+- extendedWaitUntil:
+    visible:
+      id: "legal-terms-checkbox"
+    timeout: 15000
+- tapOn:
+    id: "legal-terms-checkbox"
+- tapOn:
+    id: "legal-enter-button"
+    enabled: true
+- assertNotVisible: "Antes de começar"
+- assertVisible: "Dá identidade à tua jornada"
+- tapOn:
+    id: "profile-name-input"
+- inputText: "Maestro"
+- tapOn:
+    id: "profile-onboarding-continue"
+    enabled: true
+- assertNotVisible: "Dá identidade à tua jornada"
+
+# O tutorial guiado aparece após o onboarding; salta-o se estiver visível.
+- runFlow:
+    when:
+      visible:
+        id: "guided-tutorial-modal"
+    commands:
+      - tapOn:
+          id: "tutorial-skip-button"
+
+# Abre as Definições pelo botão de privacidade no cabeçalho do ecrã inicial.
+- tapOn:
+    id: "privacy-settings-button"
+- assertVisible: "Definições"
+- assertVisible: "Aparência e idioma"
+
+# Tema: alterna para Claro e de volta para Escuro (defeito).
+- tapOn: "Claro"
+- assertVisible:
+    text: "Claro"
+    checked: true
+- tapOn: "Escuro"
+- assertVisible:
+    text: "Escuro"
+    checked: true
+
+# Idioma: muda para English; os rótulos das tabs são traduzidos.
+- tapOn: "English"
+- assertVisible:
+    text: "English"
+    checked: true
+# O botão de voltar é identificado pelo accessibilityLabel "Voltar" (fixo em PT).
+- tapOn: "Voltar"
+- assertVisible: "Fasting"
+- assertNotVisible: "Jejum"
+
+# Repõe Português para deixar a app no estado inicial.
+- tapOn:
+    id: "privacy-settings-button"
+- tapOn: "Português"
+- tapOn: "Voltar"
+- assertVisible: "Jejum"
