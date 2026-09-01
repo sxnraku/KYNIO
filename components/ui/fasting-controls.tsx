@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FastingStartModal } from "@/components/ui/fasting-start-modal";
 import { COLORS } from "@/constants/colors";
 import { triggerMediumImpact, triggerSuccessFeedback } from "@/services/hapticsService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
 
   FASTING_GOALS,
@@ -18,14 +20,19 @@ interface FastingControlsProps {
   currentGoalId: FastingGoalId;
   isActive: boolean;
   isSaving: boolean;
+  onOpenSchedule: () => void;
+  scheduleLabel: string | null;
 }
 
 export function FastingControls({
   currentGoalId,
   isActive,
   isSaving,
+  onOpenSchedule,
+  scheduleLabel,
 }: FastingControlsProps) {
   const endFasting = useFastingStore((state) => state.endFasting);
+  const language = useAppPreferencesStore((state) => state.language);
   const setGoal = useFastingStore((state) => state.setGoal);
   const setStartedAt = useFastingStore((state) => state.setStartedAt);
   const startFasting = useFastingStore((state) => state.startFasting);
@@ -52,10 +59,10 @@ export function FastingControls({
       <View className="mt-5">
         {!isActive ? (
           <Pressable
-            accessibilityLabel="Iniciar Jejum"
+            accessibilityLabel={translateText("Iniciar Jejum", language)}
             accessibilityRole="button"
             accessibilityState={{ disabled: isSaving }}
-            className="min-h-14 flex-row items-center justify-center rounded-2xl bg-success px-5 active:opacity-80"
+            className="min-h-14 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80"
             disabled={isSaving}
             onPress={() => {
               triggerMediumImpact();
@@ -64,17 +71,17 @@ export function FastingControls({
             style={{ opacity: isSaving ? 0.45 : 1 }}
             testID="start-fasting-button"
           >
-            <Ionicons color="#002113" name="play" size={18} />
-            <Text className="ml-2 font-headline text-base text-[#002113]">
+            <Ionicons color="#3A2200" name="play" size={18} />
+            <Text className="ml-2 font-headline text-base text-[#3A2200]">
               Iniciar Jejum
             </Text>
           </Pressable>
         ) : (
           <Pressable
-            accessibilityLabel="Terminar Jejum"
+            accessibilityLabel={translateText("Terminar Jejum", language)}
             accessibilityRole="button"
             accessibilityState={{ disabled: isSaving }}
-            className="min-h-14 flex-row items-center justify-center rounded-2xl bg-foreground px-5 active:opacity-80"
+            className="min-h-14 flex-row items-center justify-center rounded-full bg-foreground px-5 active:opacity-80"
             disabled={isSaving}
             onPress={() => {
               triggerSuccessFeedback();
@@ -91,46 +98,79 @@ export function FastingControls({
           </Pressable>
         )}
 
-        {!isActive ? (
-          <Pressable
-            accessibilityLabel="Já comecei o jejum antes"
-            accessibilityRole="button"
-            className="mt-3 min-h-12 flex-row items-center justify-center rounded-2xl border border-success/30 bg-success/5 px-5 active:opacity-70"
-            onPress={() => setStartModalMode("start")}
-            testID="start-fasting-earlier-button"
-          >
-            <Ionicons color={COLORS.success} name="time-outline" size={18} />
-            <Text className="ml-2 font-headline text-sm text-success">
-              Já comecei antes
-            </Text>
-          </Pressable>
-        ) : (
-          <Pressable
-            accessibilityLabel="Editar hora de início do jejum"
-            accessibilityRole="button"
-            className="mt-3 min-h-12 flex-row items-center justify-center rounded-2xl border border-success/30 bg-success/5 px-5 active:opacity-70"
-            onPress={() => setStartModalMode("edit")}
-            testID="edit-fasting-start-button"
-          >
-            <Ionicons color={COLORS.success} name="create-outline" size={18} />
-            <Text className="ml-2 font-headline text-sm text-success">
-              Editar início
-            </Text>
-          </Pressable>
-        )}
-
+        {/* ações secundárias em mono, sem caixas */}
         <Pressable
-          accessibilityLabel={`Editar Objetivo ${currentGoal.label}`}
+          accessibilityLabel={translateText("Configurar Rotina de Jejum", language)}
           accessibilityRole="button"
-          className="mt-3 min-h-12 flex-row items-center justify-center rounded-2xl border border-border bg-surface-raised px-5 active:opacity-70"
-          onPress={() => setIsGoalPickerOpen(true)}
-          testID="edit-fasting-goal-button"
+          className="mt-4 min-h-11 items-center justify-center active:opacity-60"
+          onPress={onOpenSchedule}
         >
-          <Ionicons color={COLORS.success} name="options-outline" size={18} />
-          <Text className="ml-2 font-headline text-sm text-foreground">
-            Objetivo · {currentGoal.label}
+          <Text
+            className="font-label text-[10px] uppercase text-muted"
+            style={{ letterSpacing: 1.6 }}
+            translate={false}
+          >
+            {scheduleLabel
+              ? `${translateText("Ajustar rotina", language)} · ${scheduleLabel}`
+              : translateText("Configurar rotina de jejum", language)}
           </Text>
         </Pressable>
+
+        <View className="mt-1 flex-row items-center justify-center">
+          <Pressable
+            accessibilityLabel={translateText(
+              `Editar Objetivo ${currentGoal.label}`,
+              language,
+            )}
+            accessibilityRole="button"
+            className="min-h-11 flex-row items-center justify-center px-3 active:opacity-60"
+            onPress={() => setIsGoalPickerOpen(true)}
+            testID="edit-fasting-goal-button"
+          >
+            <Text
+              className="font-label text-[10px] uppercase text-success"
+              style={{ letterSpacing: 1.2 }}
+            >
+              Objetivo · {currentGoal.label}
+            </Text>
+          </Pressable>
+
+          <Text className="font-label text-[10px] text-border" translate={false}>
+            ·
+          </Text>
+
+          {!isActive ? (
+            <Pressable
+              accessibilityLabel={translateText("Já comecei o jejum antes", language)}
+              accessibilityRole="button"
+              className="min-h-11 flex-row items-center justify-center px-3 active:opacity-60"
+              onPress={() => setStartModalMode("start")}
+              testID="start-fasting-earlier-button"
+            >
+              <Text
+                className="font-label text-[10px] uppercase text-success"
+                style={{ letterSpacing: 1.2 }}
+              >
+                Já comecei antes
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              accessibilityLabel={translateText("Editar hora de início do jejum", language)}
+              accessibilityRole="button"
+              className="min-h-11 flex-row items-center justify-center px-3 active:opacity-60"
+              onPress={() => setStartModalMode("edit")}
+              testID="edit-fasting-start-button"
+            >
+              <Text
+                className="font-label text-[10px] uppercase text-success"
+                style={{ letterSpacing: 1.2 }}
+              >
+                Editar início
+              </Text>
+            </Pressable>
+          )}
+        </View>
       </View>
 
       {startModalMode ? (
@@ -150,7 +190,7 @@ export function FastingControls({
       >
         <View className="flex-1 justify-end bg-black/70">
           <Pressable
-            accessibilityLabel="Fechar seleção de objetivo"
+            accessibilityLabel={translateText("Fechar seleção de objetivo", language)}
             onPress={() => setIsGoalPickerOpen(false)}
             style={StyleSheet.absoluteFill}
           />
@@ -170,7 +210,7 @@ export function FastingControls({
                   </Text>
                 </View>
                 <Pressable
-                  accessibilityLabel="Fechar"
+                  accessibilityLabel={translateText("Fechar", language)}
                   className="h-9 w-9 items-center justify-center rounded-full bg-background"
                   onPress={() => setIsGoalPickerOpen(false)}
                 >

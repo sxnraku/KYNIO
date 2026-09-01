@@ -4,6 +4,8 @@ import { Text } from "@/components/ui/text";
 
 import { COLORS } from "@/constants/colors";
 import type { LevelProgress } from "@/services/gamificationService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface LevelProgressCardProps {
   level: number;
@@ -18,6 +20,7 @@ export function LevelProgressCard({
   levelTitle,
   totalXp,
 }: LevelProgressCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const remainingXp = Math.max(0, levelProgress.nextLevelTotalXp - totalXp);
 
   return (
@@ -47,7 +50,10 @@ export function LevelProgressCard({
       </View>
 
       <View
-        accessibilityLabel={`${levelProgress.xpIntoLevel} de ${levelProgress.xpRequiredInLevel} XP para o próximo nível`}
+        accessibilityLabel={translateText(
+          `${levelProgress.xpIntoLevel} de ${levelProgress.xpRequiredInLevel} XP para o próximo nível`,
+          language,
+        )}
         accessibilityRole="progressbar"
         accessibilityValue={{
           max: levelProgress.xpRequiredInLevel,

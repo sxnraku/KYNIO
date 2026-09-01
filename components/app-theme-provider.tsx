@@ -13,6 +13,7 @@ export function AppThemeProvider({ children }: PropsWithChildren) {
       vars({
         "--color-background": palette.backgroundRgb,
         "--color-border": palette.borderRgb,
+        "--color-danger": palette.dangerRgb,
         "--color-foreground": palette.foregroundRgb,
         "--color-muted": palette.mutedRgb,
         "--color-success-dark": palette.successDarkRgb,

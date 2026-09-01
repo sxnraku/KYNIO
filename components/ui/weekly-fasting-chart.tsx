@@ -5,7 +5,7 @@ import { View } from "react-native";
 
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { COLORS } from "@/constants/colors";
+import { COLORS, successWithAlpha } from "@/constants/colors";
 import type { FastRecord } from "@/db/schema";
 import { getFastRecords } from "@/services/dbService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
@@ -124,10 +124,10 @@ export function WeeklyFastingChart() {
                   backgroundColor: hasFasted
                     ? day.isToday
                       ? COLORS.success
-                      : "rgba(16, 185, 129, 0.45)"
+                      : successWithAlpha(0.45)
                     : "rgba(255, 255, 255, 0.05)",
                   borderWidth: hasFasted ? 1 : 0,
-                  borderColor: day.isToday ? COLORS.success : "rgba(16, 185, 129, 0.6)",
+                  borderColor: day.isToday ? COLORS.success : successWithAlpha(0.6),
                 }}
               />
 

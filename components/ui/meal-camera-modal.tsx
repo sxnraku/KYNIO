@@ -15,6 +15,9 @@ import {
   View,
 } from "react-native";
 import { Text } from "@/components/ui/text";
+import { COLORS } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { SelectedMealImage } from "@/types/meal";
@@ -51,6 +54,7 @@ export function MealCameraModal({
   onUsePhoto,
   visible,
 }: MealCameraModalProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>("back");
@@ -112,7 +116,7 @@ export function MealCameraModal({
     if (!permission) {
       return (
         <View className="flex-1 items-center justify-center bg-[#050706] px-8">
-          <ActivityIndicator color="#10B981" size="large" />
+          <ActivityIndicator color={COLORS.success} size="large" />
           <Text className="mt-4 font-body text-sm text-white/70">
             A preparar a câmara…
           </Text>
@@ -124,7 +128,7 @@ export function MealCameraModal({
       return (
         <View className="flex-1 items-center justify-center bg-[#050706] px-8">
           <View className="h-16 w-16 items-center justify-center rounded-full bg-success/20">
-            <Ionicons color="#10B981" name="camera-outline" size={30} />
+            <Ionicons color={COLORS.success} name="camera-outline" size={30} />
           </View>
           <Text className="mt-6 text-center font-headline text-2xl text-white">
             Ativar câmara
@@ -225,7 +229,7 @@ export function MealCameraModal({
 
         <View className="absolute inset-x-0 bottom-0 flex-row items-center justify-around bg-black/55 px-8 pb-7 pt-5">
           <Pressable
-            accessibilityLabel="Trocar câmara"
+            accessibilityLabel={translateText("Trocar câmara", language)}
             accessibilityRole="button"
             className="h-12 w-12 items-center justify-center rounded-full bg-white/15"
             onPress={() =>
@@ -236,7 +240,7 @@ export function MealCameraModal({
           </Pressable>
 
           <Pressable
-            accessibilityLabel="Captar fotografia"
+            accessibilityLabel={translateText("Captar fotografia", language)}
             accessibilityRole="button"
             accessibilityState={{ disabled: !isCameraReady || isCapturing }}
             className="h-[76px] w-[76px] items-center justify-center rounded-full border-4 border-white bg-white/25"
@@ -266,7 +270,7 @@ export function MealCameraModal({
       <SafeAreaView className="flex-1 bg-[#050706]">
         <View className="h-16 flex-row items-center justify-between bg-[#050706] px-5">
           <Pressable
-            accessibilityLabel="Fechar câmara"
+            accessibilityLabel={translateText("Fechar câmara", language)}
             accessibilityRole="button"
             className="h-10 w-10 items-center justify-center rounded-full bg-white/10"
             onPress={resetAndClose}

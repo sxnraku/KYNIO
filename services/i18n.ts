@@ -8,7 +8,11 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Meal analysis only sends the chosen photo and/or description through KYNIO to Google Gemini; the rest of your history and account ID are not included.",
   "A aplicação não substitui aconselhamento profissional.":
     "The app does not replace professional advice.",
+  "A analisar…": "Analysing…",
   "A calcular progresso local…": "Calculating local progress…",
+  "A câmara não devolveu os dados da imagem. Repete a fotografia.":
+    "The camera did not return the image data. Retake the photo.",
+  "A carregar histórico…": "Loading history…",
   "A cloud só é usada após ligares uma conta. A aplicação não substitui aconselhamento profissional.":
     "Cloud sync is only used after you connect an account. The app does not replace professional advice.",
   "A concluir a ligação segura…": "Completing the secure connection…",
@@ -41,12 +45,15 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A sincronizar…": "Syncing…",
   "A tua identidade e o teu círculo, com controlo claro sobre o que partilhas.":
     "Your identity and circle, with clear control over what you share.",
+  "A tua identidade e progresso pessoal no KYNIO.":
+    "Your identity and personal progress in KYNIO.",
   "A tua identidade, círculo e preferências, com controlo claro sobre a sincronização.":
     "Your identity, circle and preferences, with clear control over syncing.",
   "A tua jornada": "Your journey",
   "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.":
     "Open the live camera, choose a gallery image or describe what you ate.",
   "Abrir definições": "Open settings",
+  "Abrir definições de privacidade": "Open privacy settings",
   "Absorção dos macro e micronutrientes da última refeição":
     "Absorption of macro and micronutrients from the last meal",
   "Acesso a 36h Monge, 48h Reset, OMAD e Jejum Livre prolongado.":
@@ -70,6 +77,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Add the first person to your circle.",
   "Adiciona uma pitada de sal marinho na água para manter o equilíbrio eletrolítico.":
     "Stay well hydrated with mineral water to support natural electrolyte balance.",
+  "Adicionar 250ml de água": "Add 250ml of water",
+  "Adicionar 500ml de água": "Add 500ml of water",
   "Adicionar amigo": "Add friend",
   "Adicionar registo de peso": "Add weight entry",
   "Ainda sem atividades": "No activities yet",
@@ -94,6 +103,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Aprendiz: "Apprentice",
   "As categorias e o esforço percebido são descritivos. Não constituem aconselhamento médico ou de treino e não substituem orientação profissional adequada ao teu caso.":
     "Categories and perceived effort are descriptive. They are not medical or training advice and do not replace professional guidance suited to your situation.",
+  "As fases são estimativas biológicas de referência e não substituem avaliação médica. Em caso de tonturas ou mal-estar, interrompe o jejum. Todos os dados permanecem na tua base SQLite local privada.":
+    "Phases are reference biological estimates and do not replace medical evaluation. If you feel dizzy or unwell, stop fasting. All data stays in your private local SQLite database.",
   "As insígnias desbloqueadas aparecerão aqui.":
     "Unlocked badges will appear here.",
   "As preferências ficam guardadas apenas neste dispositivo.":
@@ -121,13 +132,14 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Alterar ↗": "Change ↗",
   "Hora do Jejum ADF": "ADF Fasting Time",
   "Hora do teu Jejum": "Time to Fast",
-  "Ativa realces visuais esmeralda e micro-animações personalizadas.":
-    "Enables emerald visual highlights and custom micro-animations.",
+  "Ativa realces visuais âmbar e micro-animações personalizadas.":
+    "Enables amber visual highlights and custom micro-animations.",
   "Ativar câmara": "Enable camera",
   "Ativas": "Active",
   Atividade: "Activity",
   "Atividade recente": "Recent activity",
   "ATUAL": "CURRENT",
+  "ATUALIZAÇÃO OBRIGATÓRIA": "MANDATORY UPDATE",
   Atual: "Current",
   "Aura Essencial": "Essential Aura",
   "Aura Pro Ativo ✦": "Aura Pro Active ✦",
@@ -143,6 +155,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Benefícios comprovados": "Proven benefits",
   "Bicicleta": "Cycling",
   Bio: "Bio",
+  "Biografia do perfil": "Profile bio",
   "BIOLOGIA & HORMONAS": "BIOLOGY & HORMONES",
   Bloqueada: "Locked",
   Bloqueado: "Locked",
@@ -156,6 +169,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Cancelar: "Cancel",
   "Captar fotografia": "Take photo",
   Cetose: "Ketosis",
+  "Clarificação dos alimentos": "Food clarification",
   "Cetose Ativa": "Active Ketosis",
   "Cetose Estimada": "Estimated ketosis",
   Claro: "Light",
@@ -165,6 +179,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Billed monthly · Cancel anytime",
   "Como queres aparecer?": "How would you like to appear?",
   "Compreendo e aceito os termos.": "I understand and accept the terms.",
+  "Compreendo e aceito os termos": "I understand and accept the terms",
   "CONCLUÍDO": "COMPLETED",
   Concluído: "Completed",
   "Conclui um jejum no objetivo.": "Complete a fast at your target.",
@@ -174,6 +189,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Confiança média": "Medium confidence",
   "Confirma a primeira análise de refeição.":
     "Confirm your first meal analysis.",
+  "Configurar Rotina de Jejum": "Configure Fasting Routine",
   "Confirmar e Ganhar +30 XP": "Confirm and Earn +30 XP",
   Consistente: "Consistent",
   "Constrói o teu ritmo": "Build your rhythm",
@@ -189,8 +205,10 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.":
     "Creates a JSON file with your full local SQLite history and opens the system options to save it.",
   "Dá identidade à tua jornada": "Give your journey an identity",
+  "Data de início do jejum": "Fasting start date",
   Decorrido: "Elapsed",
   Definições: "Settings",
+  "Descrição da refeição": "Meal description",
   Desbloqueada: "Unlocked",
   Desbloqueado: "Unlocked",
   "Desbloquear": "Unlock",
@@ -204,17 +222,24 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "DICA PRÁTICA": "PRACTICAL TIP",
   "Dica de Hidratação Saudável": "Healthy Hydration Tip",
   Digestão: "Digestion",
+  "Dias com jejum": "Days with fasting",
+  "Dias seguidos": "Days in a row",
   "Digestão & Absorção": "Digestion & Absorption",
   "Diminuição acentuada de IGF-1 e ativação da apoptose de células danificadas com regeneração imunitária.":
     "Marked drop in IGF-1 and activation of damaged cell clearance with immune rejuvenation.",
   Disciplinado: "Disciplined",
   "Documentos e suporte": "Documents and support",
   "Duração em minutos": "Duration in minutes",
+  "Duração personalizada em minutos": "Custom duration in minutes",
+  "Editar hora de início do jejum": "Edit fasting start time",
   "Editar início": "Edit start",
+  "Ajustar rotina": "Adjust routine",
+  "Configurar rotina de jejum": "Set up fasting routine",
   "Editar objetivo": "Edit target",
   Elevado: "High",
   "Eliminar definitivamente": "Delete permanently",
   "Eliminar conta pela web": "Delete account on the web",
+  "Eliminar registo": "Delete entry",
   "Eliminar este registo?": "Delete this entry?",
   "Eliminar Todos os Dados": "Delete All Data",
   "Eliminar todos os dados?": "Delete all data?",
@@ -234,6 +259,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Escolhe o protocolo ou opta por jejum livre sem limite fixo.":
     "Choose a protocol or opt for open fasting with no fixed limit.",
   "Escolhe um nome para o teu perfil.": "Choose a name for your profile.",
+  "Escolher fotografia de perfil": "Choose profile photo",
   "Escolhes o destino. Nada é publicado automaticamente.":
     "You choose the destination. Nothing is posted automatically.",
   "ESCOLHE O TEU PLANO": "CHOOSE YOUR PLAN",
@@ -247,6 +273,9 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "This is the estimated phase your body is currently in.",
   "Esta janela fecha automaticamente quando a conta Google estiver ligada.":
     "This window closes automatically when the Google account is connected.",
+  Evolução: "Progress",
+  "É necessário atualizar para continuar a utilizar o KYNIO.":
+    "You need to update to continue using KYNIO.",
   "Estabilização da glicemia sanguínea": "Stabilisation of blood glucose",
   "Excelente momento para caminhadas ligeiras ou trabalho focado; a clareza mental começa a aumentar.":
     "Great time for light walks or deep focused work; mental clarity begins to sharpen.",
@@ -270,10 +299,20 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Fases metabólicas estimadas": "Estimated metabolic phases",
   "Fases metabólicas estimadas com base em literatura geral. Varia de pessoa para pessoa.":
     "Metabolic phases are estimated from general literature. They vary from person to person.",
+  "Fases metabólicas estimadas com base em literatura científica de jejum. Varia de pessoa para pessoa. Toca nas fases para ver todos os detalhes biológicos.":
+    "Metabolic phases estimated from fasting science literature. They vary from person to person. Tap the phases to see all biological details.",
+  "Fechar": "Close",
+  "Fechar câmara": "Close camera",
+  "Fechar detalhes da fase": "Close phase details",
+  "Fechar seleção da hora de início": "Close start time selection",
+  "Fechar seleção de objetivo": "Close goal selection",
   "Ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico, nutricional ou de treino.":
     "Personal lifestyle tracking and gamification tool. It does not provide medical, nutritional or training advice.",
   "FLEXÍVEL": "FLEXIBLE",
   Força: "Strength",
+  "Fotografia da conta Google": "Google account photo",
+  "Fotografia de perfil": "Profile photo",
+  "Fotografia selecionada da refeição": "Selected meal photo",
   "Fotografa ou descreve o que comeste e revê sempre as estimativas.":
     "Photograph or describe what you ate and always review the estimates.",
   "Fotografa e analisa refeições sem limites diários de tokens.":
@@ -288,6 +327,10 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Gordura: "Fat",
   "Gordura, editável": "Fat, editable",
   "Guardada apenas neste dispositivo.": "Stored only on this device.",
+  "Histórico": "History",
+  "Histórico de Peso": "Weight History",
+  "Hora de início do jejum": "Fasting start time",
+  "Horas de Jejum (7 Dias)": "Fasting Hours (7 Days)",
   "Guardar atividade · +50 XP": "Save activity · +50 XP",
   "Guardar perfil": "Save profile",
   "Guardar registo": "Save entry",
@@ -310,7 +353,10 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Imagem e link enviados para a app escolhida.":
     "Image and link sent to the selected app.",
   "Imagem e link partilhados.": "Image and link shared.",
+  "Indica a hora real para recuperar o tempo já decorrido.":
+    "Enter the real time to recover the elapsed time.",
   Iniciado: "Initiated",
+  "Iniciar Jejum": "Start Fast",
   "Inicia-se a autofagia, um processo biológico nobre em que as células reciclam organelos danificados, vírus latentes e proteínas acumuladas, rejuvenescendo os tecidos.":
     "Autophagy begins—a cellular process where damaged organelles, latent viruses, and aggregated proteins are recycled, rejuvenating tissues.",
   "Início de Queima de Glicose": "Early glucose use",
@@ -330,11 +376,13 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Introduz um peso válido ou deixa o campo vazio.":
     "Enter a valid weight or leave the field empty.",
   "Já comecei antes": "Started earlier",
+  "Já comecei o jejum antes": "I started fasting earlier",
   Jejum: "Fasting",
   "JEJUM ATIVO": "FAST ACTIVE",
   "JEJUM INATIVO": "FAST INACTIVE",
   "Jejum Livre": "Open Fasting",
   "Jejum livre": "Open fasting",
+  "Jejum mais longo": "Longest fast",
   "Jejuns, refeições, peso, progresso e fotografias confirmadas ficam sempre disponíveis neste dispositivo.":
     "Fasts, meals, weight, progress and confirmed photos always remain available on this device.",
   "Jejuns, refeições, progresso e fotografias confirmadas ficam sempre disponíveis neste dispositivo.":
@@ -344,6 +392,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Leve: "Light",
   "Leva o teu jejum e nutrição ao próximo nível com IA ilimitada.":
     "Take your fasting and nutrition to the next level with unlimited AI.",
+  "Lembrar mais tarde": "Remind me later",
   "Ligar Google agora · opcional": "Connect Google now · optional",
   "Limpeza de mitocôndrias disfuncionais (mitofagia)":
     "Clearance of dysfunctional mitochondria (mitophagy)",
@@ -366,6 +415,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Mestre da Longevidade": "Master of Longevity",
   "Métricas & Tendências Avançadas": "Advanced Metrics & Trends",
   "Métricas Avançadas": "Advanced Metrics",
+  "Mês": "Month",
   "minutos no total": "total minutes",
   Mobilidade: "Mobility",
   Moderado: "Moderate",
@@ -374,17 +424,25 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Na tua lista privada": "In your private list",
   "Não foi possível abrir o documento. Tenta novamente.":
     "The document could not be opened. Please try again.",
+  "Não foi possível captar a fotografia. Tenta novamente.":
+    "The photo could not be taken. Please try again.",
+  "Não foi possível carregar os registos de peso.":
+    "Weight entries could not be loaded.",
   "Não foi possível calcular o resumo de hoje.":
     "Today's summary could not be calculated.",
   "Não foi possível concluir a ligação Google.":
     "The Google connection could not be completed.",
   "Não foi possível eliminar este registo.": "This entry could not be deleted.",
+  "Não foi possível eliminar o registo.": "The entry could not be deleted.",
   "Não foi possível eliminar todos os dados locais.":
     "Could not delete all local data.",
   "Não foi possível exportar os dados locais.":
     "Could not export local data.",
   "Não foi possível guardar o perfil.": "The profile could not be saved.",
   "Não foi possível guardar o registo.": "The entry could not be saved.",
+  "Não foi possível iniciar a pré-visualização da câmara.":
+    "The camera preview could not be started.",
+  "Não foi possível preparar a partilha.": "Sharing could not be prepared.",
   "Não foi possível preparar o perfil. Tenta novamente.":
     "The profile could not be prepared. Please try again.",
   "Não são partilhados jejuns, refeições ou treinos automaticamente.":
@@ -397,6 +455,9 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Nome: "Name",
   "Nome do amigo": "Friend's name",
   "Nome do perfil": "Profile name",
+  "Notas opcionais sobre a atividade": "Optional notes about the activity",
+  "NOVA VERSÃO DISPONÍVEL": "NEW VERSION AVAILABLE",
+  "Nova versão:": "New version:",
   "Notas opcionais: percurso, como te sentiste…":
     "Optional notes: route, how you felt…",
   "Nova análise": "New analysis",
@@ -438,6 +499,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Customise the interface with Obsidian Glow and Emerald Neon visuals.",
   Peso: "Weight",
   "Peso atual (opcional)": "Current weight (optional)",
+  "Peso inicial opcional": "Optional starting weight",
   "Pico de insulina circulante e início do armazenamento de glicose sob a forma de glicogénio muscular e hepático.":
     "Peak circulating insulin and onset of glucose storage as muscle and liver glycogen.",
   "Plano Anual": "Annual Plan",
@@ -469,6 +531,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Quando terminares o teu primeiro jejum, ele aparecerá aqui com a duração, meta e XP ganho.":
     "When you finish your first fast, it will appear here with duration, goal details, and XP earned.",
   "Quantidade / Porção (opcional)": "Quantity / Portion (optional)",
+  "Quantidade ou porção da refeição": "Meal quantity or portion",
   "Quebra o jejum prolongado com caldos nutritivos e porções pequenas de fácil digestão.":
     "Break extended fasts with nourishing broths and small, easily digestible portions.",
   "Queda dos níveis de açúcar no sangue e desbloqueio gradual das vias de oxidação lipídica.":
@@ -480,6 +543,11 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Want to adjust ingredients or portion?",
   "Quota diária de IA atingida": "Daily AI quota reached",
   "Recalcular com estes detalhes": "Recalculate with these details",
+  "Recompensas de XP": "XP Rewards",
+  "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.":
+    "Removes the SQLite database, private photos and, when connected, the account and synced data.",
+  "Renovação": "Renewal",
+  "Queima": "Burning",
   "Reciclagem celular e degradação de proteínas senescentes":
     "Cellular recycling and degradation of senescent proteins",
   "Redução de marcadores inflamatórios sistémicos":
@@ -500,6 +568,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Registar atividade": "Log activity",
   "Registo opcional": "Optional log",
   Remover: "Remove",
+  "Remover 250ml de água": "Remove 250ml of water",
   "Remover amigo?": "Remove friend?",
   "Remover fotografia": "Remove photo",
   Repetir: "Retake",
@@ -516,6 +585,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Segurança de Saúde & Privacidade RGPD": "Health Safety & GDPR Privacy",
   "Sem atividade registada": "No activity logged",
   "Sem limite fixo (>1 dia / livre)": "No fixed limit (>1 day / flexible)",
+  "Sem registos de peso": "No weight entries",
+  "Semana": "Week",
   "Sem meta pré-fixada · Conta até decidires terminar":
     "No preset target · Counts until you choose to end",
   "Sem registos": "No entries",
@@ -523,12 +594,16 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Enhanced sensitivity of insulin receptors",
   "Sincronização em Nuvem": "Cloud Sync",
   "Sincronizar agora": "Sync now",
+  "Símbolo KYNIO": "KYNIO symbol",
   "Só a fotografia e a descrição desta análise são enviadas à API. A resposta não é armazenada remotamente pela app.":
     "Only this analysis photo and description are sent to the API. The response is not stored remotely by the app.",
   Sobre: "About",
   "Subscrição com renovação automática através da tua conta Google Play. Cancela a qualquer momento nas definições da Play Store com pelo menos 24h de antecedência.":
     "Auto-renewing subscription through your Google Play account. Cancel anytime in Play Store settings at least 24h in advance.",
   "Tema Aura Glow": "Aura Glow Theme",
+  "Tempo total de jejum": "Total fasting time",
+  "Toca em + para acompanhar a tua evolução ao longo do tempo.":
+    "Tap + to track your progress over time.",
   "Temas Exclusivos Aura": "Exclusive Aura Themes",
   "Tentar novamente": "Try again",
   "Terminar Jejum": "End Fast",
@@ -539,6 +614,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Totais dos registos confirmados. Sem metas prescritas.":
     "Totals from confirmed logs. No prescribed targets.",
   Treinos: "Workouts",
+  "Trocar câmara": "Flip camera",
   "Uma ferramenta de registo, não de prescrição":
     "A logging tool, not a prescription",
   "Uma frase sobre o teu ritmo, objetivos ou motivação.":
@@ -549,9 +625,12 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário.":
     "AI-estimated values for personal habit tracking. Adjust manually as needed.",
   "Ver biologia & dicas →": "View biology & tips →",
+  "Ver todos os registos": "View all entries",
+  "Versão instalada:": "Installed version:",
   "VISUAL": "VISUAL",
   "Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade.":
     "Shows the Fasting, Meals, Workouts, Progress and Privacy guide again.",
+  "Voltar": "Back",
   "Voltar ao perfil": "Return to profile",
   "XP total": "Total XP",
 };
@@ -594,6 +673,29 @@ export function translateText(value: string, language: AppLanguage): string {
     const targetWithProtocol = normalized.match(/^Objetivo · (.+)$/i);
     const activePlanTier = normalized.match(/^Plano ativo \((.+)\) · Acesso total$/i);
     const exportPrepared = normalized.match(/^Exportação preparada: (.+)$/i);
+    const dailyHours = normalized.match(/^Diário · (\d+)h$/i);
+    const phaseNoLimit = normalized.match(/^Fase: (.+) · Sem limite pré-fixado$/i);
+    const weightUnitPrompt = normalized.match(
+      /^Introduz o teu peso em (kg|lb)\.$/i,
+    );
+    const unlockFeature = normalized.match(
+      /^Desbloqueia (.+) e todas as ferramentas premium\.$/i,
+    );
+    const levelXpProgress = normalized.match(
+      /^(\d+) de (\d+) XP neste nível$/i,
+    );
+    const nextLevelXpProgress = normalized.match(
+      /^(\d+) de (\d+) XP para o próximo nível$/i,
+    );
+    const editGoalLabel = normalized.match(/^Editar Objetivo (.+)$/i);
+    const fastingTimerStatus = normalized.match(
+      /^Objetivo (.+), temporizador (.+), Jejum (Ativo|Inativo)$/i,
+    );
+    const badgeState = normalized.match(/^(.+), (desbloqueada|bloqueada)$/i);
+    const currentPhaseLabel = normalized.match(
+      /^(\S+), (.+), fase estimada atual$/i,
+    );
+    const phaseLabel = normalized.match(/^(\S+), (.+)$/i);
 
     if (levelLabel) {
       translation = `Level ${levelLabel[1]} - ${translateText(levelLabel[2], language)}`;
@@ -631,6 +733,28 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `Active plan (${activePlanTier[1]}) · Full access`;
     } else if (exportPrepared) {
       translation = `Export ready: ${exportPrepared[1]}`;
+    } else if (dailyHours) {
+      translation = `Daily · ${dailyHours[1]}h`;
+    } else if (phaseNoLimit) {
+      translation = `Phase: ${translateText(phaseNoLimit[1], language)} · No preset limit`;
+    } else if (weightUnitPrompt) {
+      translation = `Enter your weight in ${weightUnitPrompt[1]}.`;
+    } else if (unlockFeature) {
+      translation = `Unlock ${translateText(unlockFeature[1], language)} and all premium tools.`;
+    } else if (levelXpProgress) {
+      translation = `${levelXpProgress[1]} of ${levelXpProgress[2]} XP in this level`;
+    } else if (nextLevelXpProgress) {
+      translation = `${nextLevelXpProgress[1]} of ${nextLevelXpProgress[2]} XP to the next level`;
+    } else if (editGoalLabel) {
+      translation = `Edit target ${translateText(editGoalLabel[1], language)}`;
+    } else if (fastingTimerStatus) {
+      translation = `Target ${translateText(fastingTimerStatus[1], language)}, timer ${fastingTimerStatus[2]}, ${fastingTimerStatus[3].toLowerCase() === "ativo" ? "active" : "inactive"} fast`;
+    } else if (badgeState) {
+      translation = `${translateText(badgeState[1], language)}, ${badgeState[2].toLowerCase() === "desbloqueada" ? "unlocked" : "locked"}`;
+    } else if (currentPhaseLabel) {
+      translation = `${currentPhaseLabel[1]}, ${translateText(currentPhaseLabel[2], language)}, current estimated phase`;
+    } else if (phaseLabel) {
+      translation = `${phaseLabel[1]}, ${translateText(phaseLabel[2], language)}`;
     } else if (normalized.startsWith("Rotina: ")) {
       const routineContent = normalized.replace(/^Rotina:\s*/i, "");
       translation = `Routine: ${translateText(routineContent, language)}`;

@@ -19,6 +19,8 @@ import {
   type EstimatedMetabolicPhase,
   type EstimatedMetabolicPhaseId,
 } from "@/services/fasting";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -40,6 +42,7 @@ export function MetabolicPhases({
   elapsedHours,
   isActive,
 }: MetabolicPhasesProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const currentPhaseIndex = getEstimatedPhaseIndex(elapsedHours);
   const [selectedPhase, setSelectedPhase] =
     useState<EstimatedMetabolicPhase | null>(null);
@@ -77,18 +80,16 @@ export function MetabolicPhases({
 
   return (
     <View className="mt-8">
-      <View className="mb-4 flex-row items-end justify-between">
-        <View className="flex-1 pr-4">
-          <Text className="font-headline text-2xl text-foreground">
-            A tua jornada
-          </Text>
-          <Text className="mt-1 font-body text-sm text-muted">
-            Fases metabólicas · Toca para ver o que acontece no corpo
-          </Text>
-        </View>
-        <View className="rounded-full bg-success/10 px-3 py-1.5 border border-success/20">
-          <Text className="font-headline text-xs text-success">Referência</Text>
-        </View>
+      <View className="mb-4">
+        <Text
+          className="font-label text-[11px] uppercase text-success"
+          style={{ letterSpacing: 2.6 }}
+        >
+          A tua jornada
+        </Text>
+        <Text className="mt-1 font-body text-sm text-muted">
+          Fases metabólicas · Toca para ver o que acontece no corpo
+        </Text>
       </View>
 
       <ScrollView
@@ -105,29 +106,29 @@ export function MetabolicPhases({
           return (
             <Pressable
               accessibilityHint="Abre explicações e benefícios detalhados desta fase metabólica"
-              accessibilityLabel={`${phase.timeRange}, ${phase.title}${isCurrent ? ", fase estimada atual" : ""}`}
+              accessibilityLabel={translateText(
+                `${phase.timeRange}, ${phase.title}${isCurrent ? ", fase estimada atual" : ""}`,
+                language,
+              )}
               accessibilityRole="button"
-              className="min-h-40 w-44 rounded-[24px] border bg-surface p-4 active:opacity-75"
+              className="min-h-40 w-44 border-b-2 py-1 pr-4 active:opacity-75"
               key={phase.timeRange}
               onPress={() => openPhaseDetail(phase, index)}
               style={{
-                backgroundColor: isCurrent
-                  ? "rgba(16, 185, 129, 0.09)"
-                  : COLORS.surface,
-                borderColor: isCurrent ? COLORS.success : COLORS.border,
+                borderBottomColor: isCurrent
+                  ? COLORS.success
+                  : COLORS.border,
               }}
             >
               <View className="flex-row items-center justify-between">
-                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-background border border-border/50">
-                  <Ionicons
-                    color={accentColor}
-                    name={isCompleted ? "checkmark" : PHASE_ICONS[phase.id]}
-                    size={20}
-                  />
-                </View>
+                <Ionicons
+                  color={accentColor}
+                  name={isCompleted ? "checkmark" : PHASE_ICONS[phase.id]}
+                  size={20}
+                />
                 {isCurrent ? (
                   <Animated.View
-                    className="flex-row items-center rounded-full bg-success/20 px-2 py-0.5"
+                    className="flex-row items-center"
                     style={activePulseStyle}
                   >
                     <View className="mr-1.5 h-1.5 w-1.5 rounded-full bg-success" />
@@ -136,11 +137,9 @@ export function MetabolicPhases({
                     </Text>
                   </Animated.View>
                 ) : isCompleted ? (
-                  <View className="rounded-full bg-success/10 px-2 py-0.5">
-                    <Text className="font-label text-[9px] text-success">
-                      CONCLUÍDO
-                    </Text>
-                  </View>
+                  <Text className="font-label text-[9px] text-success">
+                    CONCLUÍDO
+                  </Text>
                 ) : (
                   <Ionicons color={COLORS.muted} name="information-circle-outline" size={16} />
                 )}

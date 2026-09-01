@@ -5,6 +5,8 @@ import { Text } from "@/components/ui/text";
 
 import { COLORS } from "@/constants/colors";
 import type { GamificationBadge } from "@/services/gamificationService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -21,12 +23,16 @@ interface BadgeCardProps {
 }
 
 export function BadgeCard({ badge }: BadgeCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const accentColor = badge.unlocked ? COLORS.xp : COLORS.muted;
 
   return (
     <View
       accessible
-      accessibilityLabel={`${badge.title}, ${badge.unlocked ? "desbloqueada" : "bloqueada"}`}
+      accessibilityLabel={translateText(
+        `${badge.title}, ${badge.unlocked ? "desbloqueada" : "bloqueada"}`,
+        language,
+      )}
       className="min-h-48 w-[48%] rounded-2xl border bg-surface p-4"
       style={{
         borderColor: badge.unlocked ? COLORS.xp : COLORS.border,

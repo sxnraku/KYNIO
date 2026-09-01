@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { COLORS } from "@/constants/colors";
 import { getLegalDocumentUrl } from "@/services/legalLinks";
+import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 
@@ -170,7 +171,7 @@ export function LegalOnboardingModal() {
               </View>
 
               <Pressable
-                accessibilityLabel="Compreendo e aceito os termos"
+                accessibilityLabel={translateText("Compreendo e aceito os termos", language)}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: isChecked }}
                 className="mt-2 flex-row items-center gap-3 rounded-2xl border border-border bg-surface-raised p-4 active:opacity-70"
@@ -198,7 +199,7 @@ export function LegalOnboardingModal() {
               </Pressable>
 
               <Pressable
-                accessibilityLabel="Entrar"
+                accessibilityLabel={translateText("Entrar", language)}
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !isChecked || isAccepting }}
                 className={`mt-4 min-h-14 flex-row items-center justify-center gap-2 rounded-2xl px-5 ${

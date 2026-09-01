@@ -5,6 +5,8 @@ import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface ProfileHeroCardProps {
   avatarUri: string | null;
@@ -33,13 +35,15 @@ export function ProfileHeroCard({
   onRemoveAvatar,
   onSave,
 }: ProfileHeroCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
+
   return (
     <Card>
       <View className="items-center">
         <View>
           {avatarUri ? (
             <Image
-              accessibilityLabel="Fotografia de perfil"
+              accessibilityLabel={translateText("Fotografia de perfil", language)}
               resizeMode="cover"
               source={{ uri: avatarUri }}
               style={{ borderRadius: 32, height: 96, width: 96 }}
@@ -56,7 +60,7 @@ export function ProfileHeroCard({
           )}
 
           <Pressable
-            accessibilityLabel="Escolher fotografia de perfil"
+            accessibilityLabel={translateText("Escolher fotografia de perfil", language)}
             accessibilityRole="button"
             className="absolute -bottom-1 -right-1 h-10 w-10 items-center justify-center rounded-full border-4 border-surface bg-foreground active:opacity-80"
             onPress={onPickAvatar}

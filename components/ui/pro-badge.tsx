@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { AppText } from "@/components/ui/text";
+import { COLORS, successWithAlpha } from "@/constants/colors";
 
 
 
@@ -12,8 +13,20 @@ export function ProBadge({ size = "small" }: ProBadgeProps) {
   const isSmall = size === "small";
 
   return (
-    <View style={[styles.badge, isSmall ? styles.badgeSmall : styles.badgeMedium]}>
-      <AppText style={[styles.badgeText, isSmall ? styles.textSmall : styles.textMedium]}>
+    <View
+      style={[
+        styles.badge,
+        { borderColor: COLORS.success },
+        isSmall ? styles.badgeSmall : styles.badgeMedium,
+      ]}
+    >
+      <AppText
+        style={[
+          styles.badgeText,
+          { color: COLORS.success },
+          isSmall ? styles.textSmall : styles.textMedium,
+        ]}
+      >
         ✦ PRO
       </AppText>
     </View>
@@ -22,8 +35,7 @@ export function ProBadge({ size = "small" }: ProBadgeProps) {
 
 const styles = StyleSheet.create({
   badge: {
-    backgroundColor: "rgba(16, 185, 129, 0.15)",
-    borderColor: "#10B981",
+    backgroundColor: successWithAlpha(0.15),
     borderWidth: 1,
     borderRadius: 8,
     alignItems: "center",
@@ -39,7 +51,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   badgeText: {
-    color: "#10B981",
     fontWeight: "700",
     letterSpacing: 0.8,
   },
@@ -50,4 +61,3 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
-

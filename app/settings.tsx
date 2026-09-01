@@ -120,7 +120,7 @@ export default function SettingsScreen() {
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <View className="flex-row items-center border-b border-border px-5 pb-4 pt-3">
         <Pressable
-          accessibilityLabel="Voltar"
+          accessibilityLabel={translateText("Voltar", language)}
           accessibilityRole="button"
           className="h-9 w-9 items-center justify-center rounded-full bg-surface active:opacity-70"
           onPress={() => router.back()}
@@ -147,11 +147,17 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Subscription / Pro Card */}
-        <View className="mb-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+        <View className="mb-5 rounded-2xl border border-success/30 bg-success/5 p-5">
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2.5">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 border border-emerald-500/30">
-                <Text className="text-xl">👑</Text>
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/15 border border-success/30">
+                <Text
+                  accessibilityElementsHidden
+                  className="text-xl"
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  👑
+                </Text>
               </View>
               <View>
                 <View className="flex-row items-center gap-1.5">
@@ -170,9 +176,9 @@ export default function SettingsScreen() {
 
             <Pressable
               onPress={() => setPaywallOpen(true)}
-              className="rounded-xl bg-emerald-500 px-3.5 py-2 active:opacity-80"
+              className="rounded-xl bg-success px-3.5 py-2 active:opacity-80"
             >
-              <Text className="font-label text-xs font-bold text-black">
+              <Text className="font-label text-xs font-bold" style={{ color: "#3A2200" }}>
                 {isPro ? "Gerir" : "Desbloquear"}
               </Text>
             </Pressable>
@@ -243,9 +249,9 @@ export default function SettingsScreen() {
         {errorMessage ? (
           <View
             accessibilityLiveRegion="polite"
-            className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4"
+            className="mt-4 rounded-xl border border-danger/20 bg-danger/10 p-4"
           >
-            <Text className="font-body text-sm leading-5 text-red-300">
+            <Text className="font-body text-sm leading-5 text-danger">
               {errorMessage}
             </Text>
           </View>

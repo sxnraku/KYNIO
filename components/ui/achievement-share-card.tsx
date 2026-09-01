@@ -17,14 +17,14 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
 
     return (
       <View
-        className="overflow-hidden rounded-2xl border border-[#DCE4DF] bg-white"
+        className="overflow-hidden rounded-2xl border border-[#D5CBAF] bg-[#F6F0DE]"
         collapsable={false}
         ref={ref}
       >
         <View className="bg-success px-5 pb-6 pt-5">
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-2.5">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-white/95">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FBF7EA]">
                 <Ionicons
                   color={COLORS.success}
                   name="shield-checkmark-outline"
@@ -32,55 +32,55 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                 />
               </View>
               <View>
-                <Text className="font-headline text-lg tracking-wide text-white">
+                <Text className="font-headline text-lg tracking-wide text-[#3A2200]">
                   KYNIO
                 </Text>
-                <Text className="font-label text-[8px] uppercase tracking-widest text-white/80">
+                <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]/80">
                   A minha jornada
                 </Text>
               </View>
             </View>
-            <View className="rounded-full bg-white/20 px-3 py-2">
-              <Text className="font-label text-[8px] uppercase tracking-widest text-white">
+            <View className="rounded-full bg-[#3A2200]/15 px-3 py-2">
+              <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]">
                 Conquista
               </Text>
             </View>
           </View>
 
-          <Text className="mt-7 font-label text-[9px] uppercase tracking-widest text-white/75">
+          <Text className="mt-7 font-label text-[9px] uppercase tracking-widest text-[#3A2200]/75">
             Nível atual
           </Text>
-          <Text className="mt-1 font-headline text-[32px] leading-9 text-white">
+          <Text className="mt-1 font-headline text-[32px] leading-9 text-[#3A2200]">
             Nível {payload.level}
           </Text>
-          <Text className="mt-1 font-body text-base text-white/90">
+          <Text className="mt-1 font-body text-base text-[#3A2200]/90">
             {payload.levelTitle}
           </Text>
         </View>
 
         <View className="px-5 pb-5 pt-4">
           <View className="flex-row gap-2">
-            <View className="flex-1 rounded-xl bg-[#F3F6F4] p-3">
-              <Text className="font-headline text-xl text-[#111713]">
+            <View className="flex-1 rounded-xl bg-[#EDE6D3] p-3">
+              <Text className="font-headline text-xl text-[#3A3A38]">
                 {payload.totalXp}
               </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#68736C]">
+              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
                 XP total
               </Text>
             </View>
-            <View className="flex-1 rounded-xl bg-[#F3F6F4] p-3">
-              <Text className="font-headline text-xl text-[#111713]">
+            <View className="flex-1 rounded-xl bg-[#EDE6D3] p-3">
+              <Text className="font-headline text-xl text-[#3A3A38]">
                 {payload.streakDays}
               </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#68736C]">
+              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
                 Dias seguidos
               </Text>
             </View>
-            <View className="flex-1 rounded-xl bg-[#EEF2FF] p-3">
+            <View className="flex-1 rounded-xl bg-[#F0DFC0] p-3">
               <Text className="font-headline text-xl text-xp">
                 {payload.badgeTitles.length}
               </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#68736C]">
+              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
                 Insígnias
               </Text>
             </View>
@@ -90,7 +90,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
             {visibleBadges.length ? (
               visibleBadges.map((badge) => (
                 <View
-                  className="rounded-full bg-[#EEF2FF] px-3 py-2"
+                  className="rounded-full bg-[#F0DFC0] px-3 py-2"
                   key={badge}
                 >
                   <Text className="font-label text-[8px] text-xp">{badge}</Text>
@@ -105,8 +105,8 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
             )}
           </View>
 
-          <View className="mt-5 flex-row items-center justify-between border-t border-[#DCE4DF] pt-4">
-            <Text className="font-body text-[11px] text-[#68736C]">
+          <View className="mt-5 flex-row items-center justify-between border-t border-[#D5CBAF] pt-4">
+            <Text className="font-body text-[11px] text-[#6F6E66]">
               Hábitos ao meu ritmo.
             </Text>
             <Text className="font-label text-[8px] text-success">

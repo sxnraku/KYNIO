@@ -4,19 +4,16 @@ import { useState } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
-import { FriendsPanel } from "@/components/ui/friends-panel";
 import { PageTitle } from "@/components/ui/page-title";
 import { ProfileAchievementsCard } from "@/components/ui/profile-achievements-card";
 import { ProfileHeroCard } from "@/components/ui/profile-hero-card";
-import {
-  type ProfileSection,
-  ProfileSectionTabs,
-} from "@/components/ui/profile-section-tabs";
 import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
 import type { UserProfileRecord } from "@/db/schema";
 import { useGamificationProgress } from "@/hooks/use-gamification-progress";
 import { useLocalProfile } from "@/hooks/use-local-profile";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface ProfileEditorProps {
   isSaving: boolean;
@@ -53,16 +50,16 @@ function ProfileEditor({
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const language = useAppPreferencesStore((state) => state.language);
   const localProfile = useLocalProfile();
   const gamification = useGamificationProgress();
-  const [activeSection, setActiveSection] = useState<ProfileSection>("profile");
 
   return (
     <Screen>
       <PageTitle
         action={
           <Pressable
-            accessibilityLabel="Abrir definições"
+            accessibilityLabel={translateText("Abrir definições", language)}
             accessibilityRole="button"
             className="h-12 w-12 items-center justify-center rounded-2xl border border-border bg-surface active:opacity-70"
             onPress={() => router.push("/settings")}
@@ -75,16 +72,9 @@ export default function ProfileScreen() {
             />
           </Pressable>
         }
-        description="A tua identidade e o teu círculo, com controlo claro sobre o que partilhas."
+        description="A tua identidade e progresso pessoal no KYNIO."
         title="Perfil"
       />
-
-      <View className="mt-6">
-        <ProfileSectionTabs
-          activeSection={activeSection}
-          onChange={setActiveSection}
-        />
-      </View>
 
       {localProfile.error ? (
         <View className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
@@ -111,7 +101,7 @@ export default function ProfileScreen() {
         </View>
       ) : null}
 
-      {localProfile.profile && activeSection === "profile" ? (
+      {localProfile.profile ? (
         <View className="mt-4 gap-4">
           <ProfileEditor
             isSaving={localProfile.isSaving}
@@ -124,17 +114,7 @@ export default function ProfileScreen() {
           <ProfileAchievementsCard snapshot={gamification.snapshot} />
         </View>
       ) : null}
-
-      {activeSection === "friends" ? (
-        <View className="mt-4">
-          <FriendsPanel
-            friends={localProfile.friends}
-            isSaving={localProfile.isSaving}
-            onAdd={localProfile.addFriend}
-            onRemove={localProfile.removeFriend}
-          />
-        </View>
-      ) : null}
     </Screen>
   );
 }
+

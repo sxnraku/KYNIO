@@ -25,14 +25,14 @@ export function SettingsActionCard({
   onPress,
   testID,
 }: SettingsActionCardProps) {
-  const accentColor = destructive ? "#FB7185" : COLORS.success;
+  const accentColor = destructive ? COLORS.danger : COLORS.success;
 
   return (
     <View className="rounded-2xl border border-border bg-surface p-5">
       <View className="flex-row items-start gap-4">
         <View
           className={`h-11 w-11 items-center justify-center rounded-xl ${
-            destructive ? "bg-red-500/10" : "bg-success/10"
+            destructive ? "bg-danger/10" : "bg-success/10"
           }`}
         >
           <Ionicons color={accentColor} name={icon} size={23} />
@@ -50,7 +50,7 @@ export function SettingsActionCard({
         accessibilityState={{ disabled: disabled || isLoading }}
         className={`mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-xl border px-4 active:opacity-70 ${
           destructive
-            ? "border-red-400/40 bg-red-500/10"
+            ? "border-danger/40 bg-danger/10"
             : "border-success/30 bg-success/10"
         } ${disabled ? "opacity-50" : ""}`}
         disabled={disabled || isLoading}
@@ -61,7 +61,7 @@ export function SettingsActionCard({
           <ActivityIndicator color={accentColor} size="small" />
         ) : null}
         <Text
-          className={`font-headline text-sm ${destructive ? "text-red-300" : "text-success"}`}
+          className={`font-headline text-sm ${destructive ? "text-danger" : "text-success"}`}
         >
           {label}
         </Text>
