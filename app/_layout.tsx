@@ -13,6 +13,7 @@ import { useEffect } from "react";
 
 import { AppThemeProvider } from "@/components/app-theme-provider";
 import { CloudSyncBootstrap } from "@/components/cloud-sync-bootstrap";
+import { HydrationRemindersBootstrap } from "@/components/hydration-reminders-bootstrap";
 import { ForceUpdateModal } from "@/components/ui/force-update-modal";
 import { GuidedTutorialModal } from "@/components/ui/guided-tutorial-modal";
 import { LegalOnboardingModal } from "@/components/ui/legal-onboarding-modal";
@@ -53,6 +54,7 @@ export default function RootLayout() {
         }}
       />
       <CloudSyncBootstrap />
+      <HydrationRemindersBootstrap />
       <LegalOnboardingModal />
       <ProfileOnboardingModal />
       <GuidedTutorialModal />

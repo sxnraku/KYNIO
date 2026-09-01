@@ -72,6 +72,12 @@ async function main() {
   assert.match(edgeFunctionSource, /EXCLUSIVAMENTE com JSON válido/);
   assert.match(edgeFunctionSource, /responseJsonSchema: RESPONSE_SCHEMA/);
   assert.match(edgeFunctionSource, /store: false/);
+  // A função tem verify_jwt=false, por isso valida internamente a chave
+  // publishable do projeto (apikey ou Authorization: Bearer) e rejeita com 401
+  // os pedidos anónimos da Internet.
+  assert.match(edgeFunctionSource, /Deno\.env\.get\('SUPABASE_PUBLISHABLE_KEY'\)/);
+  assert.match(edgeFunctionSource, /SUPABASE_ANON_KEY/);
+  assert.match(edgeFunctionSource, /'Não autorizado\.'/);
   process.stdout.write('Proxy e contrato JSON da análise de refeições validados.\n');
 }
 

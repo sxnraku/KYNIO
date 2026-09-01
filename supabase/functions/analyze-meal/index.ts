@@ -60,6 +60,10 @@ interface AnalysisInput {
   image?: { base64: string; mimeType: string };
 }
 
+// Erros de validação do pedido: só estas mensagens (fixas e em PT) podem chegar
+// ao cliente com 400. Qualquer outro erro interno devolve uma mensagem genérica.
+class InputError extends Error {}
+
 interface MealAnalysis {
   confidence: 'high' | 'low' | 'medium';
   dish_name: string;
@@ -83,7 +87,7 @@ function isNumberInRange(value: unknown, maximum: number): value is number {
 
 function parseInput(value: unknown): AnalysisInput {
   if (!isRecord(value)) {
-    throw new Error('Pedido inválido.');
+    throw new InputError('Pedido inválido.');
   }
 
   const description =
@@ -101,7 +105,7 @@ function parseInput(value: unknown): AnalysisInput {
       value.image.base64.length === 0 ||
       value.image.base64.length > MAX_IMAGE_BASE64_LENGTH
     ) {
-      throw new Error(
+      throw new InputError(
         'A fotografia deve ser JPEG, PNG, WebP, HEIC ou HEIF e ter até 8 MB.',
       );
     }
@@ -113,11 +117,11 @@ function parseInput(value: unknown): AnalysisInput {
   }
 
   if (!description && !image) {
-    throw new Error('Adiciona uma fotografia ou descreve a refeição.');
+    throw new InputError('Adiciona uma fotografia ou descreve a refeição.');
   }
 
   if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-    throw new Error('A descrição deve ter até 1000 caracteres.');
+    throw new InputError('A descrição deve ter até 1000 caracteres.');
   }
 
   return { description, image };
@@ -212,6 +216,13 @@ function getCorsHeaders(request: Request): Record<string, string> | null {
     'Access-Control-Allow-Origin': origin ?? '*',
     Vary: 'Origin',
   };
+}
+
+function isProjectCredential(request: Request, publishableKey: string): boolean {
+  return (
+    request.headers.get('apikey') === publishableKey ||
+    request.headers.get('authorization') === `Bearer ${publishableKey}`
+  );
 }
 
 function jsonResponse(
@@ -316,11 +327,24 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: 'Método não permitido.' }, 405, corsHeaders);
   }
 
-  // Exige as credenciais públicas do projeto (apikey ou Authorization), que a app
-  // envia sempre. Pedidos anónimos sem qualquer credencial são rejeitados antes
-  // de consumir quota de análise.
-  if (!request.headers.get('apikey') && !request.headers.get('authorization')) {
-    return jsonResponse({ error: 'Credenciais em falta.' }, 401, corsHeaders);
+  // verify_jwt = false porque a app não envia o JWT do utilizador: autentica-se
+  // com a chave publishable do projeto (header apikey ou Authorization: Bearer).
+  // Pedidos anónimos da Internet sem essa chave são rejeitados antes de
+  // consumirem quota de análise ou de rate limit.
+  const publishableKey =
+    Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY');
+
+  if (!publishableKey) {
+    console.error('[analyze-meal] Chave publishable do projeto não configurada.');
+    return jsonResponse(
+      { error: 'Função remota não configurada.' },
+      500,
+      corsHeaders,
+    );
+  }
+
+  if (!isProjectCredential(request, publishableKey)) {
+    return jsonResponse({ error: 'Não autorizado.' }, 401, corsHeaders);
   }
 
   const contentLength = Number(request.headers.get('content-length') ?? '0');
@@ -394,14 +418,9 @@ Deno.serve(async (request) => {
     return jsonResponse(analysis, 200, corsHeaders);
   } catch (error) {
     console.error('[analyze-meal] Erro interno:', error);
-    const message = error instanceof Error ? error.message : '';
-    const isInputError =
-      message.includes('fotografia') ||
-      message.includes('descrição') ||
-      message.includes('Pedido inválido');
 
-    if (isInputError) {
-      return jsonResponse({ error: message }, 400, corsHeaders);
+    if (error instanceof InputError) {
+      return jsonResponse({ error: error.message }, 400, corsHeaders);
     }
 
     return jsonResponse(

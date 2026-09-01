@@ -21,7 +21,9 @@ export function getDefaultAppLanguage(): AppLanguage {
 }
 
 interface AppPreferencesState {
+  hydrationRemindersEnabled: boolean;
   language: AppLanguage;
+  setHydrationRemindersEnabled: (enabled: boolean) => void;
   setLanguage: (language: AppLanguage) => void;
   setThemeMode: (themeMode: AppThemeMode) => void;
   themeMode: AppThemeMode;
@@ -30,7 +32,10 @@ interface AppPreferencesState {
 export const useAppPreferencesStore = create<AppPreferencesState>()(
   persist(
     (set) => ({
+      hydrationRemindersEnabled: false,
       language: getDefaultAppLanguage(),
+      setHydrationRemindersEnabled: (hydrationRemindersEnabled) =>
+        set({ hydrationRemindersEnabled }),
       setLanguage: (language) => set({ language }),
       setThemeMode: (themeMode) => set({ themeMode }),
       themeMode: "light",
@@ -38,7 +43,11 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
 
     {
       name: "kynio-app-preferences-v1",
-      partialize: ({ language, themeMode }) => ({ language, themeMode }),
+      partialize: ({ hydrationRemindersEnabled, language, themeMode }) => ({
+        hydrationRemindersEnabled,
+        language,
+        themeMode,
+      }),
       skipHydration: process.env.NODE_ENV === "test",
       storage: createJSONStorage(() => AsyncStorage),
     },

@@ -21,6 +21,7 @@ import {
 } from "@/services/dbService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useFastingScheduleStore } from "@/store/use-fasting-schedule-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 import { useGuidedTutorialStore } from "@/store/guided-tutorial-store";
 
@@ -40,6 +41,8 @@ function parseOptionalWeight(value: string): number | undefined {
   return parsed;
 }
 
+const FASTING_GOALS = [12, 14, 16, 18, 20] as const;
+
 export function ProfileOnboardingModal() {
   const cloudAccount = useCloudAccount();
   const language = useAppPreferencesStore((state) => state.language);
@@ -57,6 +60,9 @@ export function ProfileOnboardingModal() {
   const setProfileOnboardingComplete = useGuidedTutorialStore(
     (state) => state.setProfileOnboardingComplete,
   );
+  const currentTargetHours = useFastingScheduleStore((state) => state.targetHours);
+  const setTargetHours = useFastingScheduleStore((state) => state.setTargetHours);
+  const [fastingGoal, setFastingGoal] = useState<number>(currentTargetHours);
 
   useEffect(() => {
     if (!hasAcceptedTerms) {
@@ -110,6 +116,7 @@ export function ProfileOnboardingModal() {
     setIsLoading(true);
 
     try {
+      setTargetHours(fastingGoal);
       await completeProfileOnboarding({
         displayName: name,
         initialWeight: trackWeight ? parseOptionalWeight(weight) : undefined,
@@ -297,6 +304,39 @@ export function ProfileOnboardingModal() {
                 avalia a tua saúde, não define um peso ideal e não substitui
                 orientação profissional.
               </Text>
+            </View>
+
+            <Text className="mt-5 font-label text-[10px] uppercase tracking-widest text-success">
+              Objetivo de jejum diário
+            </Text>
+            <Text className="mt-1 font-body text-xs leading-4 text-muted">
+              Escolhe a meta com que queres começar. Podes mudá-la quando
+              quiseres.
+            </Text>
+            <View className="mt-2 flex-row flex-wrap gap-2">
+              {FASTING_GOALS.map((hours) => {
+                const selected = fastingGoal === hours;
+                return (
+                  <Pressable
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: selected }}
+                    className={`min-h-11 min-w-14 items-center justify-center rounded-full border px-4 active:opacity-70 ${
+                      selected ? "border-xp bg-xp" : "border-border bg-background"
+                    }`}
+                    key={hours}
+                    onPress={() => setFastingGoal(hours)}
+                    testID={`fasting-goal-${hours}`}
+                  >
+                    <Text
+                      className={`font-headline text-sm ${
+                        selected ? "text-background" : "text-foreground"
+                      }`}
+                    >
+                      {`${hours}:${24 - hours}`}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
 
             {error ? (

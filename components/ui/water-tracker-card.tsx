@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native";
 
 import { Text } from "@/components/ui/text";
 import { COLORS, successWithAlpha } from "@/constants/colors";
+import { triggerLightImpact } from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useWaterStore } from "@/store/useWaterStore";
@@ -83,7 +84,10 @@ export function WaterTrackerCard() {
           accessibilityLabel={translateText("Adicionar 250ml de água", language)}
           accessibilityRole="button"
           className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
-          onPress={() => void addWater(250)}
+          onPress={() => {
+            triggerLightImpact();
+            void addWater(250);
+          }}
           style={{
             backgroundColor: successWithAlpha(0.15),
             borderColor: successWithAlpha(0.4),
@@ -99,7 +103,10 @@ export function WaterTrackerCard() {
           accessibilityLabel={translateText("Adicionar 500ml de água", language)}
           accessibilityRole="button"
           className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
-          onPress={() => void addWater(500)}
+          onPress={() => {
+            triggerLightImpact();
+            void addWater(500);
+          }}
           style={{
             backgroundColor: successWithAlpha(0.15),
             borderColor: successWithAlpha(0.4),
@@ -116,7 +123,10 @@ export function WaterTrackerCard() {
             accessibilityLabel={translateText("Remover 250ml de água", language)}
             accessibilityRole="button"
             className="h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface active:opacity-60"
-            onPress={() => void removeWater(250)}
+            onPress={() => {
+              triggerLightImpact();
+              void removeWater(250);
+            }}
           >
             <Ionicons color={COLORS.muted} name="remove" size={16} />
           </Pressable>

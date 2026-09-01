@@ -96,6 +96,24 @@ export default function MealsScreen() {
         </Pressable>
       </View>
 
+      {/* Aviso não-bloqueante na última análise grátis do dia */}
+      {!isPro && remainingScans === 1 ? (
+        <Pressable
+          accessibilityRole="button"
+          className="mt-3 flex-row items-center gap-2.5 rounded-xl border border-xp/30 bg-xp/10 px-4 py-3 active:opacity-70"
+          onPress={openPaywall}
+          testID="last-free-scan-banner"
+        >
+          <Ionicons color={COLORS.xp} name="sparkles-outline" size={17} />
+          <Text className="flex-1 font-body text-xs leading-4 text-foreground">
+            Última análise grátis — desbloqueia ilimitado
+          </Text>
+          <Text className="font-label text-xs font-bold text-success">
+            Desbloquear
+          </Text>
+        </Pressable>
+      ) : null}
+
 
       <View className="mt-7">
         <DailyMealSummaryCard

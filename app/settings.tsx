@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Linking, Pressable, ScrollView, View } from "react-native";
+import { Alert, Linking, Pressable, ScrollView, Switch, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,8 +16,18 @@ import {
   deleteAllLocalData,
   exportAllLocalData,
 } from "@/services/dataPrivacyService";
+import {
+  cancelHydrationReminders,
+  requestNotificationPermission,
+  scheduleHydrationReminders,
+} from "@/services/fastingNotificationService";
 import { translateText } from "@/services/i18n";
+import {
+  IAP_SKUS,
+  restoreActivePurchases,
+} from "@/services/inAppPurchaseService";
 import { getLegalDocumentUrl, type LegalDocument } from "@/services/legalLinks";
+import { verifyPurchaseWithServer } from "@/services/purchaseVerificationService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useGuidedTutorialStore } from "@/store/guided-tutorial-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
@@ -31,15 +41,102 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const hydrationRemindersEnabled = useAppPreferencesStore(
+    (state) => state.hydrationRemindersEnabled,
+  );
   const language = useAppPreferencesStore((state) => state.language);
+  const setHydrationRemindersEnabled = useAppPreferencesStore(
+    (state) => state.setHydrationRemindersEnabled,
+  );
   const isPro = useSubscriptionStore((state) => state.isPro);
   const tier = useSubscriptionStore((state) => state.tier);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isRestoring, setIsRestoring] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const handleRestorePurchases = async () => {
+    if (isRestoring || isDeleting || isExporting) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setIsRestoring(true);
+
+    try {
+      const result = await restoreActivePurchases();
+
+      if (!result.hasActiveSubscription || result.tier === "free") {
+        Alert.alert(
+          translateText("Sem compras ativas", language),
+          translateText(
+            "Não foram encontradas compras ou subscrições ativas para esta conta Google.",
+            language,
+          ),
+        );
+        return;
+      }
+
+      const tierSku =
+        result.tier === "lifetime"
+          ? IAP_SKUS.LIFETIME_PRODUCT
+          : result.tier === "annual"
+            ? IAP_SKUS.ANNUAL_SUBSCRIPTION
+            : IAP_SKUS.MONTHLY_SUBSCRIPTION;
+      const restoredPurchase = result.purchases.find(
+        (purchase) => purchase.productId === tierSku && purchase.purchaseToken,
+      );
+
+      // Replica o fluxo do paywall: verificação server-side antes de ativar.
+      if (restoredPurchase?.purchaseToken) {
+        const verification = await verifyPurchaseWithServer(
+          {
+            productId: restoredPurchase.productId,
+            purchaseToken: restoredPurchase.purchaseToken,
+          },
+          result.tier === "lifetime" ? "product" : "subscription",
+        );
+
+        if (verification === "invalid") {
+          Alert.alert(
+            translateText("Erro ao restaurar", language),
+            translateText(
+              "Não foi possível validar a compra restaurada. Tenta novamente.",
+              language,
+            ),
+          );
+          return;
+        }
+      }
+
+      useSubscriptionStore.getState().activateSubscription(
+        result.tier,
+        undefined,
+        restoredPurchase?.purchaseToken,
+        restoredPurchase?.transactionId,
+      );
+      Alert.alert(
+        translateText("Compras restauradas", language),
+        translateText(
+          "A tua subscrição Pro foi restaurada neste dispositivo.",
+          language,
+        ),
+      );
+    } catch {
+      Alert.alert(
+        translateText("Erro ao restaurar", language),
+        translateText(
+          "Não foi possível verificar as compras. Verifica a ligação à internet e tenta novamente.",
+          language,
+        ),
+      );
+    } finally {
+      setIsRestoring(false);
+    }
+  };
 
   const openLegalDocument = async (document: LegalDocument) => {
     try {
@@ -116,6 +213,32 @@ export default function SettingsScreen() {
     );
   };
 
+  const handleHydrationRemindersToggle = async (enabled: boolean) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    if (!enabled) {
+      setHydrationRemindersEnabled(false);
+      await cancelHydrationReminders();
+      return;
+    }
+
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) {
+      setHydrationRemindersEnabled(false);
+      setErrorMessage(
+        translateText(
+          "Ativa as notificações nas definições do sistema para receberes lembretes de hidratação.",
+          language,
+        ),
+      );
+      return;
+    }
+
+    setHydrationRemindersEnabled(true);
+    await scheduleHydrationReminders();
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <View className="flex-row items-center border-b border-border px-5 pb-4 pt-3">
@@ -185,8 +308,54 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        <View className="mb-5">
+          <SettingsActionCard
+            description="Recupera a subscrição ou compra Pro ativa na tua conta Google Play."
+            disabled={isDeleting || isExporting}
+            icon="refresh-outline"
+            isLoading={isRestoring}
+            label="Restaurar compras"
+            onPress={() => void handleRestorePurchases()}
+            testID="restore-purchases-button"
+          />
+        </View>
+
         <PreferenceControls />
 
+        {/* Lembretes de hidratação */}
+        <View className="mt-5 rounded-2xl border border-border bg-surface p-5">
+          <View className="flex-row items-center gap-3">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/10">
+              <Ionicons color={COLORS.success} name="water-outline" size={21} />
+            </View>
+            <View className="flex-1 pr-3">
+              <Text className="font-headline text-base text-foreground">
+                {translateText("Lembretes de hidratação", language)}
+              </Text>
+              <Text className="mt-1 font-body text-xs leading-4 text-muted">
+                {translateText(
+                  "Pausas diárias para um copo de água às 10:00, 13:00, 16:00 e 19:00.",
+                  language,
+                )}
+              </Text>
+            </View>
+            <Switch
+              accessibilityLabel={translateText(
+                "Lembretes de hidratação",
+                language,
+              )}
+              onValueChange={(value) =>
+                void handleHydrationRemindersToggle(value)
+              }
+              testID="hydration-reminders-toggle"
+              thumbColor={
+                hydrationRemindersEnabled ? COLORS.surfaceRaised : COLORS.muted
+              }
+              trackColor={{ false: COLORS.border, true: COLORS.success }}
+              value={hydrationRemindersEnabled}
+            />
+          </View>
+        </View>
 
         <View className="mt-5">
           <SettingsActionCard

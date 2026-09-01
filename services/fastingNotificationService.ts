@@ -3,6 +3,27 @@ import { Platform } from 'react-native';
 
 const HOURS_TO_MS = 60 * 60 * 1000;
 
+// Identificadores estáveis das notificações agendadas: permitem cancelar só
+// as de jejum (ou só as de hidratação) sem nunca usar
+// cancelAllScheduledNotificationsAsync, que apagaria as outras.
+const FASTING_PHASE_NOTIFICATION_IDS = [12, 14, 16, 24].map(
+  (hours) => `fasting-phase-${hours}`,
+);
+const FASTING_GOAL_NOTIFICATION_ID = 'fasting-goal';
+const FASTING_ROUTINE_REMINDER_NOTIFICATION_ID = 'fasting-routine-reminder';
+
+const FASTING_NOTIFICATION_IDS = [
+  ...FASTING_PHASE_NOTIFICATION_IDS,
+  FASTING_GOAL_NOTIFICATION_ID,
+  FASTING_ROUTINE_REMINDER_NOTIFICATION_ID,
+];
+
+// Lembretes diários de hidratação: 10:00, 13:00, 16:00 e 19:00.
+const HYDRATION_REMINDER_HOURS = [10, 13, 16, 19];
+const HYDRATION_NOTIFICATION_IDS = HYDRATION_REMINDER_HOURS.map(
+  (hour) => `hydration-reminder-${hour}`,
+);
+
 // Configure default notification handler for foreground display
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({
@@ -43,7 +64,13 @@ export async function cancelFastingNotifications(): Promise<void> {
   }
 
   try {
-    await Notifications.cancelAllScheduledNotificationsAsync();
+    // Cancela apenas as notificações de jejum (por identificador), para não
+    // apagar os lembretes de hidratação sempre que um jejum inicia/termina.
+    await Promise.all(
+      FASTING_NOTIFICATION_IDS.map((identifier) =>
+        Notifications.cancelScheduledNotificationAsync(identifier),
+      ),
+    );
   } catch {
     // Silently ignore cancellation errors
   }
@@ -99,6 +126,7 @@ export async function scheduleFastingPhaseNotifications(
 
       if (delaySeconds > 10) {
         await Notifications.scheduleNotificationAsync({
+          identifier: `fasting-phase-${milestone.hours}`,
           content: {
             title: milestone.title,
             body: milestone.body,
@@ -120,6 +148,7 @@ export async function scheduleFastingPhaseNotifications(
 
       if (targetDelaySeconds > 10) {
         await Notifications.scheduleNotificationAsync({
+          identifier: FASTING_GOAL_NOTIFICATION_ID,
           content: {
             title: 'Meta de Jejum Atingida! 🎉',
             body: `Parabéns! Completaste a tua meta de ${targetHours}h. Toca para registar o teu progresso e ganhar XP!`,
@@ -165,6 +194,7 @@ export async function scheduleRoutineReminderNotification(
         : `Está na hora de iniciar o teu jejum de ${targetHours}h. Toca para começar!`;
 
       await Notifications.scheduleNotificationAsync({
+        identifier: FASTING_ROUTINE_REMINDER_NOTIFICATION_ID,
         content: {
           title,
           body,
@@ -182,3 +212,58 @@ export async function scheduleRoutineReminderNotification(
   }
 }
 
+
+export async function scheduleHydrationReminders(): Promise<void> {
+  if (Platform.OS === 'web') {
+    return;
+  }
+
+  try {
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    // Reagendamento idempotente: cancela primeiro os lembretes antigos para
+    // não duplicar quando chamado no arranque da app ou ao reativar o toggle.
+    await cancelHydrationReminders();
+
+    for (const hour of HYDRATION_REMINDER_HOURS) {
+      const trigger: Notifications.DailyTriggerInput = {
+        hour,
+        minute: 0,
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      };
+
+      await Notifications.scheduleNotificationAsync({
+        identifier: `hydration-reminder-${hour}`,
+        content: {
+          title: 'Hidratação',
+          body: 'Pausa para um copo de água. O teu jejum agradece.',
+          data: { type: 'hydration_reminder' },
+          sound: true,
+        },
+        trigger,
+      });
+    }
+  } catch {
+    // Non-blocking notification failure
+  }
+}
+
+export async function cancelHydrationReminders(): Promise<void> {
+  if (Platform.OS === 'web') {
+    return;
+  }
+
+  try {
+    // Cancela apenas os lembretes de hidratação, sem tocar nos de jejum.
+    await Promise.all(
+      HYDRATION_NOTIFICATION_IDS.map((identifier) =>
+        Notifications.cancelScheduledNotificationAsync(identifier),
+      ),
+    );
+  } catch {
+    // Silently ignore cancellation errors
+  }
+}
