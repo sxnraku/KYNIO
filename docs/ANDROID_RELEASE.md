@@ -31,7 +31,9 @@ npx supabase functions deploy verify-purchase --no-verify-jwt
 ```
 
 A função `delete-account` valida internamente o JWT do utilizador. A função `analyze-meal` não envia
-o JWT do utilizador ao Gemini e mantém apenas um hash salgado de rede por até uma hora para limitar
+o JWT do utilizador ao Gemini: com `verify_jwt = false`, rejeita com 401 os pedidos sem a chave
+publishable do projeto (`apikey` ou `Authorization: Bearer`, lidos de `SUPABASE_PUBLISHABLE_KEY` /
+`SUPABASE_ANON_KEY`) e mantém apenas um hash salgado de rede por até uma hora para limitar
 abuso. Fotografias e descrições não são guardadas pela função.
 
 A função `verify-purchase` valida compras Google Play junto da API Android Publisher. Sem o segredo

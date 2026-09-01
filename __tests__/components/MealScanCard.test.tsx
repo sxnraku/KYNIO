@@ -185,6 +185,43 @@ describe('MealScanCard', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('mostra aviso não-bloqueante na última análise grátis e abre o paywall', async () => {
+    useSubscriptionStore.setState({
+      dailyAiScansCount: 2,
+      dailyAiScansDate: new Date().toISOString().slice(0, 10),
+      expiresAt: null,
+      isPro: false,
+      maxFreeDailyAiScans: 3,
+      tier: 'free',
+    });
+
+    await render(<MealsScreen />);
+
+    const banner = await screen.findByTestId('last-free-scan-banner');
+    expect(
+      screen.getByText('Última análise grátis — desbloqueia ilimitado'),
+    ).toBeTruthy();
+
+    await fireEvent.press(banner);
+
+    expect(await screen.findByText('KYNIO AURA PRO')).toBeTruthy();
+  });
+
+  it('não mostra o aviso de última análise grátis a utilizadores Pro', async () => {
+    useSubscriptionStore.setState({
+      dailyAiScansCount: 2,
+      dailyAiScansDate: new Date().toISOString().slice(0, 10),
+      expiresAt: null,
+      isPro: true,
+      maxFreeDailyAiScans: 3,
+      tier: 'annual',
+    });
+
+    await render(<MealsScreen />);
+
+    expect(screen.queryByTestId('last-free-scan-banner')).toBeNull();
+  });
+
   it('confirma a refeição editada através do serviço SQLite local', async () => {
     await renderAnalyzedMeal();
 

@@ -384,4 +384,91 @@ describe('cloudSyncService — soft delete no sync', () => {
     expect(result.downloadedRecords).toBe(1);
     expect(tables.get(userProfile)?.[0].totalXp).toBe(100);
   });
+
+  it('não ressuscita um registo ativo no remoto que tem tombstone local', async () => {
+    // O registo foi apagado localmente (tombstone ainda não purgado) mas o
+    // remoto ainda tem a versão ativa: o sync não o pode reinserir como ativo.
+    const deletedFast: Row = {
+      completed: true,
+      deletedAt: 5_000,
+      endTime: 4_000,
+      id: 2,
+      startTime: 3_000,
+      targetHours: 16,
+      xpEarned: 50,
+    };
+    const { database, tables } = createFakeDatabase({
+      fasts: [deletedFast],
+      profile: createProfile(),
+    });
+    const { client, upserts } = createFakeSupabase({
+      ...EMPTY_REMOTE,
+      fasts: [
+        {
+          completed: true,
+          deleted_at: null,
+          end_time: 4_000,
+          record_key: '3000:4000',
+          start_time: 3_000,
+          target_hours: 16,
+          updated_at: 4_000,
+          user_id: 'user-1',
+          xp_earned: 50,
+        },
+      ],
+    });
+    getInitializedDatabaseMock.mockResolvedValue(database as never);
+    requireSupabaseMock.mockReturnValue(client as never);
+
+    const result = await syncAllUserData();
+
+    // O tombstone local ganha: é enviado para o remoto, purgado localmente e a
+    // versão ativa remota não é reinserida.
+    expect(
+      upserts.some(
+        (entry) =>
+          entry.table === 'fasts' &&
+          entry.rows.some(
+            (row) => row.record_key === '3000:4000' && row.deleted_at === 5_000,
+          ),
+      ),
+    ).toBe(true);
+    expect(tables.get(fasts)).toEqual([]);
+    expect(result.downloadedRecords).toBe(0);
+    expect(tables.get(userProfile)?.[0].totalXp).toBe(0);
+  });
+
+  it('ignora tombstones remotos de registos que não existem localmente', async () => {
+    // Uma refeição apagada noutro dispositivo chega como tombstone remoto a um
+    // dispositivo que nunca a viu: não pode ser inserida como registo ativo.
+    const { database, tables } = createFakeDatabase({
+      profile: createProfile(),
+    });
+    const { client } = createFakeSupabase({
+      ...EMPTY_REMOTE,
+      meals: [
+        {
+          carbs_grams: null,
+          deleted_at: 9_000,
+          estimated_calories: null,
+          fat_grams: null,
+          protein_grams: null,
+          record_key: '8000',
+          tags: [],
+          timestamp: 8_000,
+          updated_at: 9_000,
+          user_id: 'user-1',
+          xp_earned: 30,
+        },
+      ],
+    });
+    getInitializedDatabaseMock.mockResolvedValue(database as never);
+    requireSupabaseMock.mockReturnValue(client as never);
+
+    const result = await syncAllUserData();
+
+    expect(tables.get(meals)).toEqual([]);
+    expect(result.downloadedRecords).toBe(0);
+    expect(tables.get(userProfile)?.[0].totalXp).toBe(0);
+  });
 });

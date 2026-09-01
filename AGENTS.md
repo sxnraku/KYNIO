@@ -27,6 +27,11 @@ Princípios rígidos (de `.cursorrules`):
 - **expo-router** (typed routes ativados) para navegação; entrada `expo-router/entry`.
 - **NativeWind 4** (Tailwind CSS) para estilos; config em `tailwind.config.js`, `global.css`,
   Babel com `babel-plugin-inline-import` para `.sql`.
+- **Tipografia**: Hanken Grotesk (400/600/700/800) para texto e JetBrains Mono Medium para
+  etiquetas, carregadas com `expo-font` em `app/_layout.tsx`
+  (`@expo-google-fonts/hanken-grotesk`, `@expo-google-fonts/jetbrains-mono`); famílias Tailwind
+  `font-body`, `font-headline`, `font-label`.
+- **react-native-svg** para os gráficos desenhados à mão do design (arco solar, dot-clock).
 - **Expo SQLite + Drizzle ORM** para persistência local; schema em `db/schema.ts`, cliente em
   `db/client.ts`, migrações geradas em `drizzle/` (config em `drizzle.config.ts`).
 - **Zustand 5** para estado local (stores em `store/`).
@@ -59,13 +64,34 @@ Princípios rígidos (de `.cursorrules`):
 - `legal-site/` — páginas legais estáticas (privacidade, termos, eliminação de conta, suporte)
   publicadas no GitHub Pages por `.github/workflows/legal-pages.yml`.
 - `types/`, `constants/colors.ts`, `assets/`, `store/google-play/` (textos e assets da loja),
-  `docs/` (ANDROID_RELEASE, CLOUD_SETUP, GOOGLE_PLAY_DATA_SAFETY).
+  `docs/` (ANDROID_RELEASE, CLOUD_SETUP, GOOGLE_PLAY_DATA_SAFETY),
+  `design-proposta/` (mockup HTML estático do redesign "Circadiano", servido por `server.js`;
+  não faz parte da app).
+
+## Sistema de design — "Circadiano"
+
+O tema visual atual é o **Circadiano**: papel quente, tinta carvão e um único acento âmbar
+(o "sol" do mostrador). Modo escuro "Noite": âmbar-vela sobre carvão quente.
+
+- **Paleta** em `constants/colors.ts` (`LIGHT_COLORS`/`DARK_COLORS`, proxy `COLORS` sensível ao
+  tema, helper `successWithAlpha(alpha)`): fundo `#EDE6D3` / tinta `#3A3A38` / acento `#D9922E`
+  (escuro: `#1C1915` / `#F1E9D6` / `#E8A83E`). O acento âmbar é único — não introduzir cores novas.
+- **Estética**: minimalista e plana — sem sombras, sem gradientes decorativos, cartões planos com
+  hairlines (`border`) e separadores `border-b`; hierarquia por peso tipográfico e espaçamento.
+  Etiquetas em mono maiúsculas com tracking largo (estilo "label").
+- **Componentes de assinatura**: `components/ui/dot-clock.tsx` (relógio de matriz de pontos 5×7
+  em SVG) e `components/ui/fasting-timer.tsx` (arco solar em cúpula com ticks das fases do jejum
+  e "phase rail"; react-native-svg não tem `pathLength`, o arco usa comprimento calculado por
+  ângulo).
+- **Web**: props RN de acessibilidade (`accessibilityElementsHidden`, `importantForAccessibility`)
+  nunca diretamente em `<Svg>` — vão numa `<View>` envolvente (react-native-web rejeita-as no DOM).
 
 ## Comandos de build e desenvolvimento
 
 ```bash
 npm install
 npm start                    # expo start
+npm run dev                  # expo start --web (preview rápido no browser)
 npm run android              # expo run:android (development build; Expo Go NÃO suporta módulos nativos como react-native-share)
 npm run web
 npm run typecheck            # tsc --noEmit
@@ -102,7 +128,8 @@ expo-doctor + export). Procedimento detalhado em `docs/ANDROID_RELEASE.md`.
 - Strings da UI em português no código-fonte; a tradução inglesa vive no mapa
   `ENGLISH_BY_PORTUGUESE` de `services/i18n.ts` — ao adicionar texto novo, adiciona a entrada
   correspondente. Preferências de tema e idioma ficam em `store/app-preferences-store.ts`.
-- Estilos com classes NativeWind/Tailwind; cores de tema centralizadas em `constants/colors.ts`.
+- Estilos com classes NativeWind/Tailwind; cores de tema centralizadas em `constants/colors.ts`
+  (nunca hex hardcoded nos componentes — usar `COLORS` / classes de tema / `successWithAlpha`).
 - Persistência sempre via `services/dbService.ts` / `db/`, nunca SQL direto espalhado pela UI.
 - Registos locais (`fasts`, `meals`, `workouts`, `weight_entries`) usam **soft delete** (`deleted_at`)
   para o sync de cloud propagar apagamentos; todas as leituras filtram `deletedAt IS NULL`.
@@ -136,5 +163,5 @@ Regras ao delegar trabalho a subagentes (ferramentas `Agent`/`AgentSwarm`):
 - `credentials/`, `credentials.json` e chaves de assinatura nunca devem ser commitados nem lidos
   por ferramentas automatizadas.
 - O primeiro arranque bloqueia a navegação até aceitação explícita do aviso legal
-  (`store/legal-consent-store.ts`); exportação e eliminação RGPD em `app/settings.tsx` +
+  (`store/legal-consent-store.ts`); a exportação e a eliminação RGPD ficam em `app/settings.tsx` +
   `services/dataPrivacyService.ts`.

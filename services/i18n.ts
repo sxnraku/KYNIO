@@ -50,6 +50,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A tua identidade, círculo e preferências, com controlo claro sobre a sincronização.":
     "Your identity, circle and preferences, with clear control over syncing.",
   "A tua jornada": "Your journey",
+  "A tua subscrição Pro foi restaurada neste dispositivo.":
+    "Your Pro subscription has been restored on this device.",
   "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.":
     "Open the live camera, choose a gallery image or describe what you ate.",
   "Abrir definições": "Open settings",
@@ -132,6 +134,14 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Alterar ↗": "Change ↗",
   "Hora do Jejum ADF": "ADF Fasting Time",
   "Hora do teu Jejum": "Time to Fast",
+  "Hidratação": "Hydration",
+  "Lembretes de hidratação": "Hydration reminders",
+  "Pausa para um copo de água. O teu jejum agradece.":
+    "Pause for a glass of water. Your fast thanks you.",
+  "Pausas diárias para um copo de água às 10:00, 13:00, 16:00 e 19:00.":
+    "Daily pauses for a glass of water at 10:00, 13:00, 16:00 and 19:00.",
+  "Ativa as notificações nas definições do sistema para receberes lembretes de hidratação.":
+    "Enable notifications in the system settings to receive hydration reminders.",
   "Ativa realces visuais âmbar e micro-animações personalizadas.":
     "Enables amber visual highlights and custom micro-animations.",
   "Ativar câmara": "Enable camera",
@@ -199,6 +209,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Continuar: "Continue",
   Conquista: "Achievement",
   Conquistas: "Achievements",
+  "Compras restauradas": "Purchases restored",
   "(Copo)": "(Glass)",
   Copo: "Glass",
   Corrida: "Run",
@@ -252,6 +263,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Enquadra a refeição": "Frame the meal",
   Entendido: "Understood",
   Entrar: "Enter",
+  "Erro ao restaurar": "Restore failed",
   "Escolhe a janela que pretendes acompanhar.":
     "Choose the window you want to track.",
   "Escolhe o nome que aparece no teu perfil. Podes alterá-lo mais tarde.":
@@ -422,6 +434,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Modo IA Pro Turbo": "AI Pro Turbo Mode",
   "Mostra ou descreve a refeição": "Show or describe the meal",
   "Na tua lista privada": "In your private list",
+  "Não foram encontradas compras ou subscrições ativas para esta conta Google.":
+    "No active purchases or subscriptions were found for this Google account.",
   "Não foi possível abrir o documento. Tenta novamente.":
     "The document could not be opened. Please try again.",
   "Não foi possível captar a fotografia. Tenta novamente.":
@@ -445,6 +459,10 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Não foi possível preparar a partilha.": "Sharing could not be prepared.",
   "Não foi possível preparar o perfil. Tenta novamente.":
     "The profile could not be prepared. Please try again.",
+  "Não foi possível validar a compra restaurada. Tenta novamente.":
+    "The restored purchase could not be validated. Please try again.",
+  "Não foi possível verificar as compras. Verifica a ligação à internet e tenta novamente.":
+    "Purchases could not be checked. Check your internet connection and try again.",
   "Não são partilhados jejuns, refeições ou treinos automaticamente.":
     "Fasts, meals and workouts are not shared automatically.",
   "Nenhuma análise": "No analysis",
@@ -481,6 +499,9 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "O teu movimento": "Your movement",
   "O teu progresso, à tua maneira": "Your progress, your way",
   "Objetivo de jejum": "Fasting target",
+  "Objetivo de jejum diário": "Daily fasting target",
+  "Escolhe a meta com que queres começar. Podes mudá-la quando quiseres.":
+    "Choose the target you want to start with. You can change it anytime.",
   "Opcional, descritivo e sem metas obrigatórias.":
     "Optional, descriptive and without mandatory targets.",
   "Otimização profunda da sensibilidade à insulina":
@@ -544,6 +565,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Quota diária de IA atingida": "Daily AI quota reached",
   "Recalcular com estes detalhes": "Recalculate with these details",
   "Recompensas de XP": "XP Rewards",
+  "Recupera a subscrição ou compra Pro ativa na tua conta Google Play.":
+    "Recovers the Pro subscription or purchase active on your Google Play account.",
   "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.":
     "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Renovação": "Renewal",
@@ -576,6 +599,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Rest and hydration with mineral water and electrolytes are key during full-day fasts.",
   Restante: "Remaining",
   "Restaurar": "Restore",
+  "Restaurar compras": "Restore purchases",
   "Resultado estruturado": "Structured result",
   "Resumo de hoje": "Today's summary",
   "Resumo do jejum": "Fasting summary",
@@ -584,6 +608,7 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "If you feel sudden hunger, drink water or unsweetened tea; it is simply ghrelin's hormonal wave.",
   "Segurança de Saúde & Privacidade RGPD": "Health Safety & GDPR Privacy",
   "Sem atividade registada": "No activity logged",
+  "Sem compras ativas": "No active purchases",
   "Sem limite fixo (>1 dia / livre)": "No fixed limit (>1 day / flexible)",
   "Sem registos de peso": "No weight entries",
   "Semana": "Week",
@@ -621,6 +646,8 @@ const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "A sentence about your rhythm, goals or motivation.",
   "Usar fotografia": "Use photo",
   "Utilizador KYNIO": "KYNIO User",
+  "Última análise grátis — desbloqueia ilimitado":
+    "Last free analysis — unlock unlimited",
   "Últimos 7 dias": "Last 7 days",
   "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário.":
     "AI-estimated values for personal habit tracking. Adjust manually as needed.",

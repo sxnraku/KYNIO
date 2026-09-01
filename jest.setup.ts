@@ -37,11 +37,13 @@ jest.mock('expo-haptics', () => ({
 }));
 jest.mock('expo-notifications', () => ({
   cancelAllScheduledNotificationsAsync: jest.fn().mockResolvedValue(undefined),
+  cancelScheduledNotificationAsync: jest.fn().mockResolvedValue(undefined),
   getPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
   requestPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
   scheduleNotificationAsync: jest.fn().mockResolvedValue('mock-notification-id'),
   setNotificationHandler: jest.fn(),
   SchedulableTriggerInputTypes: {
+    DAILY: 'daily',
     TIME_INTERVAL: 'timeInterval',
   },
 }));
