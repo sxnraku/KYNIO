@@ -61,18 +61,6 @@ export function AppHeader() {
             className="flex-row items-center gap-2"
             style={{ flexShrink: 0 }}
           >
-            <Text
-              accessibilityLabel={translateText(
-                `${progress.currentXp} de ${progress.targetXp} XP neste nível`,
-                language,
-              )}
-              className="font-label text-[10px] text-muted"
-              style={{ letterSpacing: 1.4 }}
-              translate={false}
-            >
-              {`${progress.currentXp} / ${progress.targetXp} XP`}
-            </Text>
-
             {!isPro ? (
               <Pressable
                 accessibilityLabel={translateText("Desbloquear Aura Pro", language)}
@@ -114,20 +102,33 @@ export function AppHeader() {
           </View>
         </View>
 
-        {/* filete de progresso XP */}
-        <View
-          accessibilityRole="progressbar"
-          accessibilityValue={{
-            max: progress.targetXp,
-            min: 0,
-            now: progress.currentXp,
-          }}
-          className="mt-2.5 h-0.5 w-full overflow-hidden rounded-full bg-border"
-        >
+        {/* filete de progresso XP: valor à esquerda da barra */}
+        <View className="mt-2.5 flex-row items-center gap-3">
+          <Text
+            accessibilityLabel={translateText(
+              `${progress.currentXp} de ${progress.targetXp} XP neste nível`,
+              language,
+            )}
+            className="font-label text-[10px] text-muted"
+            style={{ letterSpacing: 1.4 }}
+            translate={false}
+          >
+            {`${progress.currentXp} / ${progress.targetXp} XP`}
+          </Text>
           <View
-            className="h-full rounded-full bg-success"
-            style={{ width: `${Math.round(progress.progress * 100)}%` }}
-          />
+            accessibilityRole="progressbar"
+            accessibilityValue={{
+              max: progress.targetXp,
+              min: 0,
+              now: progress.currentXp,
+            }}
+            className="h-0.5 flex-1 overflow-hidden rounded-full bg-border"
+          >
+            <View
+              className="h-full rounded-full bg-success"
+              style={{ width: `${Math.round(progress.progress * 100)}%` }}
+            />
+          </View>
         </View>
       </View>
     </View>
