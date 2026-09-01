@@ -32,7 +32,10 @@ export function AppHeader() {
       >
         {/* Tira de estado: nível · classe · XP */}
         <View className="flex-row items-center justify-between">
-          <View className="min-w-0 flex-1 flex-row items-center">
+          <View
+            className="flex-row items-center"
+            style={{ flex: 1, flexShrink: 1, minWidth: 0 }}
+          >
             <Image
               accessibilityLabel={translateText("Símbolo KYNIO", language)}
               resizeMode="cover"
@@ -42,7 +45,7 @@ export function AppHeader() {
             <Text
               className="ml-2.5 font-label text-[10px] uppercase text-foreground"
               numberOfLines={1}
-              style={{ letterSpacing: 1.8 }}
+              style={{ flexShrink: 1, letterSpacing: 1.8 }}
               translate={false}
             >
               {`NÍVEL ${progress.level} · ${progress.levelTitle.toUpperCase()}`}
@@ -54,7 +57,10 @@ export function AppHeader() {
             ) : null}
           </View>
 
-          <View className="flex-row items-center gap-2">
+          <View
+            className="flex-row items-center gap-2"
+            style={{ flexShrink: 0 }}
+          >
             <Text
               accessibilityLabel={translateText(
                 `${progress.currentXp} de ${progress.targetXp} XP neste nível`,
