@@ -13,7 +13,7 @@
     },
     "android": {
       "package": "com.kynio.app",
-      "versionCode": 18,
+      "versionCode": 20,
       "adaptiveIcon": {
         "backgroundColor": "#121214",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -21,7 +21,8 @@
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "com.android.vending.BILLING"
       ]
     },
     "web": {
