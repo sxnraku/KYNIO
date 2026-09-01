@@ -316,6 +316,13 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: 'Método não permitido.' }, 405, corsHeaders);
   }
 
+  // Exige as credenciais públicas do projeto (apikey ou Authorization), que a app
+  // envia sempre. Pedidos anónimos sem qualquer credencial são rejeitados antes
+  // de consumir quota de análise.
+  if (!request.headers.get('apikey') && !request.headers.get('authorization')) {
+    return jsonResponse({ error: 'Credenciais em falta.' }, 401, corsHeaders);
+  }
+
   const contentLength = Number(request.headers.get('content-length') ?? '0');
 
   if (contentLength > MAX_BODY_BYTES) {
@@ -386,14 +393,21 @@ Deno.serve(async (request) => {
     );
     return jsonResponse(analysis, 200, corsHeaders);
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Não foi possível analisar a refeição.';
-    const status =
-      message.includes('fotografia') || message.includes('descrição')
-        ? 400
-        : 500;
-    return jsonResponse({ error: message }, status, corsHeaders);
+    console.error('[analyze-meal] Erro interno:', error);
+    const message = error instanceof Error ? error.message : '';
+    const isInputError =
+      message.includes('fotografia') ||
+      message.includes('descrição') ||
+      message.includes('Pedido inválido');
+
+    if (isInputError) {
+      return jsonResponse({ error: message }, 400, corsHeaders);
+    }
+
+    return jsonResponse(
+      { error: 'Não foi possível analisar a refeição. Tenta novamente mais tarde.' },
+      500,
+      corsHeaders,
+    );
   }
 });

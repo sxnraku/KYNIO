@@ -54,7 +54,8 @@ Deno.serve(async (request) => {
   const deletion = await adminClient.auth.admin.deleteUser(data.user.id);
 
   if (deletion.error) {
-    return new Response(JSON.stringify({ error: deletion.error.message }), {
+    console.error('[delete-account] Falha ao eliminar utilizador:', deletion.error);
+    return new Response(JSON.stringify({ error: 'Não foi possível eliminar a conta. Tenta novamente mais tarde.' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

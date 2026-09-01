@@ -48,6 +48,13 @@ supabase/.temp/
 # tests
 coverage/
 
+# build artifacts
+*.aab
+*.apk
+
+# Maestro run artifacts
+.maestro/*-results.xml
+
 example
 
 # generated native folders

@@ -11,7 +11,7 @@ Studio. Cria uma nova chave apenas para a Edge Function. Guarda-a em
 
 ```dotenv
 GEMINI_API_KEY=nova-chave
-GEMINI_MODEL=gemini-3.7-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 AI_RATE_LIMIT_SALT=uma-frase-aleatoria-longa-e-unica
 ALLOWED_ORIGINS=https://sxnraku.github.io,http://localhost:8081,http://127.0.0.1:8081
 ```
@@ -27,11 +27,28 @@ npx supabase db push
 npx supabase secrets set --env-file supabase/.env.functions
 npx supabase functions deploy analyze-meal --no-verify-jwt
 npx supabase functions deploy delete-account --no-verify-jwt
+npx supabase functions deploy verify-purchase --no-verify-jwt
 ```
 
 A função `delete-account` valida internamente o JWT do utilizador. A função `analyze-meal` não envia
 o JWT do utilizador ao Gemini e mantém apenas um hash salgado de rede por até uma hora para limitar
 abuso. Fotografias e descrições não são guardadas pela função.
+
+A função `verify-purchase` valida compras Google Play junto da API Android Publisher. Sem o segredo
+abaixo responde em modo "soft" (`mode: "unconfigured"`) e a app ativa o Pro localmente como até aqui.
+Para ativar a verificação real:
+
+1. No **Google Play Console → Configuração → Acesso à API**, associa um projeto Google Cloud.
+2. Nesse projeto Google Cloud, cria uma **conta de serviço** e gera uma chave JSON.
+3. De volta ao Play Console, concede à conta de serviço acesso de leitura às compras
+   (permissão financeira/de encomendas) para a app.
+4. Guarda o JSON completo da chave (numa única linha) como segredo Supabase:
+
+```bash
+npx supabase secrets set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON='{"type":"service_account",...}'
+```
+
+A chave privada da conta de serviço fica apenas nos segredos Supabase; nunca na app nem no repositório.
 
 ## 3. Google OAuth
 
