@@ -26,8 +26,11 @@ create table if not exists public.fasts (
   completed boolean not null default false,
   xp_earned integer not null default 0,
   updated_at bigint not null,
+  deleted_at bigint,
   primary key (user_id, record_key)
 );
+
+alter table public.fasts add column if not exists deleted_at bigint;
 
 create table if not exists public.meals (
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -40,8 +43,11 @@ create table if not exists public.meals (
   tags jsonb not null default '[]'::jsonb,
   xp_earned integer not null default 0,
   updated_at bigint not null,
+  deleted_at bigint,
   primary key (user_id, record_key)
 );
+
+alter table public.meals add column if not exists deleted_at bigint;
 
 create table if not exists public.workouts (
   user_id uuid not null references auth.users(id) on delete cascade,

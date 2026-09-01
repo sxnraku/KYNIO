@@ -72,6 +72,7 @@ const VALID_AI_PAYLOAD: MealAnalysisResult = {
 
 const SAVED_MEAL: MealRecord = {
   carbsGrams: 58,
+  deletedAt: null,
   estimatedCalories: 550,
   fatGrams: 14,
   id: 1,

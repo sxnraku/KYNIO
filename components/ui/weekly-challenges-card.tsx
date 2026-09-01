@@ -8,9 +8,11 @@ import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import { getFastRecords, getMealRecords, getUserProfile, updateUserProfileXp } from "@/services/dbService";
 import { triggerSuccessFeedback } from "@/services/hapticsService";
+import { getCurrentWeekKey } from "@/services/weeklyChallengesService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useUserProgressStore } from "@/store/user-progress-store";
 import { useWaterStore } from "@/store/useWaterStore";
+import { useWeeklyChallengesStore } from "@/store/use-weekly-challenges-store";
 
 interface Challenge {
   current: number;
@@ -26,8 +28,10 @@ interface Challenge {
 export function WeeklyChallengesCard() {
   const language = useAppPreferencesStore((state) => state.language);
   const waterHistory = useWaterStore((state) => state.history);
+  const claimedMap = useWeeklyChallengesStore((state) => state.claimed);
+  const claimChallenge = useWeeklyChallengesStore((state) => state.claimChallenge);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
+  const weekKey = getCurrentWeekKey();
 
   const loadChallengesProgress = useCallback(async () => {
     try {
@@ -47,7 +51,16 @@ export function WeeklyChallengesCard() {
       ).length;
 
       // Count water days >= 1500ml in the last 7 days
-      const waterDays = Object.values(waterHistory).filter((ml) => ml >= 1500).length;
+      const recentDayKeys = new Set(
+        Array.from({ length: 7 }, (_, index) => {
+          const day = new Date(now);
+          day.setDate(day.getDate() - index);
+          return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
+        }),
+      );
+      const waterDays = Object.entries(waterHistory).filter(
+        ([dayKey, ml]) => recentDayKeys.has(dayKey) && ml >= 1500,
+      ).length;
 
       // Count AI meals logged in the last 7 days
       const weeklyMeals = meals.filter((m) => m.timestamp >= weekStart).length;
@@ -62,20 +75,20 @@ export function WeeklyChallengesCard() {
               : "Completa 4 jejuns de 14h+ nesta semana",
           icon: "flame",
           id: "iron_week",
-          isClaimed: claimedIds.has("iron_week"),
+          isClaimed: claimedMap.iron_week?.weekKey === weekKey,
           target: 4,
           title: language === "en" ? "Iron Week" : "Semana de Ferro",
           xpReward: 150,
         },
         {
-          current: Math.min(4, Math.max(waterDays, weeklyFasts > 0 ? 1 : 0)),
+          current: Math.min(4, waterDays),
           description:
             language === "en"
               ? "Drink 1.5L+ of water across 4 days"
               : "Bebe 1.5L+ de água em 4 dias",
           icon: "water",
           id: "hydration_master",
-          isClaimed: claimedIds.has("hydration_master"),
+          isClaimed: claimedMap.hydration_master?.weekKey === weekKey,
           target: 4,
           title: language === "en" ? "Hydration Master" : "Mestre da Água",
           xpReward: 100,
@@ -88,7 +101,7 @@ export function WeeklyChallengesCard() {
               : "Regista 3 refeições com análise IA",
           icon: "restaurant",
           id: "nutrition_tracker",
-          isClaimed: claimedIds.has("nutrition_tracker"),
+          isClaimed: claimedMap.nutrition_tracker?.weekKey === weekKey,
           target: 3,
           title: language === "en" ? "Mindful Nutrition" : "Nutrição Consciente",
           xpReward: 75,
@@ -97,7 +110,7 @@ export function WeeklyChallengesCard() {
     } catch {
       // Non-blocking
     }
-  }, [claimedIds, language, waterHistory]);
+  }, [claimedMap, language, waterHistory, weekKey]);
 
   useFocusEffect(
     useCallback(() => {
@@ -112,7 +125,9 @@ export function WeeklyChallengesCard() {
       const updated = await updateUserProfileXp(profile.totalXp + challenge.xpReward);
       useUserProgressStore.getState().syncProfile(updated);
 
-      setClaimedIds((prev) => new Set([...prev, challenge.id]));
+      // Persiste o claim para a semana atual: impede reclamar o mesmo desafio
+      // várias vezes ao remontar o ecrã e permite ao sync derivar este XP.
+      claimChallenge(challenge.id, weekKey, challenge.xpReward);
 
       Alert.alert(
         language === "en" ? "Challenge Completed! 🎉" : "Desafio Concluído! 🎉",

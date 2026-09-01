@@ -1,39 +1,54 @@
 import { sql } from 'drizzle-orm';
-import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const fasts = sqliteTable('fasts', {
-  completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
-  endTime: integer('end_time').notNull(),
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  startTime: integer('start_time').notNull(),
-  targetHours: integer('target_hours').notNull(),
-  xpEarned: integer('xp_earned').notNull().default(0),
-});
+export const fasts = sqliteTable(
+  'fasts',
+  {
+    completed: integer('completed', { mode: 'boolean' }).notNull().default(false),
+    deletedAt: integer('deleted_at'),
+    endTime: integer('end_time').notNull(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    startTime: integer('start_time').notNull(),
+    targetHours: integer('target_hours').notNull(),
+    xpEarned: integer('xp_earned').notNull().default(0),
+  },
+  (table) => [index('fasts_start_time_idx').on(table.startTime)],
+);
 
-export const meals = sqliteTable('meals', {
-  carbsGrams: real('carbs_grams'),
-  estimatedCalories: integer('estimated_calories'),
-  fatGrams: real('fat_grams'),
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  imageUrl: text('image_url'),
-  proteinGrams: real('protein_grams'),
-  tags: text('tags', { mode: 'json' })
-    .$type<string[]>()
-    .notNull()
-    .default(sql`'[]'`),
-  timestamp: integer('timestamp').notNull(),
-  xpEarned: integer('xp_earned').notNull().default(0),
-});
+export const meals = sqliteTable(
+  'meals',
+  {
+    carbsGrams: real('carbs_grams'),
+    deletedAt: integer('deleted_at'),
+    estimatedCalories: integer('estimated_calories'),
+    fatGrams: real('fat_grams'),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    imageUrl: text('image_url'),
+    proteinGrams: real('protein_grams'),
+    tags: text('tags', { mode: 'json' })
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'`),
+    timestamp: integer('timestamp').notNull(),
+    xpEarned: integer('xp_earned').notNull().default(0),
+  },
+  (table) => [index('meals_timestamp_idx').on(table.timestamp)],
+);
 
-export const workouts = sqliteTable('workouts', {
-  durationMinutes: integer('duration_minutes').notNull(),
-  effort: text('effort', { enum: ['light', 'moderate', 'intense'] }).notNull(),
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  notes: text('notes'),
-  timestamp: integer('timestamp').notNull(),
-  type: text('type').notNull(),
-  xpEarned: integer('xp_earned').notNull().default(0),
-});
+export const workouts = sqliteTable(
+  'workouts',
+  {
+    deletedAt: integer('deleted_at'),
+    durationMinutes: integer('duration_minutes').notNull(),
+    effort: text('effort', { enum: ['light', 'moderate', 'intense'] }).notNull(),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    notes: text('notes'),
+    timestamp: integer('timestamp').notNull(),
+    type: text('type').notNull(),
+    xpEarned: integer('xp_earned').notNull().default(0),
+  },
+  (table) => [index('workouts_timestamp_idx').on(table.timestamp)],
+);
 
 export const userProfile = sqliteTable('user_profile', {
   avatarRemotePath: text('avatar_remote_path'),
@@ -63,11 +78,16 @@ export const friends = sqliteTable('friends', {
   id: integer('id').primaryKey({ autoIncrement: true }),
 });
 
-export const weightEntries = sqliteTable('weight_entries', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  timestamp: integer('timestamp').notNull(),
-  weightGrams: integer('weight_grams').notNull(),
-});
+export const weightEntries = sqliteTable(
+  'weight_entries',
+  {
+    deletedAt: integer('deleted_at'),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    timestamp: integer('timestamp').notNull(),
+    weightGrams: integer('weight_grams').notNull(),
+  },
+  (table) => [index('weight_entries_timestamp_idx').on(table.timestamp)],
+);
 
 export type FastRecord = typeof fasts.$inferSelect;
 export type MealRecord = typeof meals.$inferSelect;

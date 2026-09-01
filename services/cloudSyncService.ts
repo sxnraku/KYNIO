@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 import { getInitializedDatabase } from '@/db/client';
 import {
@@ -10,7 +10,13 @@ import {
   workouts,
 } from '@/db/schema';
 import { calculateLevel } from '@/services/gamificationService';
+import {
+  deleteProfileImage,
+  persistRemoteProfileImage,
+} from '@/services/localProfileImageService';
 import { requireSupabase } from '@/services/supabaseClient';
+import { getPersistedWaterXp } from '@/services/waterXpService';
+import { getPersistedChallengeXp } from '@/services/weeklyChallengesService';
 
 interface RemoteProfileRow {
   avatar_path: string | null;
@@ -26,6 +32,7 @@ interface RemoteProfileRow {
 
 interface RemoteFastRow {
   completed: boolean;
+  deleted_at: number | string | null;
   end_time: number | string;
   record_key: string;
   start_time: number | string;
@@ -37,6 +44,7 @@ interface RemoteFastRow {
 
 interface RemoteMealRow {
   carbs_grams: number | null;
+  deleted_at: number | string | null;
   estimated_calories: number | null;
   fat_grams: number | null;
   protein_grams: number | null;
@@ -238,9 +246,29 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     remoteProfile &&
     Number(remoteProfile.updated_at) > localProfile.profileUpdatedAt
   ) {
-    const remoteAvatarUri = remoteProfile.avatar_path
-      ? await createSignedAvatarUrl(remoteProfile.avatar_path)
-      : localProfile.googleAvatarUrl;
+    // Nunca guardar um signed URL temporário (expira ao fim de 7 dias) como
+    // avatarUri: o avatar remoto é descarregado para um ficheiro local e só
+    // substitui o ficheiro atual se o download for bem-sucedido.
+    let remoteAvatarUri = localProfile.avatarUri;
+
+    if (remoteProfile.avatar_path) {
+      const signedUrl = await createSignedAvatarUrl(remoteProfile.avatar_path);
+      const downloadedAvatarUri = await persistRemoteProfileImage(signedUrl);
+
+      if (downloadedAvatarUri) {
+        if (
+          localProfile.avatarUri &&
+          localProfile.avatarUri !== downloadedAvatarUri &&
+          localProfile.avatarUri !== localProfile.googleAvatarUrl
+        ) {
+          deleteProfileImage(localProfile.avatarUri);
+        }
+        remoteAvatarUri = downloadedAvatarUri;
+      }
+    } else {
+      remoteAvatarUri = localProfile.googleAvatarUrl;
+    }
+
     const [updatedProfile] = await database
       .update(userProfile)
       .set({
@@ -327,8 +355,15 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
       database.select().from(weightEntries),
     ]);
   const syncTimestamp = Date.now();
-  const fastUploads = localFasts.map((fast) => ({
+  // Jejuns e refeições usam soft delete: os tombstones locais são enviados
+  // com deleted_at para o remoto propagar a remoção a outros dispositivos.
+  const activeLocalFasts = localFasts.filter((fast) => fast.deletedAt === null);
+  const deletedLocalFasts = localFasts.filter((fast) => fast.deletedAt !== null);
+  const activeLocalMeals = localMeals.filter((meal) => meal.deletedAt === null);
+  const deletedLocalMeals = localMeals.filter((meal) => meal.deletedAt !== null);
+  const fastUploads = activeLocalFasts.map((fast) => ({
     completed: fast.completed,
+    deleted_at: null,
     end_time: fast.endTime,
     record_key: fastKey(fast.startTime, fast.endTime),
     start_time: fast.startTime,
@@ -337,8 +372,20 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     user_id: user.id,
     xp_earned: fast.xpEarned,
   }));
-  const mealUploads = localMeals.map((meal) => ({
+  const fastTombstoneUploads = deletedLocalFasts.map((fast) => ({
+    completed: fast.completed,
+    deleted_at: fast.deletedAt,
+    end_time: fast.endTime,
+    record_key: fastKey(fast.startTime, fast.endTime),
+    start_time: fast.startTime,
+    target_hours: fast.targetHours,
+    updated_at: fast.deletedAt,
+    user_id: user.id,
+    xp_earned: fast.xpEarned,
+  }));
+  const mealUploads = activeLocalMeals.map((meal) => ({
     carbs_grams: meal.carbsGrams,
+    deleted_at: null,
     estimated_calories: meal.estimatedCalories,
     fat_grams: meal.fatGrams,
     protein_grams: meal.proteinGrams,
@@ -346,6 +393,19 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     tags: meal.tags,
     timestamp: meal.timestamp,
     updated_at: meal.timestamp,
+    user_id: user.id,
+    xp_earned: meal.xpEarned,
+  }));
+  const mealTombstoneUploads = deletedLocalMeals.map((meal) => ({
+    carbs_grams: meal.carbsGrams,
+    deleted_at: meal.deletedAt,
+    estimated_calories: meal.estimatedCalories,
+    fat_grams: meal.fatGrams,
+    protein_grams: meal.proteinGrams,
+    record_key: mealKey(meal.timestamp),
+    tags: meal.tags,
+    timestamp: meal.timestamp,
+    updated_at: meal.deletedAt,
     user_id: user.id,
     xp_earned: meal.xpEarned,
   }));
@@ -381,10 +441,20 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
           .from('fasts')
           .upsert(fastUploads, { onConflict: 'user_id,record_key' })
       : Promise.resolve({ error: null }),
+    fastTombstoneUploads.length
+      ? client
+          .from('fasts')
+          .upsert(fastTombstoneUploads, { onConflict: 'user_id,record_key' })
+      : Promise.resolve({ error: null }),
     mealUploads.length
       ? client
           .from('meals')
           .upsert(mealUploads, { onConflict: 'user_id,record_key' })
+      : Promise.resolve({ error: null }),
+    mealTombstoneUploads.length
+      ? client
+          .from('meals')
+          .upsert(mealTombstoneUploads, { onConflict: 'user_id,record_key' })
       : Promise.resolve({ error: null }),
     workoutUploads.length
       ? client
@@ -439,6 +509,18 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     []) as unknown as RemoteFriendRow[];
   const remoteWeights = (weightDownload.data ??
     []) as unknown as RemoteWeightRow[];
+  const remoteActiveFasts = remoteFasts.filter(
+    (fast) => fast.deleted_at === null || Number(fast.deleted_at) === 0,
+  );
+  const remoteDeletedFasts = remoteFasts.filter(
+    (fast) => fast.deleted_at !== null && Number(fast.deleted_at) !== 0,
+  );
+  const remoteActiveMeals = remoteMeals.filter(
+    (meal) => meal.deleted_at === null || Number(meal.deleted_at) === 0,
+  );
+  const remoteDeletedMeals = remoteMeals.filter(
+    (meal) => meal.deleted_at !== null && Number(meal.deleted_at) !== 0,
+  );
   const localFastKeys = new Set(
     localFasts.map((fast) => fastKey(fast.startTime, fast.endTime)),
   );
@@ -456,10 +538,10 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
   const localWeightKeys = new Set(
     localWeights.map((entry) => weightKey(entry.timestamp)),
   );
-  const missingFasts = remoteFasts.filter(
+  const missingFasts = remoteActiveFasts.filter(
     (fast) => !localFastKeys.has(fast.record_key),
   );
-  const missingMeals = remoteMeals.filter(
+  const missingMeals = remoteActiveMeals.filter(
     (meal) => !localMealKeys.has(meal.record_key),
   );
   const missingWorkouts = remoteWorkouts.filter(
@@ -471,6 +553,12 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
   const missingWeights = remoteWeights.filter(
     (entry) => !localWeightKeys.has(entry.record_key),
   );
+
+  // O XP de hidratação e dos desafios semanais não tem registos na base local
+  // (vive no estado persistido dos respetivos stores), por isso é derivado
+  // deterministicamente para não ser apagado pelo recálculo.
+  const waterXp = await getPersistedWaterXp();
+  const challengeXp = await getPersistedChallengeXp();
 
   await database.transaction(async (transaction) => {
     if (missingFasts.length) {
@@ -530,25 +618,71 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
         })),
       );
     }
+
+    // Aplica os deletes vindos do remoto: um registo apagado noutro
+    // dispositivo é removido localmente e nunca ressuscita.
+    for (const fast of remoteDeletedFasts) {
+      const [startTime, endTime] = fast.record_key.split(':').map(Number);
+      await transaction
+        .delete(fasts)
+        .where(and(eq(fasts.startTime, startTime), eq(fasts.endTime, endTime)));
+    }
+
+    for (const meal of remoteDeletedMeals) {
+      await transaction
+        .delete(meals)
+        .where(eq(meals.timestamp, Number(meal.record_key)));
+    }
+
+    // Os tombstones locais já foram enviados com sucesso para o remoto,
+    // por isso podem ser purgados definitivamente.
+    if (deletedLocalFasts.length) {
+      await transaction.delete(fasts).where(
+        inArray(
+          fasts.id,
+          deletedLocalFasts.map((fast) => fast.id),
+        ),
+      );
+    }
+
+    if (deletedLocalMeals.length) {
+      await transaction.delete(meals).where(
+        inArray(
+          meals.id,
+          deletedLocalMeals.map((meal) => meal.id),
+        ),
+      );
+    }
+
+    // O recálculo do XP e a atualização local do perfil ficam dentro da
+    // transação de merge para não correrem em race com o merge.
+    const mergedFasts = await transaction
+      .select()
+      .from(fasts)
+      .where(isNull(fasts.deletedAt));
+    const mergedMeals = await transaction
+      .select()
+      .from(meals)
+      .where(isNull(meals.deletedAt));
+    const mergedWorkouts = await transaction
+      .select()
+      .from(workouts)
+      .where(isNull(workouts.deletedAt));
+    const recordsXp = [...mergedFasts, ...mergedMeals, ...mergedWorkouts].reduce(
+      (total, record) => total + record.xpEarned,
+      0,
+    );
+    const totalXp = recordsXp + waterXp + challengeXp;
+    await transaction
+      .update(userProfile)
+      .set({
+        cloudUserId: user.id,
+        currentLevel: calculateLevel(totalXp),
+        totalXp,
+      })
+      .where(eq(userProfile.id, 1));
   });
 
-  const [mergedFasts, mergedMeals, mergedWorkouts] = await Promise.all([
-    database.select().from(fasts),
-    database.select().from(meals),
-    database.select().from(workouts),
-  ]);
-  const totalXp = [...mergedFasts, ...mergedMeals, ...mergedWorkouts].reduce(
-    (total, record) => total + record.xpEarned,
-    0,
-  );
-  await database
-    .update(userProfile)
-    .set({
-      cloudUserId: user.id,
-      currentLevel: calculateLevel(totalXp),
-      totalXp,
-    })
-    .where(eq(userProfile.id, 1));
   const finalProfile = await database
     .select()
     .from(userProfile)
@@ -587,7 +721,9 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     syncedAt: syncTimestamp,
     uploadedRecords:
       fastUploads.length +
+      fastTombstoneUploads.length +
       mealUploads.length +
+      mealTombstoneUploads.length +
       workoutUploads.length +
       friendUploads.length +
       weightUploads.length,

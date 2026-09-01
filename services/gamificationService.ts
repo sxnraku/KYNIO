@@ -109,7 +109,7 @@ export function getXpRewardTiers(
     },
     {
       description:
-        'Ativa realces visuais esmeralda e micro-animações personalizadas.',
+        'Ativa realces visuais âmbar e micro-animações personalizadas.',
       id: 'tier-2-visuals',
       isUnlocked: currentLevel >= 2,
       levelRequired: 2,

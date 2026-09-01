@@ -24,6 +24,7 @@ function createFastRecord(id: number, daysAgo: number): FastRecord {
 
   return {
     completed: true,
+    deletedAt: null,
     endTime,
     id,
     startTime: endTime - 16 * HOUR_IN_MILLISECONDS,
@@ -104,6 +105,7 @@ describe('gamificationService', () => {
     const fast = createFastRecord(1, 0);
     const meal = {
       carbsGrams: 20,
+      deletedAt: null,
       estimatedCalories: 450,
       fatGrams: 15,
       id: 1,
@@ -114,6 +116,7 @@ describe('gamificationService', () => {
       xpEarned: 30,
     };
     const workout = {
+      deletedAt: null,
       durationMinutes: 45,
       effort: 'moderate' as const,
       id: 1,

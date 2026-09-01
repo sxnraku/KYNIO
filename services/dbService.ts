@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, isNull } from 'drizzle-orm';
 
 import { getInitializedDatabase } from '@/db/client';
 import {
@@ -140,7 +140,11 @@ export async function saveFastRecord(
 
 export async function getFastRecords(): Promise<FastRecord[]> {
   const database = await getInitializedDatabase();
-  return database.select().from(fasts).orderBy(desc(fasts.startTime));
+  return database
+    .select()
+    .from(fasts)
+    .where(isNull(fasts.deletedAt))
+    .orderBy(desc(fasts.startTime));
 }
 
 export async function getFastRecordById(
@@ -152,12 +156,17 @@ export async function getFastRecordById(
     .from(fasts)
     .where(eq(fasts.id, id))
     .limit(1);
-  return record ?? null;
+  return record && record.deletedAt === null ? record : null;
 }
 
+// Soft delete: o registo fica marcado localmente e o sync seguinte propaga
+// a remoção para a cloud antes de purgar o tombstone.
 export async function deleteFastRecord(id: number): Promise<void> {
   const database = await getInitializedDatabase();
-  await database.delete(fasts).where(eq(fasts.id, id));
+  await database
+    .update(fasts)
+    .set({ deletedAt: Date.now() })
+    .where(eq(fasts.id, id));
   requestCloudSync();
 }
 
@@ -207,7 +216,11 @@ export async function saveScannedMealRecord(
 
 export async function getMealRecords(): Promise<MealRecord[]> {
   const database = await getInitializedDatabase();
-  return database.select().from(meals).orderBy(desc(meals.timestamp));
+  return database
+    .select()
+    .from(meals)
+    .where(isNull(meals.deletedAt))
+    .orderBy(desc(meals.timestamp));
 }
 
 export async function getMealRecordById(
@@ -219,7 +232,18 @@ export async function getMealRecordById(
     .from(meals)
     .where(eq(meals.id, id))
     .limit(1);
-  return record ?? null;
+  return record && record.deletedAt === null ? record : null;
+}
+
+// Soft delete equivalente ao dos jejuns: marca deletedAt e deixa o sync
+// propagar a remoção para a cloud.
+export async function deleteMealRecord(id: number): Promise<void> {
+  const database = await getInitializedDatabase();
+  await database
+    .update(meals)
+    .set({ deletedAt: Date.now() })
+    .where(eq(meals.id, id));
+  requestCloudSync();
 }
 
 export async function saveWorkoutRecord(
@@ -271,7 +295,11 @@ export async function saveLoggedWorkoutRecord(
 
 export async function getWorkoutRecords(): Promise<WorkoutRecord[]> {
   const database = await getInitializedDatabase();
-  return database.select().from(workouts).orderBy(desc(workouts.timestamp));
+  return database
+    .select()
+    .from(workouts)
+    .where(isNull(workouts.deletedAt))
+    .orderBy(desc(workouts.timestamp));
 }
 
 export async function getWeightEntries(): Promise<WeightEntryRecord[]> {
@@ -279,6 +307,7 @@ export async function getWeightEntries(): Promise<WeightEntryRecord[]> {
   return database
     .select()
     .from(weightEntries)
+    .where(isNull(weightEntries.deletedAt))
     .orderBy(desc(weightEntries.timestamp));
 }
 
