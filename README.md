@@ -29,14 +29,20 @@ chamado.
 
 ## Testes E2E com Maestro
 
-Os fluxos em `.maestro/` testam o onboarding, o início do temporizador e a exportação RGPD num
-binário nativo com o identificador `com.kynio.app`. O Maestro é uma ferramenta externa e não
-adiciona dependências ao bundle React Native. Com a CLI instalada e uma development build aberta
-num emulador/simulador, execute:
+Os fluxos em `.maestro/` testam o onboarding, o início do temporizador, a exportação RGPD,
+o registo manual de treinos, o contador de água, o registo de peso, o paywall e a alternância
+de tema/idioma num binário nativo com o identificador `com.kynio.app`. O Maestro é uma
+ferramenta externa e não adiciona dependências ao bundle React Native. Com a CLI instalada e
+uma development build aberta num emulador/simulador, execute:
 
 ```bash
 npm run e2e:onboarding
 npm run e2e:export
+npm run e2e:workout
+npm run e2e:water
+npm run e2e:weight
+npm run e2e:paywall
+npm run e2e:theme-language
 # ou toda a suite
 npm run e2e
 ```
