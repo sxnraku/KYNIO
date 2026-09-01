@@ -6,6 +6,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import type { EstimatedMetabolicPhase } from "@/services/fasting";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -33,6 +35,8 @@ export function MetabolicPhaseDetailModal({
   phase,
   phaseIndex,
 }: MetabolicPhaseDetailModalProps) {
+  const language = useAppPreferencesStore((state) => state.language);
+
   if (!phase) {
     return null;
   }
@@ -50,7 +54,7 @@ export function MetabolicPhaseDetailModal({
     >
       <View className="flex-1 justify-end bg-black/75">
         <Pressable
-          accessibilityLabel="Fechar detalhes da fase"
+          accessibilityLabel={translateText("Fechar detalhes da fase", language)}
           onPress={onClose}
           style={StyleSheet.absoluteFill}
         />
@@ -81,7 +85,7 @@ export function MetabolicPhaseDetailModal({
               </View>
 
               <Pressable
-                accessibilityLabel="Fechar"
+                accessibilityLabel={translateText("Fechar", language)}
                 className="h-9 w-9 items-center justify-center rounded-full bg-background"
                 onPress={onClose}
               >
@@ -119,8 +123,8 @@ export function MetabolicPhaseDetailModal({
               {/* Efeito Fisiológico */}
               <View className="rounded-2xl border border-border bg-background p-4">
                 <View className="mb-1.5 flex-row items-center">
-                  <Ionicons color="#38BDF8" name="hardware-chip-outline" size={17} />
-                  <Text className="ml-2 font-headline text-xs text-[#38BDF8]">
+                  <Ionicons color={COLORS.success} name="hardware-chip-outline" size={17} />
+                  <Text className="ml-2 font-headline text-xs text-success">
                     BIOLOGIA & HORMONAS
                   </Text>
                 </View>
@@ -180,7 +184,7 @@ export function MetabolicPhaseDetailModal({
 
 
             <Pressable
-              accessibilityLabel="Entendido"
+              accessibilityLabel={translateText("Entendido", language)}
               accessibilityRole="button"
               className="mt-2 min-h-12 items-center justify-center rounded-2xl bg-foreground active:opacity-80"
               onPress={onClose}

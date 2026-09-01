@@ -5,6 +5,8 @@ import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type { SelectedMealImage } from "@/types/meal";
 
 interface MealCaptureCardProps {
@@ -54,6 +56,8 @@ export function MealCaptureCard({
   portionQuantity = "",
   selectedImage,
 }: MealCaptureCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
+
   return (
     <Card>
       <Text className="font-label text-[10px] uppercase tracking-widest text-success">
@@ -83,13 +87,16 @@ export function MealCaptureCard({
       {selectedImage ? (
         <View className="mt-4 overflow-hidden rounded-xl border border-border">
           <Image
-            accessibilityLabel="Fotografia selecionada da refeição"
+            accessibilityLabel={translateText(
+              "Fotografia selecionada da refeição",
+              language,
+            )}
             className="h-48 w-full"
             resizeMode="cover"
             source={{ uri: selectedImage.uri }}
           />
           <Pressable
-            accessibilityLabel="Remover fotografia"
+            accessibilityLabel={translateText("Remover fotografia", language)}
             accessibilityRole="button"
             className="absolute right-3 top-3 h-9 w-9 items-center justify-center rounded-full bg-background/90 active:opacity-70"
             onPress={onRemovePhoto}

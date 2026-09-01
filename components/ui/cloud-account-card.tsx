@@ -5,6 +5,8 @@ import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
 import { useCloudAccount } from "@/hooks/use-cloud-account";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface CloudAccountCardProps {
   onLocalDataChanged: () => void | Promise<void>;
@@ -14,6 +16,7 @@ export function CloudAccountCard({
   onLocalDataChanged,
 }: CloudAccountCardProps) {
   const account = useCloudAccount(onLocalDataChanged);
+  const language = useAppPreferencesStore((state) => state.language);
 
   return (
     <Card>
@@ -48,7 +51,10 @@ export function CloudAccountCard({
           <View className="flex-row items-center rounded-xl border border-border bg-background p-4">
             {account.account.avatarUrl ? (
               <Image
-                accessibilityLabel="Fotografia da conta Google"
+                accessibilityLabel={translateText(
+                  "Fotografia da conta Google",
+                  language,
+                )}
                 source={{ uri: account.account.avatarUrl }}
                 style={{ borderRadius: 18, height: 48, width: 48 }}
               />

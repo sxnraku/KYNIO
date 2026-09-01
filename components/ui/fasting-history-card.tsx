@@ -3,7 +3,6 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 
-import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import type { FastRecord } from "@/db/schema";
@@ -120,7 +119,7 @@ export function FastingHistoryCard() {
   );
 
   return (
-    <Card>
+    <View className="border-t border-border pt-5">
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
@@ -130,7 +129,7 @@ export function FastingHistoryCard() {
             {language === "en" ? "Recent Fasts" : "Jejuns Recentes"}
           </Text>
         </View>
-        <View className="flex-row items-center rounded-full border border-border bg-background px-2.5 py-1">
+        <View className="flex-row items-center px-1 py-1">
           <Ionicons color={COLORS.muted} name="time-outline" size={14} />
           <Text className="ml-1.5 font-mono text-xs text-muted">
             {fasts.length} {language === "en" ? "records" : "registos"}
@@ -146,7 +145,7 @@ export function FastingHistoryCard() {
           </Text>
         </View>
       ) : fasts.length === 0 ? (
-        <View className="mt-4 rounded-xl border border-border/50 bg-background/50 p-4 items-center text-center">
+        <View className="mt-4 items-center p-4 text-center">
           <Ionicons color={COLORS.muted} name="calendar-outline" size={28} />
           <Text className="mt-2 font-headline text-sm text-foreground text-center">
             {language === "en" ? "No completed fasts yet" : "Ainda sem jejuns registados"}
@@ -158,7 +157,7 @@ export function FastingHistoryCard() {
           </Text>
         </View>
       ) : (
-        <View className="mt-4 gap-2.5">
+        <View className="mt-4">
           {fasts.slice(0, 10).map((fast) => {
             const durationMs = Math.max(0, fast.endTime - fast.startTime);
             const isCompleted = fast.completed;
@@ -166,7 +165,7 @@ export function FastingHistoryCard() {
             return (
               <View
                 key={fast.id}
-                className="flex-row items-center justify-between rounded-xl border border-border bg-background p-3"
+                className="flex-row items-center justify-between border-b border-border/70 py-3"
               >
                 <View className="flex-1 pr-2">
                   <View className="flex-row items-center gap-2">
@@ -235,6 +234,6 @@ export function FastingHistoryCard() {
           })}
         </View>
       )}
-    </Card>
+    </View>
   );
 }

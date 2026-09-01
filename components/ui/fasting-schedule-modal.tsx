@@ -14,8 +14,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
-import { COLORS } from '@/constants/colors';
+import { COLORS, successWithAlpha } from '@/constants/colors';
 import { triggerSuccessFeedback } from '@/services/hapticsService';
+import { translateText } from '@/services/i18n';
 import {
   FastingScheduleMode,
   PRESET_SCHEDULES,
@@ -126,7 +127,7 @@ export function FastingScheduleModal({ onClose, visible }: FastingScheduleModalP
                   </Text>
                 </View>
                 <Pressable
-                  accessibilityLabel="Fechar"
+                  accessibilityLabel={translateText('Fechar', language)}
                   accessibilityRole="button"
                   onPress={onClose}
                   style={styles.closeButton}
@@ -155,7 +156,7 @@ export function FastingScheduleModal({ onClose, visible }: FastingScheduleModalP
                   <Switch
                     onValueChange={setEnabled}
                     thumbColor={enabled ? '#FFFFFF' : '#71717A'}
-                    trackColor={{ false: '#27272A', true: COLORS.success }}
+                    trackColor={{ false: '#3A3428', true: COLORS.success }}
                     value={enabled}
                   />
                 </View>
@@ -344,8 +345,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   badgePro: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderColor: 'rgba(16, 185, 129, 0.4)',
+    backgroundColor: successWithAlpha(0.15),
+    borderColor: successWithAlpha(0.4),
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 6,
@@ -358,15 +359,15 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignItems: 'center',
-    backgroundColor: '#27272A',
+    backgroundColor: '#3A3428',
     borderRadius: 18,
     height: 36,
     justifyContent: 'center',
     width: 36,
   },
   customDaysBox: {
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 16,
     borderWidth: 1,
     marginTop: 14,
@@ -374,8 +375,8 @@ const styles = StyleSheet.create({
   },
   dayButton: {
     alignItems: 'center',
-    backgroundColor: '#1E1E22',
-    borderColor: '#2E2E33',
+    backgroundColor: '#2B2620',
+    borderColor: '#443D2E',
     borderRadius: 10,
     borderWidth: 1,
     flex: 1,
@@ -387,12 +388,12 @@ const styles = StyleSheet.create({
     borderColor: COLORS.success,
   },
   dayText: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 11,
   },
   dayTextActive: {
-    color: '#002113',
+    color: '#3A2200',
   },
   durationBox: {
     flex: 1.4,
@@ -402,15 +403,15 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   footer: {
-    borderTopColor: '#27272A',
+    borderTopColor: '#3A3428',
     borderTopWidth: 1,
     paddingHorizontal: 20,
     paddingTop: 14,
   },
   hPill: {
     alignItems: 'center',
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 12,
     borderWidth: 1,
     justifyContent: 'center',
@@ -423,16 +424,16 @@ const styles = StyleSheet.create({
     borderColor: COLORS.success,
   },
   hPillText: {
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 13,
   },
   hPillTextActive: {
-    color: '#002113',
+    color: '#3A2200',
   },
   header: {
     alignItems: 'center',
-    borderBottomColor: '#27272A',
+    borderBottomColor: '#3A3428',
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -441,13 +442,13 @@ const styles = StyleSheet.create({
     paddingTop: 18,
   },
   headerSubtitle: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_400Regular',
     fontSize: 12,
     marginTop: 2,
   },
   headerTitle: {
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_800ExtraBold',
     fontSize: 18,
   },
@@ -455,19 +456,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   presetCard: {
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 16,
     borderWidth: 1,
     marginBottom: 8,
     padding: 14,
   },
   presetCardActive: {
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    backgroundColor: successWithAlpha(0.08),
     borderColor: COLORS.success,
   },
   presetDesc: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_400Regular',
     fontSize: 12,
     lineHeight: 16,
@@ -479,7 +480,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   presetLabel: {
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 14,
   },
@@ -491,8 +492,8 @@ const styles = StyleSheet.create({
   },
   reminderPill: {
     alignItems: 'center',
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 12,
     borderWidth: 1,
     flex: 1,
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   reminderPillActive: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: successWithAlpha(0.15),
     borderColor: COLORS.success,
   },
   reminderRow: {
@@ -510,7 +511,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   reminderText: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_600SemiBold',
     fontSize: 11,
   },
@@ -528,7 +529,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   saveButtonText: {
-    color: '#002113',
+    color: '#3A2200',
     fontFamily: 'HankenGrotesk_800ExtraBold',
     fontSize: 15,
   },
@@ -537,7 +538,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   sectionHeading: {
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 13,
     marginTop: 18,
@@ -555,7 +556,7 @@ const styles = StyleSheet.create({
     maxHeight: '100%',
   },
   subHeading: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_600SemiBold',
     fontSize: 12,
     marginBottom: 4,
@@ -564,11 +565,11 @@ const styles = StyleSheet.create({
     flex: 0.9,
   },
   timeInput: {
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 12,
     borderWidth: 1,
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 16,
     marginTop: 6,
@@ -576,21 +577,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   toggleDesc: {
-    color: '#A1A1AA',
+    color: '#A79D88',
     fontFamily: 'HankenGrotesk_400Regular',
     fontSize: 12,
     lineHeight: 16,
     marginTop: 2,
   },
   toggleLabel: {
-    color: '#F4F4F5',
+    color: '#F1E9D6',
     fontFamily: 'HankenGrotesk_700Bold',
     fontSize: 14,
   },
   toggleRow: {
     alignItems: 'center',
-    backgroundColor: '#141417',
-    borderColor: '#27272A',
+    backgroundColor: '#211E18',
+    borderColor: '#3A3428',
     borderRadius: 16,
     borderWidth: 1,
     flexDirection: 'row',

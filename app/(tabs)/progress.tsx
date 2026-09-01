@@ -36,11 +36,11 @@ export default function ProgressScreen() {
       ) : null}
 
       {error ? (
-        <View className="mt-7 rounded-2xl border border-[#FB7185]/40 bg-[#FB7185]/10 p-5">
-          <Text className="font-headline text-lg text-[#FDA4AF]">
+        <View className="mt-7 rounded-2xl border border-danger/40 bg-danger/10 p-5">
+          <Text className="font-headline text-lg text-danger">
             Progresso indisponível
           </Text>
-          <Text className="mt-2 font-body text-sm leading-5 text-[#FDA4AF]">
+          <Text className="mt-2 font-body text-sm leading-5 text-danger">
             {error}
           </Text>
         </View>

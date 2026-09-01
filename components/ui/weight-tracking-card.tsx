@@ -24,6 +24,7 @@ import {
   type WeightUnit,
 } from "@/services/dbService";
 import { deleteRemoteWeightEntry } from "@/services/cloudSyncService";
+import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 type TimeRange = "week" | "month" | "year" | "all";
@@ -224,7 +225,7 @@ export function WeightTrackingCard() {
 
           <View className="flex-row items-center gap-2">
             <Pressable
-              accessibilityLabel="Ver todos os registos"
+              accessibilityLabel={translateText("Ver todos os registos", language)}
               className="flex-row items-center py-1 pl-2 active:opacity-70"
               onPress={() => setIsHistoryModalVisible(true)}
             >
@@ -235,7 +236,7 @@ export function WeightTrackingCard() {
             </Pressable>
 
             <Pressable
-              accessibilityLabel="Adicionar registo de peso"
+              accessibilityLabel={translateText("Adicionar registo de peso", language)}
               accessibilityRole="button"
               className="h-8 w-8 items-center justify-center rounded-lg border border-border bg-background active:opacity-70"
               onPress={() => {
@@ -292,7 +293,7 @@ export function WeightTrackingCard() {
             <Svg height={chartHeight} width={chartWidth}>
               {/* Y Axis Grid Lines & Labels */}
               <Line
-                stroke="#27272A"
+                stroke={COLORS.border}
                 strokeDasharray="4 4"
                 x1={paddingLeft}
                 x2={chartWidth - paddingRight}
@@ -310,7 +311,7 @@ export function WeightTrackingCard() {
               </SvgText>
 
               <Line
-                stroke="#27272A"
+                stroke={COLORS.border}
                 strokeDasharray="4 4"
                 x1={paddingLeft}
                 x2={chartWidth - paddingRight}
@@ -328,7 +329,7 @@ export function WeightTrackingCard() {
               </SvgText>
 
               <Line
-                stroke="#27272A"
+                stroke={COLORS.border}
                 strokeDasharray="4 4"
                 x1={paddingLeft}
                 x2={chartWidth - paddingRight}
@@ -399,7 +400,7 @@ export function WeightTrackingCard() {
                       cy={pt.y}
                       fill="#FACC15"
                       r="4"
-                      stroke="#18181B"
+                      stroke={COLORS.foreground}
                       strokeWidth="2"
                     />
                     {showLabel ? (
@@ -562,7 +563,7 @@ export function WeightTrackingCard() {
                     </View>
 
                     <Pressable
-                      accessibilityLabel="Eliminar registo"
+                      accessibilityLabel={translateText("Eliminar registo", language)}
                       className="h-8 w-8 items-center justify-center active:opacity-60"
                       onPress={() => confirmDelete(entry)}
                     >

@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
-import { COLORS } from "@/constants/colors";
+import { COLORS, successWithAlpha } from "@/constants/colors";
 import {
   getXpRewardTiers,
   type XpRewardTier,
@@ -47,7 +47,7 @@ export function XpRewardsCard({ level, totalXp }: XpRewardsCardProps) {
             key={tier.id}
             style={{
               backgroundColor: tier.isUnlocked
-                ? "rgba(16, 185, 129, 0.05)"
+                ? successWithAlpha(0.05)
                 : COLORS.surfaceRaised,
               borderColor: tier.isUnlocked ? COLORS.success : COLORS.border,
             }}
@@ -66,7 +66,7 @@ export function XpRewardsCard({ level, totalXp }: XpRewardsCardProps) {
                   className="ml-2 rounded px-1.5 py-0.5"
                   style={{
                     backgroundColor: tier.isUnlocked
-                      ? "rgba(16, 185, 129, 0.15)"
+                      ? successWithAlpha(0.15)
                       : "rgba(255, 255, 255, 0.06)",
                   }}
                 >

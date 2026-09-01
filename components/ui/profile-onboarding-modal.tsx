@@ -19,6 +19,8 @@ import {
   getUserProfile,
   type WeightUnit,
 } from "@/services/dbService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useLegalConsentStore } from "@/store/legal-consent-store";
 import { useGuidedTutorialStore } from "@/store/guided-tutorial-store";
 
@@ -40,6 +42,7 @@ function parseOptionalWeight(value: string): number | undefined {
 
 export function ProfileOnboardingModal() {
   const cloudAccount = useCloudAccount();
+  const language = useAppPreferencesStore((state) => state.language);
   const hasAcceptedTerms = useLegalConsentStore(
     (state) => state.hasAcceptedTerms,
   );
@@ -161,7 +164,7 @@ export function ProfileOnboardingModal() {
               Nome do perfil
             </Text>
             <TextInput
-              accessibilityLabel="Nome do perfil"
+              accessibilityLabel={translateText("Nome do perfil", language)}
               autoCapitalize="words"
               className="mt-2 min-h-14 rounded-2xl border border-border bg-background px-4 font-body text-base text-foreground"
               maxLength={40}
@@ -251,7 +254,7 @@ export function ProfileOnboardingModal() {
             {trackWeight ? (
               <View className="mt-3 flex-row gap-3">
                 <TextInput
-                  accessibilityLabel="Peso inicial opcional"
+                  accessibilityLabel={translateText("Peso inicial opcional", language)}
                   className="min-h-14 flex-1 rounded-2xl border border-border bg-background px-4 font-body text-base text-foreground"
                   keyboardType="decimal-pad"
                   onChangeText={setWeight}

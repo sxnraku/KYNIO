@@ -48,7 +48,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
     stepLabel: (current, total) => `Passo ${current} de ${total}`,
     steps: [
       {
-        accent: '#10B981',
+        accent: '#D9922E',
         badge: 'JEJUM',
         bullets: [
           {
@@ -106,7 +106,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
         title: 'Refeições com revisão humana',
       },
       {
-        accent: '#6366F1',
+        accent: '#D9922E',
         badge: 'RITMO',
         bullets: [
           {
@@ -174,7 +174,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
     stepLabel: (current, total) => `Step ${current} of ${total}`,
     steps: [
       {
-        accent: '#10B981',
+        accent: '#D9922E',
         badge: 'FASTING',
         bullets: [
           {
@@ -232,7 +232,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
         title: 'Meals with human review',
       },
       {
-        accent: '#6366F1',
+        accent: '#D9922E',
         badge: 'RHYTHM',
         bullets: [
           {

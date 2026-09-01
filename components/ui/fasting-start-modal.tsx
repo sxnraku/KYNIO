@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { COLORS } from '@/constants/colors';
+import { translateText } from '@/services/i18n';
 import {
   formatFastingStartDate,
   formatFastingStartDateEntry,
@@ -22,6 +23,7 @@ import {
   parseFastingStartDateTime,
   type FastingStartParseError,
 } from '@/services/fastingStartService';
+import { useAppPreferencesStore } from '@/store/app-preferences-store';
 
 interface FastingStartModalProps {
   initialStartedAt: number | null;
@@ -63,6 +65,7 @@ export function FastingStartModal({
   onClose,
   onConfirm,
 }: FastingStartModalProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const [openedAt] = useState(() => Date.now());
   const [initialTimestamp] = useState(() =>
     getDefaultTimestamp({ initialStartedAt, mode, openedAt }),
@@ -110,7 +113,7 @@ export function FastingStartModal({
         className="flex-1 justify-end bg-black/70"
       >
         <Pressable
-          accessibilityLabel="Fechar seleção da hora de início"
+          accessibilityLabel={translateText('Fechar seleção da hora de início', language)}
           onPress={onClose}
           style={StyleSheet.absoluteFill}
         />
@@ -134,7 +137,7 @@ export function FastingStartModal({
                   </Text>
                 </View>
                 <Pressable
-                  accessibilityLabel="Fechar"
+                  accessibilityLabel={translateText('Fechar', language)}
                   className="h-9 w-9 items-center justify-center rounded-full bg-background"
                   onPress={onClose}
                 >
@@ -166,7 +169,7 @@ export function FastingStartModal({
                     Data
                   </Text>
                   <TextInput
-                    accessibilityLabel="Data de início do jejum"
+                    accessibilityLabel={translateText('Data de início do jejum', language)}
                     autoCorrect={false}
                     className="min-h-14 rounded-2xl border border-border bg-background px-4 font-body text-base text-foreground"
                     keyboardType="number-pad"
@@ -186,7 +189,7 @@ export function FastingStartModal({
                     Hora
                   </Text>
                   <TextInput
-                    accessibilityLabel="Hora de início do jejum"
+                    accessibilityLabel={translateText('Hora de início do jejum', language)}
                     autoCorrect={false}
                     className="min-h-14 rounded-2xl border border-border bg-background px-4 font-body text-base text-foreground"
                     keyboardType="number-pad"
@@ -204,8 +207,8 @@ export function FastingStartModal({
               </View>
 
               {errorMessage ? (
-                <View className="mt-3 rounded-2xl border border-[#FB7185]/35 bg-[#FB7185]/10 px-4 py-3">
-                  <Text className="font-body text-sm text-[#FB7185]">
+                <View className="mt-3 rounded-2xl border border-danger/35 bg-danger/10 px-4 py-3">
+                  <Text className="font-body text-sm text-danger">
                     {errorMessage}
                   </Text>
                 </View>
@@ -229,8 +232,8 @@ export function FastingStartModal({
                 onPress={confirmStart}
                 testID="confirm-fasting-start-button"
               >
-                <Ionicons color="#002113" name="checkmark" size={20} />
-                <Text className="ml-2 font-headline text-base text-[#002113]">
+                <Ionicons color="#3A2200" name="checkmark" size={20} />
+                <Text className="ml-2 font-headline text-base text-[#3A2200]">
                   {mode === 'edit' ? 'Guardar alteração' : 'Iniciar deste momento'}
                 </Text>
               </Pressable>
