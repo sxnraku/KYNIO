@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 import { COLORS } from "@/constants/colors";
@@ -73,21 +74,21 @@ export const DotClock = memo(function DotClock({
   const height = 7 * cellSize;
 
   return (
-    <Svg
+    <View
       accessibilityElementsHidden
-      height={height}
       importantForAccessibility="no-hide-descendants"
-      width={width}
     >
-      {dots.map((dot, index) => (
-        <Circle
-          cx={dot.cx}
-          cy={dot.cy}
-          fill={dot.isColon ? COLORS.success : COLORS.foreground}
-          key={`${dot.cx}-${dot.cy}-${index}`}
-          r={dotRadius}
-        />
-      ))}
-    </Svg>
+      <Svg height={height} width={width}>
+        {dots.map((dot, index) => (
+          <Circle
+            cx={dot.cx}
+            cy={dot.cy}
+            fill={dot.isColon ? COLORS.success : COLORS.foreground}
+            key={`${dot.cx}-${dot.cy}-${index}`}
+            r={dotRadius}
+          />
+        ))}
+      </Svg>
+    </View>
   );
 });
