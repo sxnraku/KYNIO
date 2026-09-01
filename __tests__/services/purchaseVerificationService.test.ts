@@ -24,7 +24,7 @@ describe('purchaseVerificationService', () => {
 
   it('devolve "unverified" quando não há purchaseToken', async () => {
     const result = await verifyPurchaseWithServer(
-      { productId: 'kynio_pro_annual' },
+      { productId: 'kynio_pro_yearly' },
       'subscription',
     );
 
@@ -37,7 +37,7 @@ describe('purchaseVerificationService', () => {
     mockFetchResponse({ verified: true });
 
     const result = await verifyPurchaseWithServer(
-      { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+      { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
       'subscription',
     );
 
@@ -49,7 +49,7 @@ describe('purchaseVerificationService', () => {
     mockFetchResponse({ verified: true });
 
     const result = await verifyPurchaseWithServer(
-      { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+      { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
       'subscription',
     );
 
@@ -76,7 +76,7 @@ describe('purchaseVerificationService', () => {
 
     await expect(
       verifyPurchaseWithServer(
-        { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+        { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
         'subscription',
       ),
     ).resolves.toBe('unverified');
@@ -85,7 +85,7 @@ describe('purchaseVerificationService', () => {
 
     await expect(
       verifyPurchaseWithServer(
-        { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+        { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
         'subscription',
       ),
     ).resolves.toBe('unverified');
@@ -95,7 +95,7 @@ describe('purchaseVerificationService', () => {
     mockFetchResponse({}, false);
 
     const result = await verifyPurchaseWithServer(
-      { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+      { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
       'subscription',
     );
 
@@ -106,7 +106,7 @@ describe('purchaseVerificationService', () => {
     globalThis.fetch = jest.fn().mockRejectedValue(new Error('sem rede'));
 
     const result = await verifyPurchaseWithServer(
-      { productId: 'kynio_pro_annual', purchaseToken: 'token' },
+      { productId: 'kynio_pro_yearly', purchaseToken: 'token' },
       'subscription',
     );
 

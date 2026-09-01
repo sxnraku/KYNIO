@@ -16,7 +16,7 @@ import {
 } from "react-native-iap";
 
 export const IAP_SKUS = {
-  ANNUAL_SUBSCRIPTION: "kynio_pro_annual",
+  ANNUAL_SUBSCRIPTION: "kynio_pro_yearly",
   MONTHLY_SUBSCRIPTION: "kynio_pro_monthly",
   LIFETIME_PRODUCT: "kynio_pro_lifetime",
 } as const;
@@ -157,8 +157,8 @@ export async function fetchStoreOfferings(): Promise<{
           title: sub.title || (isAnnual ? "Plano Anual" : "Plano Mensal"),
           priceFormatted: formattedPrice,
           currency,
-          hasFreeTrial: isAnnual ? true : hasFreeTrial,
-          trialPeriodDays: 7,
+          hasFreeTrial,
+          trialPeriodDays: hasFreeTrial ? 7 : undefined,
           offerToken,
         };
 
@@ -210,9 +210,13 @@ export async function buySubscriptionSku(
   }
 
   if (Platform.OS === "android") {
+    if (!offerToken) {
+      throw new Error(
+        "Oferta da subscrição indisponível no Google Play. Tenta novamente.",
+      );
+    }
     return (await requestSubscription({
-      sku,
-      ...(offerToken ? { subscriptionOffers: [{ sku, offerToken }] } : {}),
+      subscriptionOffers: [{ sku, offerToken }],
     })) as unknown as Purchase;
   }
 
@@ -231,7 +235,9 @@ export async function buyOneTimeProductSku(sku: string): Promise<Purchase | null
     await initializeIap();
   }
 
-  return (await requestPurchase({ sku })) as unknown as Purchase;
+  return (await requestPurchase(
+    Platform.OS === "android" ? { skus: [sku] } : { sku },
+  )) as unknown as Purchase;
 }
 
 /**

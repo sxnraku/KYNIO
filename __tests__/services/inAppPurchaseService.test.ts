@@ -12,7 +12,7 @@ jest.mock("react-native-iap", () => ({
   endConnection: jest.fn().mockResolvedValue(true),
   getSubscriptions: jest.fn().mockResolvedValue([
     {
-      productId: "kynio_pro_annual",
+      productId: "kynio_pro_yearly",
       title: "Plano Anual",
       localizedPrice: "34,99 €",
       currency: "EUR",
@@ -69,7 +69,7 @@ jest.mock("react-native-iap", () => ({
     },
   ]),
   requestSubscription: jest.fn().mockResolvedValue({
-    productId: "kynio_pro_annual",
+    productId: "kynio_pro_yearly",
     purchaseToken: "mock_token_123",
     transactionId: "GPA.1234-5678-9012",
   }),
@@ -80,7 +80,7 @@ jest.mock("react-native-iap", () => ({
   }),
   getAvailablePurchases: jest.fn().mockResolvedValue([
     {
-      productId: "kynio_pro_annual",
+      productId: "kynio_pro_yearly",
       purchaseToken: "mock_token_123",
     },
   ]),
