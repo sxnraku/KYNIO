@@ -1,3 +1,5 @@
+import Constants from "expo-constants";
+
 export interface RemoteVersionInfo {
   minimumVersionCode: number;
   latestVersionCode: number;
@@ -24,13 +26,28 @@ export interface VersionCheckResult {
   storeUrl: string;
 }
 
-export const CURRENT_VERSION_CODE = 14;
-export const CURRENT_VERSION_NAME = "1.1.8";
+// Lidos da configuração da app (app.json) via expo-constants, para nunca divergirem
+// da build instalada. Os fallbacks correspondem a app.json e servem apenas quando
+// expoConfig não está disponível (ex.: testes unitários).
+const FALLBACK_VERSION_CODE = 20;
+const FALLBACK_VERSION_NAME = "1.2.0";
 
+function resolveCurrentVersionCode(): number {
+  const code = Constants.expoConfig?.android?.versionCode;
+  return typeof code === "number" && Number.isInteger(code) && code > 0
+    ? code
+    : FALLBACK_VERSION_CODE;
+}
 
+function resolveCurrentVersionName(): string {
+  const version = Constants.expoConfig?.version;
+  return typeof version === "string" && version.length > 0
+    ? version
+    : FALLBACK_VERSION_NAME;
+}
 
-
-
+export const CURRENT_VERSION_CODE = resolveCurrentVersionCode();
+export const CURRENT_VERSION_NAME = resolveCurrentVersionName();
 
 export const PLAY_STORE_PACKAGE = "com.kynio.app";
 export const DEFAULT_STORE_URL = `market://details?id=${PLAY_STORE_PACKAGE}`;

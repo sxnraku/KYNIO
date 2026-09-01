@@ -22,7 +22,9 @@ const { outputText } = ts.transpileModule(clientSource, {
 
 const expectedAnalysis = {
   dish_name: 'Salmão com arroz e legumes',
-  estimated_calories: 550,
+  // A IA devolve 550 (número redondo); o cliente recalibra pela fórmula
+  // 4*proteína + 4*hidratos + 9*gordura = 475 kcal.
+  estimated_calories: 475,
   macros: { protein_g: 35, carbs_g: 50, fat_g: 15 },
   tags: ['Proteico', 'Quebra Suave'],
   confidence: 'high',
