@@ -8,6 +8,7 @@ function meal(
 ): MealRecord {
   return {
     carbsGrams: 30,
+    deletedAt: null,
     estimatedCalories: 400,
     fatGrams: 10,
     id,

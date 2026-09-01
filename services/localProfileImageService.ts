@@ -15,6 +15,17 @@ function getImageExtension(mimeType: string): string {
   return extensionsByMimeType[mimeType.toLowerCase()] ?? 'jpg';
 }
 
+function base64ToUint8Array(base64: string): Uint8Array {
+  const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;
+  const binaryString = atob(cleanBase64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export async function persistProfileImage(
   sourceUri: string,
   mimeType: string,
@@ -36,8 +47,8 @@ export async function persistProfileImage(
     const destination = new File(profileImagesDirectory, filename);
 
     if (base64) {
-      // Write base64 directly to file - avoids URI scheme issues with content://
-      destination.write(base64);
+      // Write binary bytes directly to file
+      destination.write(base64ToUint8Array(base64));
     } else {
       const source = new File(sourceUri);
       await source.copy(destination);
@@ -46,6 +57,37 @@ export async function persistProfileImage(
     return destination.uri;
   } catch {
     return sourceUri;
+  }
+}
+
+export async function persistRemoteProfileImage(
+  remoteUrl: string,
+): Promise<string | null> {
+  // Na web não há filesystem persistente; manter o avatar local atual é
+  // preferível a guardar um URL assinado que expira.
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
+  try {
+    const response = await fetch(remoteUrl);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const mimeType = response.headers.get('content-type') ?? 'image/jpeg';
+    const profileImagesDirectory = new Directory(Paths.document, PROFILE_IMAGES_DIRECTORY_NAME);
+    profileImagesDirectory.create({ idempotent: true, intermediates: true });
+
+    const filename = `avatar-remote-${Date.now()}.${getImageExtension(mimeType)}`;
+    const destination = new File(profileImagesDirectory, filename);
+    destination.write(bytes);
+
+    return destination.uri;
+  } catch {
+    return null;
   }
 }
 

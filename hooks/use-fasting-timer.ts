@@ -17,6 +17,8 @@ export function useFastingTimer(): FastingTimerState {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    // Re-sincronização intencional sempre que o estado do jejum muda.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setNow(Date.now());
 
     if (!isActive) {

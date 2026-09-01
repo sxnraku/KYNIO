@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback } from "react";
 import { Pressable, View } from "react-native";
 
-import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { COLORS } from "@/constants/colors";
+import { COLORS, successWithAlpha } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useWaterStore } from "@/store/useWaterStore";
 
@@ -14,17 +15,26 @@ export function WaterTrackerCard() {
   const dailyGoalMl = useWaterStore((state) => state.dailyGoalMl);
   const addWater = useWaterStore((state) => state.addWater);
   const removeWater = useWaterStore((state) => state.removeWater);
-  const [showElectrolytesModal, setShowElectrolytesModal] = useState(false);
+  const ensureToday = useWaterStore((state) => state.ensureToday);
 
-  const progressPercent = Math.min(100, Math.round((currentMl / dailyGoalMl) * 100));
+  // Garante que o contador reinicia à meia-noite: ao focar o ecrã e a cada 30 s
+  // enquanto estiver aberto (cobre a app deixada aberta por cima da viragem do dia).
+  useFocusEffect(
+    useCallback(() => {
+      ensureToday();
+      const interval = setInterval(ensureToday, 30_000);
+      return () => clearInterval(interval);
+    }, [ensureToday]),
+  );
+
   const totalGlasses = 8;
   const currentGlasses = Math.min(totalGlasses, Math.floor(currentMl / 250));
 
   return (
-    <Card>
+    <View className="border-t border-border pt-5">
       <View className="flex-row items-center justify-between">
         <View>
-          <Text className="font-label text-[10px] uppercase tracking-widest text-[#38BDF8]">
+          <Text className="font-label text-[10px] uppercase tracking-widest text-success">
             {language === "en" ? "Hydration & Fasting" : "Hidratação & Jejum"}
           </Text>
           <Text className="mt-1 font-headline text-lg text-foreground">
@@ -32,79 +42,81 @@ export function WaterTrackerCard() {
           </Text>
         </View>
 
-        <View className="flex-row items-center rounded-full border border-[#38BDF8]/30 bg-[#38BDF8]/10 px-3 py-1">
-          <Ionicons color="#38BDF8" name="water" size={14} />
-          <Text className="ml-1.5 font-mono text-xs font-bold text-[#38BDF8]">
+        <View
+          className="flex-row items-center rounded-full border px-3 py-1"
+          style={{
+            backgroundColor: successWithAlpha(0.1),
+            borderColor: successWithAlpha(0.3),
+          }}
+        >
+          <Ionicons color={COLORS.success} name="water" size={14} />
+          <Text className="ml-1.5 font-mono text-xs font-bold text-success">
             {currentMl} / {dailyGoalMl} ml
           </Text>
         </View>
       </View>
 
-      {/* Progress Bar */}
-      <View className="mt-4">
-        <View className="h-3 w-full overflow-hidden rounded-full bg-background border border-border">
-          <View
-            className="h-full rounded-full bg-[#38BDF8]"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </View>
-
-        {/* Cups indicator */}
-        <View className="mt-3 flex-row items-center justify-between px-1">
-          {Array.from({ length: totalGlasses }).map((_, index) => {
-            const isFilled = index < currentGlasses;
-            return (
-              <View
-                key={index}
-                className={`h-7 w-7 items-center justify-center rounded-lg border ${
-                  isFilled
-                    ? "bg-[#38BDF8]/20 border-[#38BDF8]/50"
-                    : "bg-background border-border/60"
-                }`}
-              >
-                <Ionicons
-                  color={isFilled ? "#38BDF8" : COLORS.muted}
-                  name="water"
-                  size={15}
-                />
-              </View>
-            );
-          })}
-        </View>
+      {/* Segmentos de copos — a "luz" sobe a cada copo */}
+      <View className="mt-4 flex-row gap-1.5">
+        {Array.from({ length: totalGlasses }).map((_, index) => {
+          const isFilled = index < currentGlasses;
+          return (
+            <View
+              accessibilityElementsHidden
+              className="h-5 flex-1 rounded-md border"
+              importantForAccessibility="no-hide-descendants"
+              key={index}
+              style={{
+                backgroundColor: isFilled
+                  ? COLORS.success
+                  : COLORS.surfaceRaised,
+                borderColor: isFilled ? COLORS.success : COLORS.border,
+              }}
+            />
+          );
+        })}
       </View>
 
       {/* Quick Add Buttons */}
       <View className="mt-5 flex-row items-center gap-2">
         <Pressable
-          accessibilityLabel="Adicionar 250ml de água"
+          accessibilityLabel={translateText("Adicionar 250ml de água", language)}
           accessibilityRole="button"
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-[#38BDF8]/40 bg-[#38BDF8]/15 py-3 active:opacity-75"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
           onPress={() => void addWater(250)}
+          style={{
+            backgroundColor: successWithAlpha(0.15),
+            borderColor: successWithAlpha(0.4),
+          }}
         >
-          <Ionicons color="#38BDF8" name="add" size={17} />
-          <Text className="font-headline text-xs text-[#38BDF8]">
+          <Ionicons color={COLORS.success} name="add" size={17} />
+          <Text className="font-headline text-xs text-success">
             +250 ml <Text className="font-body text-[11px] text-muted">(Copo)</Text>
           </Text>
         </Pressable>
 
         <Pressable
-          accessibilityLabel="Adicionar 500ml de água"
+          accessibilityLabel={translateText("Adicionar 500ml de água", language)}
           accessibilityRole="button"
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-[#38BDF8]/40 bg-[#38BDF8]/15 py-3 active:opacity-75"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
           onPress={() => void addWater(500)}
+          style={{
+            backgroundColor: successWithAlpha(0.15),
+            borderColor: successWithAlpha(0.4),
+          }}
         >
-          <Ionicons color="#38BDF8" name="add" size={17} />
-          <Text className="font-headline text-xs text-[#38BDF8]">
+          <Ionicons color={COLORS.success} name="add" size={17} />
+          <Text className="font-headline text-xs text-success">
             +500 ml <Text className="font-body text-[11px] text-muted">(Garrafa)</Text>
           </Text>
         </Pressable>
 
         {currentMl > 0 ? (
           <Pressable
-            accessibilityLabel="Remover 250ml de água"
+            accessibilityLabel={translateText("Remover 250ml de água", language)}
             accessibilityRole="button"
-            className="h-11 w-11 items-center justify-center rounded-xl border border-border bg-background active:opacity-60"
-            onPress={() => removeWater(250)}
+            className="h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface active:opacity-60"
+            onPress={() => void removeWater(250)}
           >
             <Ionicons color={COLORS.muted} name="remove" size={16} />
           </Pressable>
@@ -112,10 +124,16 @@ export function WaterTrackerCard() {
       </View>
 
       {/* Hydration Tip Banner */}
-      <View className="mt-4 flex-row items-start rounded-xl border border-sky-500/20 bg-sky-500/10 p-3">
-        <Ionicons color="#38BDF8" name="water-outline" size={16} />
+      <View
+        className="mt-4 flex-row items-start rounded-xl border p-3"
+        style={{
+          backgroundColor: successWithAlpha(0.08),
+          borderColor: successWithAlpha(0.2),
+        }}
+      >
+        <Ionicons color={COLORS.success} name="water-outline" size={16} />
         <View className="ml-2 flex-1">
-          <Text className="font-headline text-xs text-[#38BDF8]">
+          <Text className="font-headline text-xs text-success">
             {language === "en" ? "Healthy Hydration" : "Dica de Hidratação Saudável"}
           </Text>
           <Text className="mt-0.5 font-body text-xs leading-4 text-muted">
@@ -125,7 +143,6 @@ export function WaterTrackerCard() {
           </Text>
         </View>
       </View>
-    </Card>
+    </View>
   );
 }
-

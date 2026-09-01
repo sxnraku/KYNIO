@@ -22,6 +22,17 @@ function getImageExtension(mimeType: string): string {
   return extensionsByMimeType[mimeType.toLowerCase()] ?? 'jpg';
 }
 
+function base64ToUint8Array(base64: string): Uint8Array {
+  const cleanBase64 = base64.includes(',') ? base64.split(',')[1] : base64;
+  const binaryString = atob(cleanBase64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export async function persistMealImage(
   sourceUri: string,
   mimeType: string,
@@ -42,7 +53,7 @@ export async function persistMealImage(
     );
 
     if (base64) {
-      destination.write(base64);
+      destination.write(base64ToUint8Array(base64));
     } else {
       const source = new File(sourceUri);
       await source.copy(destination);

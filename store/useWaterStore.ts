@@ -4,7 +4,10 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { getUserProfile, updateUserProfileXp } from '@/services/dbService';
 import { getXpReward } from '@/services/gamificationService';
+import { calculateWaterXp, WATER_STORAGE_KEY } from '@/services/waterXpService';
 import { useUserProgressStore } from '@/store/user-progress-store';
+
+export { WATER_STORAGE_KEY };
 
 
 function getTodayString(): string {
@@ -17,14 +20,13 @@ interface WaterState {
   currentMl: number;
   dailyGoalMl: number;
   date: string;
+  ensureToday: () => void;
   hasElectrolytesTip: boolean;
   history: Record<string, number>;
-  removeWater: (amountMl?: number) => void;
-  resetWater: () => void;
+  removeWater: (amountMl?: number) => Promise<void>;
+  resetWater: () => Promise<void>;
   setDailyGoal: (goalMl: number) => void;
 }
-
-export const WATER_STORAGE_KEY = 'kynio-water-tracker-v1';
 
 export const useWaterStore = create<WaterState>()(
   persist(
@@ -44,23 +46,34 @@ export const useWaterStore = create<WaterState>()(
           },
         });
 
-        // Dar XP pela hidratação (+5 XP por copo)
-        try {
-          const xp = 5;
-          const profile = await getUserProfile();
-          const updated = await updateUserProfileXp(profile.totalXp + xp);
-          useUserProgressStore.getState().syncProfile(updated);
-        } catch {
-          // Ignora se não conseguir dar XP offline
+        // XP determinístico: 5 XP por cada 250 ml efetivamente adicionados
+        // (derivável do histórico, para o sync de cloud não o perder)
+        const xpEarned = calculateWaterXp(newAmount - currentAmount);
+        if (xpEarned > 0) {
+          try {
+            const profile = await getUserProfile();
+            const updated = await updateUserProfileXp(profile.totalXp + xpEarned);
+            useUserProgressStore.getState().syncProfile(updated);
+          } catch {
+            // Ignora se não conseguir dar XP offline
+          }
         }
-
       },
       currentMl: 0,
       dailyGoalMl: 2000,
       date: getTodayString(),
+      ensureToday: () => {
+        const today = getTodayString();
+        const state = get();
+        // Viragem de dia: o contador volta a zero sem apagar o histórico —
+        // o total de ontem já ficou registado em history[ontem].
+        if (state.date !== today) {
+          set({ currentMl: 0, date: today });
+        }
+      },
       hasElectrolytesTip: true,
       history: {},
-      removeWater: (amountMl = 250) => {
+      removeWater: async (amountMl = 250) => {
         const today = getTodayString();
         const state = get();
         const currentAmount = state.date === today ? state.currentMl : 0;
@@ -74,10 +87,24 @@ export const useWaterStore = create<WaterState>()(
             [today]: newAmount,
           },
         });
+
+        // Subtrai o XP correspondente ao que foi removido, para não ser
+        // possível acumular XP adicionando e removendo água repetidamente.
+        const xpRemoved = calculateWaterXp(currentAmount - newAmount);
+        if (xpRemoved > 0) {
+          try {
+            const profile = await getUserProfile();
+            const updated = await updateUserProfileXp(Math.max(0, profile.totalXp - xpRemoved));
+            useUserProgressStore.getState().syncProfile(updated);
+          } catch {
+            // Ignora se não conseguir atualizar o XP offline
+          }
+        }
       },
-      resetWater: () => {
+      resetWater: async () => {
         const today = getTodayString();
         const state = get();
+        const previousAmount = state.date === today ? state.currentMl : 0;
         set({
           currentMl: 0,
           date: today,
@@ -86,6 +113,17 @@ export const useWaterStore = create<WaterState>()(
             [today]: 0,
           },
         });
+
+        const xpRemoved = calculateWaterXp(previousAmount);
+        if (xpRemoved > 0) {
+          try {
+            const profile = await getUserProfile();
+            const updated = await updateUserProfileXp(Math.max(0, profile.totalXp - xpRemoved));
+            useUserProgressStore.getState().syncProfile(updated);
+          } catch {
+            // Ignora se não conseguir atualizar o XP offline
+          }
+        }
       },
       setDailyGoal: (dailyGoalMl) => set({ dailyGoalMl }),
     }),
