@@ -154,6 +154,10 @@ async function verifyWithGoogle(
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
+    if (response.status === 404 || response.status === 410) {
+      // Token inexistente/anulado: rejeição real, não erro interno.
+      return false;
+    }
     if (!response.ok) {
       throw new Error('Falha na validação da subscrição.');
     }
@@ -171,6 +175,10 @@ async function verifyWithGoogle(
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
 
+  if (response.status === 404 || response.status === 410) {
+    // Token inexistente/anulado: rejeição real, não erro interno.
+    return false;
+  }
   if (!response.ok) {
     throw new Error('Falha na validação do produto.');
   }

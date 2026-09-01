@@ -15,7 +15,7 @@
       "package": "com.kynio.app",
       "versionCode": 21,
       "adaptiveIcon": {
-        "backgroundColor": "#121214",
+        "backgroundColor": "#EDE6D3",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png"
       },
@@ -43,7 +43,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F3F6F4",
+          "backgroundColor": "#EDE6D3",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
