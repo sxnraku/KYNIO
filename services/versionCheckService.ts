@@ -29,8 +29,8 @@ export interface VersionCheckResult {
 // Lidos da configuração da app (app.json) via expo-constants, para nunca divergirem
 // da build instalada. Os fallbacks correspondem a app.json e servem apenas quando
 // expoConfig não está disponível (ex.: testes unitários).
-const FALLBACK_VERSION_CODE = 20;
-const FALLBACK_VERSION_NAME = "1.2.0";
+const FALLBACK_VERSION_CODE = 21;
+const FALLBACK_VERSION_NAME = "1.2.1";
 
 function resolveCurrentVersionCode(): number {
   const code = Constants.expoConfig?.android?.versionCode;
