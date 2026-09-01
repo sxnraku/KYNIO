@@ -30,18 +30,18 @@
 
     <style>
       :root {
-        --accent: #10B981;
-        --accent-strong: #059669;
-        --accent-subtle: rgba(16, 185, 129, 0.1);
-        --bg-dark: #09090B;
-        --surface-dark: #121215;
-        --surface-card: #18181B;
-        --surface-raised: #27272A;
-        --border-dark: #27272A;
-        --border-light: #3F3F46;
-        --text-primary: #F4F4F5;
-        --text-muted: #A1A1AA;
-        --cyan: #38BDF8;
+        --accent: #E8A83E;
+        --accent-strong: #D9922E;
+        --accent-subtle: rgba(232, 168, 62, 0.1);
+        --bg-dark: #1C1915;
+        --surface-dark: #231F18;
+        --surface-card: #26221B;
+        --surface-raised: #3A3227;
+        --border-dark: #3A3227;
+        --border-light: #4A4131;
+        --text-primary: #F1E9D6;
+        --text-muted: #A99F8C;
+        --cyan: #F4C95D;
       }
 
       * {
@@ -63,7 +63,7 @@
       header {
         position: sticky;
         top: 0;
-        background: rgba(9, 9, 11, 0.94);
+        background: rgba(28, 25, 21, 0.94);
         backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-dark);
         z-index: 100;
@@ -83,7 +83,7 @@
         align-items: center;
         gap: 12px;
         text-decoration: none;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .brand-logo {
@@ -107,7 +107,7 @@
 
       .btn-beta-nav {
         background: var(--accent);
-        color: #000;
+        color: #241A08;
         font-weight: 800;
         font-size: 13px;
         padding: 9px 18px;
@@ -146,7 +146,7 @@
 
       .lang-switch button.active {
         background: var(--surface-raised);
-        color: #fff;
+        color: #F1E9D6;
       }
 
       /* Hero Section */
@@ -164,8 +164,8 @@
         display: inline-flex;
         align-items: center;
         background: var(--accent-subtle);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: #34D399;
+        border: 1px solid rgba(232, 168, 62, 0.3);
+        color: #F4C95D;
         font-size: 11px;
         font-weight: 800;
         padding: 5px 14px;
@@ -181,12 +181,12 @@
         line-height: 1.06;
         letter-spacing: -1.5px;
         margin-bottom: 20px;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .hero-h1 em {
         font-style: normal;
-        color: #10B981;
+        color: #E8A83E;
       }
 
       .hero-sub {
@@ -206,7 +206,7 @@
 
       .btn-hero-main {
         background: var(--accent);
-        color: #000;
+        color: #241A08;
         font-size: 15px;
         font-weight: 800;
         padding: 16px 24px;
@@ -217,7 +217,7 @@
         justify-content: center;
         gap: 8px;
         cursor: pointer;
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+        box-shadow: 0 4px 20px rgba(232, 168, 62, 0.35);
         transition: transform 0.15s;
       }
 
@@ -255,7 +255,7 @@
       .app-title-text {
         font-size: 18px;
         font-weight: 800;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .app-sub-text {
@@ -267,12 +267,12 @@
       .icon-box-svg {
         width: 40px;
         height: 40px;
-        background: rgba(16, 185, 129, 0.12);
+        background: rgba(232, 168, 62, 0.12);
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #10B981;
+        color: #E8A83E;
       }
 
       .svg-icon {
@@ -308,31 +308,31 @@
 
       .t-track {
         fill: none;
-        stroke: #27272A;
+        stroke: #3A3227;
         stroke-width: 10;
       }
 
       .t-bar {
         fill: none;
-        stroke: #10B981;
+        stroke: #E8A83E;
         stroke-width: 10;
         stroke-linecap: round;
         stroke-dasharray: 534;
         stroke-dashoffset: 133;
-        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+        filter: drop-shadow(0 0 10px rgba(232, 168, 62, 0.5));
       }
 
       .t-time-h1 {
         font-size: 32px;
         font-weight: 900;
         letter-spacing: -0.5px;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .t-phase-badge {
-        background: rgba(16, 185, 129, 0.15);
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        color: #10B981;
+        background: rgba(232, 168, 62, 0.15);
+        border: 1px solid rgba(232, 168, 62, 0.35);
+        color: #E8A83E;
         font-size: 10px;
         font-weight: 800;
         padding: 3px 10px;
@@ -348,7 +348,7 @@
       .pulse-dot {
         width: 6px;
         height: 6px;
-        background: #10B981;
+        background: #E8A83E;
         border-radius: 50%;
         animation: pDot 1.4s infinite;
       }
@@ -374,7 +374,7 @@
       .m-num {
         font-size: 14px;
         font-weight: 800;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .m-lbl {
@@ -385,8 +385,8 @@
 
       .btn-app-preview {
         width: 100%;
-        background: #10B981;
-        color: #000;
+        background: #E8A83E;
+        color: #241A08;
         font-weight: 800;
         font-size: 14px;
         padding: 13px;
@@ -401,7 +401,7 @@
 
       /* Pillars Section */
       .pillars-section {
-        background: #0E0E11;
+        background: #211C15;
         border-top: 1px solid var(--border-dark);
         border-bottom: 1px solid var(--border-dark);
         padding: 80px 24px;
@@ -432,7 +432,7 @@
         font-weight: 900;
         letter-spacing: -0.8px;
         margin-bottom: 12px;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .section-desc {
@@ -462,8 +462,8 @@
         width: 44px;
         height: 44px;
         border-radius: 12px;
-        background: rgba(16, 185, 129, 0.12);
-        border: 1px solid rgba(16, 185, 129, 0.25);
+        background: rgba(232, 168, 62, 0.12);
+        border: 1px solid rgba(232, 168, 62, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -475,7 +475,7 @@
         font-size: 18px;
         font-weight: 800;
         margin-bottom: 8px;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .pillar-body {
@@ -519,7 +519,7 @@
       .shot-title {
         font-size: 14px;
         font-weight: 800;
-        color: #fff;
+        color: #F1E9D6;
         margin-bottom: 2px;
       }
 
@@ -551,7 +551,7 @@
         font-weight: 900;
         letter-spacing: -0.8px;
         margin-bottom: 12px;
-        color: #fff;
+        color: #F1E9D6;
       }
 
       .cta-desc {
@@ -580,7 +580,7 @@
       }
 
       .modal-card {
-        background: #141417;
+        background: #26221B;
         border: 1px solid var(--border-light);
         border-radius: 28px;
         width: 100%;
@@ -596,7 +596,7 @@
         right: 20px;
         background: var(--surface-raised);
         border: 1px solid var(--border-dark);
-        color: #fff;
+        color: #F1E9D6;
         width: 32px;
         height: 32px;
         border-radius: 50%;
@@ -618,7 +618,7 @@
         width: 28px;
         height: 28px;
         background: var(--accent);
-        color: #000;
+        color: #241A08;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -631,7 +631,7 @@
       .step-h4 {
         font-size: 14px;
         font-weight: 800;
-        color: #fff;
+        color: #F1E9D6;
         margin-bottom: 3px;
       }
 
@@ -644,7 +644,7 @@
       .btn-play-action {
         width: 100%;
         background: var(--accent);
-        color: #000;
+        color: #241A08;
         font-size: 15px;
         font-weight: 800;
         padding: 16px;
@@ -664,7 +664,7 @@
         border-top: 1px solid var(--border-dark);
         padding: 40px 24px;
         text-align: center;
-        background: #070709;
+        background: #171310;
       }
 
       .footer-inner {
@@ -697,7 +697,7 @@
 
       .footer-disclaimer {
         font-size: 12px;
-        color: #71717A;
+        color: #8C8172;
         max-width: 620px;
         line-height: 1.5;
       }
@@ -856,7 +856,7 @@
               <div class="m-lbl"><span data-language="pt">Restante</span><span data-language="en">Remaining</span></div>
             </div>
             <div class="m-col">
-              <div class="m-num" style="color: #10B981;">Cetose</div>
+              <div class="m-num" style="color: #E8A83E;">Cetose</div>
               <div class="m-lbl"><span data-language="pt">Fase</span><span data-language="en">Phase</span></div>
             </div>
           </div>
@@ -1026,7 +1026,7 @@
       <div class="modal-card" onclick="event.stopPropagation()">
         <button class="modal-close-btn" onclick="closeBetaModal()">✕</button>
 
-        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #fff;">
+        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #F1E9D6;">
           <span data-language="pt">Acesso à Beta do Android</span>
           <span data-language="en">Join Android Closed Beta</span>
         </h3>
