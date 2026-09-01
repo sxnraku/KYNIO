@@ -9,12 +9,14 @@ export interface SubscriptionState {
   tier: SubscriptionTier;
   expiresAt: string | null;
   trialStartedAt: string | null;
+  purchaseToken?: string | null;
+  orderId?: string | null;
   dailyAiScansDate: string;
   dailyAiScansCount: number;
   maxFreeDailyAiScans: number;
 
   // Actions
-  activateSubscription: (tier: SubscriptionTier, durationDays?: number) => void;
+  activateSubscription: (tier: SubscriptionTier, durationDays?: number, purchaseToken?: string, orderId?: string) => void;
   activateFreeTrial: () => boolean;
   cancelSubscription: () => void;
   canPerformAiScan: () => boolean;
@@ -39,9 +41,11 @@ export const useSubscriptionStore = create<SubscriptionState>()(
       dailyAiScansCount: 0,
       maxFreeDailyAiScans: FREE_DAILY_AI_LIMIT,
 
-      activateSubscription: (tier, durationDays) => {
+      activateSubscription: (tier, durationDays, purchaseToken, orderId) => {
         let expiresAt: string | null = null;
-        if (durationDays) {
+        if (tier === "lifetime") {
+          expiresAt = null;
+        } else if (durationDays) {
           const exp = new Date();
           exp.setDate(exp.getDate() + durationDays);
           expiresAt = exp.toISOString();
@@ -59,6 +63,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           isPro: true,
           tier,
           expiresAt,
+          purchaseToken: purchaseToken || null,
+          orderId: orderId || null,
         });
       },
 

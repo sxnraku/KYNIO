@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,7 +11,17 @@ import {
 } from "react-native";
 import { AppText } from "@/components/ui/text";
 import { useSubscriptionStore, SubscriptionTier } from "@/store/use-subscription-store";
-
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import {
+  fetchStoreOfferings,
+  buySubscriptionSku,
+  buyOneTimeProductSku,
+  restoreActivePurchases,
+  confirmPurchaseTransaction,
+  IAP_SKUS,
+  type FormattedPlanInfo,
+} from "@/services/inAppPurchaseService";
+import { verifyPurchaseWithServer } from "@/services/purchaseVerificationService";
 
 interface PaywallModalProps {
   visible: boolean;
@@ -51,113 +62,195 @@ const PRO_FEATURES = [
   },
 ];
 
-import { useAppPreferencesStore } from "@/store/app-preferences-store";
-
 export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalProps) {
   const language = useAppPreferencesStore((state) => state.language);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionTier>("annual");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [offerings, setOfferings] = useState<{
+    annual?: FormattedPlanInfo;
+    monthly?: FormattedPlanInfo;
+    lifetime?: FormattedPlanInfo;
+  }>({});
 
   const activateSubscription = useSubscriptionStore((state) => state.activateSubscription);
   const activateFreeTrial = useSubscriptionStore((state) => state.activateFreeTrial);
   const trialStartedAt = useSubscriptionStore((state) => state.trialStartedAt);
-  const isPro = useSubscriptionStore((state) => state.isPro);
 
   const hasTrialAvailable = !trialStartedAt;
 
-  const handlePurchase = () => {
-    if (selectedPlan === "annual" && hasTrialAvailable) {
-      Alert.alert(
-        language === "en"
-          ? "Confirm 7-Day Free Trial 🎁"
-          : "Confirmar Teste Grátis de 7 Dias 🎁",
-        language === "en"
-          ? "Today you pay 0.00 €.\n\nYou'll get 7 days of full access to Kynio Aura Pro. If you choose to continue, the annual subscription of 34.99 €/year (only 2.91 €/month) will renew automatically at the end of the trial period.\n\nYou can cancel anytime in Google Play Subscriptions at no cost."
-          : "Hoje pagarás 0,00 €.\n\nTerás 7 dias de acesso total ao Kynio Aura Pro. Se decidires continuar, a subscrição anual de 34,99 €/ano (apenas 2,91 €/mês) será renovada automaticamente no final do período experimental.\n\nPodes cancelar a qualquer momento nas Subscrições da Google Play sem qualquer custo.",
-        [
-          { text: language === "en" ? "Back" : "Voltar", style: "cancel" },
-          {
-            text: language === "en" ? "Confirm (0.00 € Today)" : "Confirmar (0,00 € Hoje)",
-            onPress: () => {
-              setIsProcessing(true);
-              setTimeout(() => {
-                setIsProcessing(false);
-                activateFreeTrial();
-                Alert.alert(
-                  language === "en"
-                    ? "Free Trial Active! 🎉"
-                    : "Subscrição com Teste Grátis Ativa! 🎉",
-                  language === "en"
-                    ? "Your 7-day free trial has started. Welcome to KYNIO Aura Pro!"
-                    : "O teu período experimental de 7 dias começou. Bem-vindo ao KYNIO Aura Pro!",
-                  [{ text: language === "en" ? "Get Started" : "Começar a Usar", onPress: onClose }]
-                );
-              }, 600);
-            },
-          },
-        ]
-      );
-      return;
+  useEffect(() => {
+    if (visible && Platform.OS !== "web") {
+      fetchStoreOfferings()
+        .then((data) => setOfferings(data))
+        .catch(() => {});
     }
+  }, [visible]);
 
-    Alert.alert(
-      language === "en" ? "Confirm Subscription 👑" : "Confirmar Subscrição 👑",
-      selectedPlan === "annual"
-        ? language === "en"
-          ? "Annual KYNIO Aura Pro: 34.99 €/year (2.91 €/month). Auto-renews yearly with free cancellation on Google Play."
-          : "Subscrição Anual KYNIO Aura Pro: 34,99 €/ano (2,91 €/mês). Renovação automática anual com cancelamento livre na Google Play."
-        : selectedPlan === "monthly"
-        ? language === "en"
-          ? "Monthly KYNIO Aura Pro: 4.99 €/month. Billed monthly with free cancellation on Google Play."
-          : "Subscrição Mensal KYNIO Aura Pro: 4,99 €/mês. Cobrado mensalmente com cancelamento livre na Google Play."
-        : language === "en"
-        ? "Lifetime KYNIO Aura Pro: 69.99 € (one-time payment)."
-        : "Acesso Vitalício KYNIO Aura Pro: 69,99 € (pagamento único).",
-      [
-        { text: language === "en" ? "Back" : "Voltar", style: "cancel" },
-        {
-          text: language === "en" ? "Confirm Purchase" : "Confirmar Compra",
-          onPress: () => {
-            setIsProcessing(true);
-            setTimeout(() => {
-              setIsProcessing(false);
-              activateSubscription(selectedPlan);
-              Alert.alert(
-                language === "en"
-                  ? "Welcome to Kynio Aura Pro! 👑"
-                  : "Bem-vindo ao Kynio Aura Pro! 👑",
-                language === "en"
-                  ? "Your Pro plan is now active across all features and logs."
-                  : "O teu plano Pro está ativo em todos os teus registos e funcionalidades.",
-                [{ text: language === "en" ? "Continue" : "Continuar", onPress: onClose }]
-              );
-            }, 600);
-          },
-        },
-      ]
-    );
+  const handlePurchase = async () => {
+    setIsProcessing(true);
+
+    try {
+      if (Platform.OS === "web") {
+        // Fallback local for web testing
+        if (selectedPlan === "annual" && hasTrialAvailable) {
+          activateFreeTrial();
+        } else {
+          activateSubscription(selectedPlan);
+        }
+        Alert.alert(
+          language === "en" ? "Welcome to Kynio Aura Pro! 👑" : "Bem-vindo ao Kynio Aura Pro! 👑",
+          language === "en"
+            ? "Your Pro plan is now active across all features and logs."
+            : "O teu plano Pro está ativo em todos os teus registos e funcionalidades.",
+          [{ text: language === "en" ? "Continue" : "Continuar", onPress: onClose }]
+        );
+        return;
+      }
+
+      let purchase = null;
+
+      if (selectedPlan === "annual") {
+        purchase = await buySubscriptionSku(
+          IAP_SKUS.ANNUAL_SUBSCRIPTION,
+          offerings.annual?.offerToken,
+        );
+      } else if (selectedPlan === "monthly") {
+        purchase = await buySubscriptionSku(
+          IAP_SKUS.MONTHLY_SUBSCRIPTION,
+          offerings.monthly?.offerToken,
+        );
+      } else if (selectedPlan === "lifetime") {
+        purchase = await buyOneTimeProductSku(IAP_SKUS.LIFETIME_PRODUCT);
+      }
+
+      if (purchase) {
+        if (purchase.purchaseToken) {
+          const verification = await verifyPurchaseWithServer(
+            {
+              productId: purchase.productId,
+              purchaseToken: purchase.purchaseToken,
+            },
+            selectedPlan === "lifetime" ? "product" : "subscription",
+          );
+
+          if (verification === "invalid") {
+            console.warn("[IAP] Compra rejeitada na verificação do servidor.");
+            Alert.alert(
+              language === "en" ? "Purchase Failed" : "Não foi possível concluir a compra",
+              language === "en"
+                ? "The transaction could not be completed. Please try again or check your payment method on Google Play."
+                : "A transação não pôde ser concluída. Por favor tenta novamente ou verifica o método de pagamento no Google Play.",
+            );
+            return;
+          }
+        }
+
+        await confirmPurchaseTransaction(purchase);
+        activateSubscription(
+          selectedPlan,
+          undefined,
+          purchase.purchaseToken,
+          purchase.transactionId,
+        );
+
+        Alert.alert(
+          language === "en" ? "Welcome to Kynio Aura Pro! 👑" : "Bem-vindo ao Kynio Aura Pro! 👑",
+          language === "en"
+            ? "Your Pro plan is now active across all features and logs."
+            : "O teu plano Pro está ativo em todos os teus registos e funcionalidades.",
+          [{ text: language === "en" ? "Continue" : "Continuar", onPress: onClose }]
+        );
+      }
+    } catch (error: unknown) {
+      const err = error as { code?: string; message?: string };
+      // Ignore user cancellations
+      if (err?.code !== "E_USER_CANCELLED") {
+        console.warn("[IAP] Purchase error:", error);
+        Alert.alert(
+          language === "en" ? "Purchase Failed" : "Não foi possível concluir a compra",
+          language === "en"
+            ? "The transaction could not be completed. Please try again or check your payment method on Google Play."
+            : "A transação não pôde ser concluída. Por favor tenta novamente ou verifica o método de pagamento no Google Play.",
+        );
+      }
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleRestore = () => {
+  const handleRestore = async () => {
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      if (isPro) {
-        Alert.alert(
-          language === "en" ? "Purchases Restored" : "Compras Restauradas",
-          language === "en"
-            ? "Your active Pro subscription has been restored."
-            : "A tua subscrição Pro ativa foi restaurada."
-        );
-      } else {
+    try {
+      if (Platform.OS === "web") {
         Alert.alert(
           language === "en" ? "No Subscriptions" : "Sem Subscrições",
           language === "en"
-            ? "No active purchases found for this Google Play account."
-            : "Não foram encontradas compras ativas para esta conta Google Play."
+            ? "No active purchases found for this account."
+            : "Não foram encontradas compras ativas para esta conta.",
+        );
+        return;
+      }
+
+      const result = await restoreActivePurchases();
+
+      if (result.hasActiveSubscription && result.tier !== "free") {
+        const tierSku =
+          result.tier === "lifetime"
+            ? IAP_SKUS.LIFETIME_PRODUCT
+            : result.tier === "annual"
+            ? IAP_SKUS.ANNUAL_SUBSCRIPTION
+            : IAP_SKUS.MONTHLY_SUBSCRIPTION;
+        const restoredPurchase = result.purchases.find(
+          (p) => p.productId === tierSku && p.purchaseToken,
+        );
+
+        if (restoredPurchase?.purchaseToken) {
+          const verification = await verifyPurchaseWithServer(
+            {
+              productId: restoredPurchase.productId,
+              purchaseToken: restoredPurchase.purchaseToken,
+            },
+            result.tier === "lifetime" ? "product" : "subscription",
+          );
+
+          if (verification === "invalid") {
+            console.warn("[IAP] Restore rejeitado na verificação do servidor.");
+            Alert.alert(
+              language === "en" ? "No Active Subscriptions" : "Sem Subscrições Ativas",
+              language === "en"
+                ? "No active subscriptions found for this Google account."
+                : "Não foram encontradas subscrições ativas para esta conta Google.",
+            );
+            return;
+          }
+        }
+
+        activateSubscription(result.tier);
+        Alert.alert(
+          language === "en" ? "Purchases Restored! 🎉" : "Compras Restauradas! 🎉",
+          language === "en"
+            ? "Your active Google Play subscription has been successfully restored."
+            : "A tua subscrição ativa da Google Play foi restaurada com sucesso.",
+        );
+      } else {
+        Alert.alert(
+          language === "en" ? "No Active Subscriptions" : "Sem Subscrições Ativas",
+          language === "en"
+            ? "No active subscriptions found for this Google account."
+            : "Não foram encontradas subscrições ativas para esta conta Google.",
         );
       }
-    }, 800);
+    } catch (error) {
+      console.warn("[IAP] Restore error:", error);
+      Alert.alert(
+        language === "en" ? "Restore Failed" : "Erro ao Restaurar",
+        language === "en"
+          ? "Could not check subscriptions. Please check your internet connection."
+          : "Não foi possível verificar as subscrições. Verifica a ligação à internet.",
+      );
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -172,7 +265,13 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.crownBadge}>
-              <AppText style={styles.crownEmoji}>👑</AppText>
+              <AppText
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                style={styles.crownEmoji}
+              >
+                👑
+              </AppText>
             </View>
             <AppText style={styles.title}>KYNIO AURA PRO</AppText>
             <AppText style={styles.subtitle}>
@@ -190,7 +289,13 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             <View style={styles.featuresContainer}>
               {PRO_FEATURES.map((item, index) => (
                 <View key={index} style={styles.featureRow}>
-                  <AppText style={styles.featureIcon}>{item.icon}</AppText>
+                  <AppText
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                    style={styles.featureIcon}
+                  >
+                    {item.icon}
+                  </AppText>
                   <View style={styles.featureTextContainer}>
                     <AppText style={styles.featureTitle}>{item.title}</AppText>
                     <AppText style={styles.featureDesc}>{item.desc}</AppText>
@@ -211,18 +316,32 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
               ]}
             >
               <View style={styles.popularBadge}>
-                <AppText style={styles.popularBadgeText}>POUPA 42% · MAIS POPULAR</AppText>
+                <AppText style={styles.popularBadgeText}>
+                  {language === "en" ? "SAVE 42% · MOST POPULAR" : "POUPA 42% · MAIS POPULAR"}
+                </AppText>
               </View>
               <View style={styles.planHeader}>
                 <View style={styles.planInfoContainer}>
-                  <AppText style={styles.planName}>Plano Anual</AppText>
+                  <AppText style={styles.planName}>
+                    {language === "en" ? "Annual Plan" : "Plano Anual"}
+                  </AppText>
                   <AppText style={styles.planTrial}>
-                    {hasTrialAvailable ? "7 Dias Grátis · Depois 34,99 €/ano" : "34,99 € / ano"}
+                    {hasTrialAvailable
+                      ? language === "en"
+                        ? `7 Days Free · Then ${offerings.annual?.priceFormatted || "34.99 €"}/year`
+                        : `7 Dias Grátis · Depois ${offerings.annual?.priceFormatted || "34,99 €"}/ano`
+                      : language === "en"
+                      ? `${offerings.annual?.priceFormatted || "34.99 €"} / year`
+                      : `${offerings.annual?.priceFormatted || "34,99 €"} / ano`}
                   </AppText>
                 </View>
                 <View style={styles.priceContainer}>
-                  <AppText style={styles.monthlyEquivalent}>2,91 €</AppText>
-                  <AppText style={styles.perMonthText}>/mês</AppText>
+                  <AppText style={styles.monthlyEquivalent}>
+                    {offerings.annual?.monthlyEquivalentFormatted || (language === "en" ? "2.91 €" : "2,91 €")}
+                  </AppText>
+                  <AppText style={styles.perMonthText}>
+                    {language === "en" ? "/mo" : "/mês"}
+                  </AppText>
                 </View>
               </View>
             </Pressable>
@@ -237,12 +356,20 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             >
               <View style={styles.planHeader}>
                 <View style={styles.planInfoContainer}>
-                  <AppText style={styles.planName}>Plano Mensal</AppText>
-                  <AppText style={styles.planTrial}>Cobrado mensalmente · Cancela quando quiseres</AppText>
+                  <AppText style={styles.planName}>
+                    {language === "en" ? "Monthly Plan" : "Plano Mensal"}
+                  </AppText>
+                  <AppText style={styles.planTrial}>
+                    {language === "en" ? "Billed monthly · Cancel anytime" : "Cobrado mensalmente · Cancela quando quiseres"}
+                  </AppText>
                 </View>
                 <View style={styles.priceContainer}>
-                  <AppText style={styles.monthlyEquivalent}>4,99 €</AppText>
-                  <AppText style={styles.perMonthText}>/mês</AppText>
+                  <AppText style={styles.monthlyEquivalent}>
+                    {offerings.monthly?.priceFormatted || (language === "en" ? "4.99 €" : "4,99 €")}
+                  </AppText>
+                  <AppText style={styles.perMonthText}>
+                    {language === "en" ? "/mo" : "/mês"}
+                  </AppText>
                 </View>
               </View>
             </Pressable>
@@ -257,12 +384,20 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             >
               <View style={styles.planHeader}>
                 <View style={styles.planInfoContainer}>
-                  <AppText style={styles.planName}>Acesso Vitalício</AppText>
-                  <AppText style={styles.planTrial}>Pagamento único · Acesso permanente</AppText>
+                  <AppText style={styles.planName}>
+                    {language === "en" ? "Lifetime Access" : "Acesso Vitalício"}
+                  </AppText>
+                  <AppText style={styles.planTrial}>
+                    {language === "en" ? "One-time payment · Permanent access" : "Pagamento único · Acesso permanente"}
+                  </AppText>
                 </View>
                 <View style={styles.priceContainer}>
-                  <AppText style={styles.monthlyEquivalent}>69,99 €</AppText>
-                  <AppText style={styles.perMonthText}>único</AppText>
+                  <AppText style={styles.monthlyEquivalent}>
+                    {offerings.lifetime?.priceFormatted || (language === "en" ? "69.99 €" : "69,99 €")}
+                  </AppText>
+                  <AppText style={styles.perMonthText}>
+                    {language === "en" ? "once" : "único"}
+                  </AppText>
                 </View>
               </View>
             </Pressable>
@@ -315,13 +450,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   sheetContainer: {
-    backgroundColor: "#121214",
+    backgroundColor: "#1C1915",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     maxHeight: "92%",
     paddingBottom: 30,
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: "#3A3428",
   },
   header: {
     alignItems: "center",
@@ -329,15 +464,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#1f1f23",
+    borderBottomColor: "#2B2620",
   },
   crownBadge: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "rgba(16, 185, 129, 0.15)",
+    backgroundColor: "rgba(232, 168, 62, 0.15)",
     borderWidth: 1,
-    borderColor: "#10B981",
+    borderColor: "#E8A83E",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
@@ -346,13 +481,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   title: {
-    color: "#f4f4f5",
+    color: "#F1E9D6",
     fontSize: 22,
     fontWeight: "800",
     letterSpacing: 1.2,
   },
   subtitle: {
-    color: "#a1a1aa",
+    color: "#A79D88",
     fontSize: 13,
     textAlign: "center",
     marginTop: 6,
@@ -365,12 +500,12 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#27272a",
+    backgroundColor: "#3A3428",
     alignItems: "center",
     justifyContent: "center",
   },
   closeText: {
-    color: "#a1a1aa",
+    color: "#A79D88",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -380,11 +515,11 @@ const styles = StyleSheet.create({
   featuresContainer: {
     marginTop: 16,
     marginBottom: 20,
-    backgroundColor: "#18181b",
+    backgroundColor: "#26221C",
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: "#3A3428",
   },
   featureRow: {
     flexDirection: "row",
@@ -399,40 +534,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featureTitle: {
-    color: "#f4f4f5",
+    color: "#F1E9D6",
     fontSize: 14,
     fontWeight: "600",
   },
   featureDesc: {
-    color: "#71717a",
+    color: "#8D8471",
     fontSize: 12,
     marginTop: 1,
   },
   sectionLabel: {
-    color: "#71717a",
+    color: "#8D8471",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
     marginBottom: 10,
   },
   planCard: {
-    backgroundColor: "#18181b",
+    backgroundColor: "#26221C",
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1.5,
-    borderColor: "#27272a",
+    borderColor: "#3A3428",
     position: "relative",
   },
   planCardSelected: {
-    borderColor: "#10B981",
-    backgroundColor: "rgba(16, 185, 129, 0.08)",
+    borderColor: "#E8A83E",
+    backgroundColor: "rgba(232, 168, 62, 0.08)",
   },
   popularBadge: {
     position: "absolute",
     top: -10,
     right: 16,
-    backgroundColor: "#10B981",
+    backgroundColor: "#E8A83E",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 8,
@@ -453,12 +588,12 @@ const styles = StyleSheet.create({
     paddingRight: 14,
   },
   planName: {
-    color: "#f4f4f5",
+    color: "#F1E9D6",
     fontSize: 15,
     fontWeight: "700",
   },
   planTrial: {
-    color: "#a1a1aa",
+    color: "#A79D88",
     fontSize: 12,
     marginTop: 3,
     lineHeight: 16,
@@ -470,26 +605,26 @@ const styles = StyleSheet.create({
     minWidth: 65,
   },
   monthlyEquivalent: {
-    color: "#f4f4f5",
+    color: "#F1E9D6",
     fontSize: 18,
     fontWeight: "800",
     textAlign: "right",
   },
   perMonthText: {
-    color: "#71717a",
+    color: "#8D8471",
     fontSize: 11,
     textAlign: "right",
     marginTop: 1,
   },
 
   ctaButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#E8A83E",
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 8,
     marginBottom: 14,
-    shadowColor: "#10B981",
+    shadowColor: "#E8A83E",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -503,7 +638,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   disclaimerText: {
-    color: "#71717a",
+    color: "#8D8471",
     fontSize: 10,
     textAlign: "center",
     lineHeight: 14,
@@ -516,12 +651,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   legalLink: {
-    color: "#a1a1aa",
+    color: "#A79D88",
     fontSize: 12,
     textDecorationLine: "underline",
   },
   legalDot: {
-    color: "#52525b",
+    color: "#6B6353",
     marginHorizontal: 8,
   },
 });
