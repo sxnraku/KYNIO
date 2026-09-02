@@ -10,15 +10,34 @@ jest.mock('@react-native-google-signin/google-signin', () => ({
     configure: jest.fn(),
     hasPlayServices: jest.fn().mockResolvedValue(true),
     signIn: jest.fn().mockResolvedValue({
+      type: 'success',
       data: { idToken: 'mock-google-id-token' },
     }),
     signOut: jest.fn().mockResolvedValue(undefined),
   },
+  isErrorWithCode: (error: unknown) =>
+    typeof error === 'object' && error !== null && 'code' in error,
+  isSuccessResponse: (response: unknown) =>
+    typeof response === 'object' &&
+    response !== null &&
+    'type' in response &&
+    response.type === 'success',
   statusCodes: {
     SIGN_IN_CANCELLED: 'SIGN_IN_CANCELLED',
     IN_PROGRESS: 'IN_PROGRESS',
     PLAY_SERVICES_NOT_AVAILABLE: 'PLAY_SERVICES_NOT_AVAILABLE',
   },
+}));
+jest.mock('react-native-iap', () => ({
+  endConnection: jest.fn().mockResolvedValue(true),
+  finishTransaction: jest.fn().mockResolvedValue(true),
+  flushFailedPurchasesCachedAsPendingAndroid: jest.fn().mockResolvedValue(true),
+  getAvailablePurchases: jest.fn().mockResolvedValue([]),
+  getProducts: jest.fn().mockResolvedValue([]),
+  getSubscriptions: jest.fn().mockResolvedValue([]),
+  initConnection: jest.fn().mockResolvedValue(true),
+  requestPurchase: jest.fn(),
+  requestSubscription: jest.fn(),
 }));
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
@@ -67,8 +86,6 @@ jest.mock('react-native-safe-area-context', () => {
     useSafeAreaInsets: () => ({ bottom: 0, left: 0, right: 0, top: 0 }),
   };
 });
-
-
 
 
 

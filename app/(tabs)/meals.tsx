@@ -91,7 +91,7 @@ export default function MealsScreen() {
         </View>
         <Pressable onPress={openPaywall} className="flex-row items-center gap-1">
           <Text className="font-label text-xs font-bold text-success">
-            {isPro ? "Aura Pro Ativo ✦" : "Desbloquear Pro →"}
+            {isPro ? "Sol Pro Ativo ✦" : "Desbloquear Pro →"}
           </Text>
         </Pressable>
       </View>

@@ -63,7 +63,7 @@ export function AppHeader() {
           >
             {!isPro ? (
               <Pressable
-                accessibilityLabel={translateText("Desbloquear Aura Pro", language)}
+                accessibilityLabel={translateText("Desbloquear Sol Pro", language)}
                 accessibilityRole="button"
                 className="flex-row items-center gap-1 rounded-lg border border-success/40 bg-success/10 px-2 py-1.5 active:opacity-70"
                 hitSlop={6}

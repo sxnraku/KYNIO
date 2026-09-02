@@ -285,7 +285,7 @@ export default function SettingsScreen() {
               <View>
                 <View className="flex-row items-center gap-1.5">
                   <Text className="font-headline text-base text-foreground">
-                    KYNIO AURA PRO
+                    KYNIO SOL PRO
                   </Text>
                   {isPro ? <ProBadge size="small" /> : null}
                 </View>

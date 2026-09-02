@@ -104,7 +104,7 @@ export function getXpRewardTiers(
       isUnlocked: true,
       levelRequired: 1,
       perkBadge: 'BASE',
-      title: 'Aura Essencial',
+      title: 'Sol Essencial',
       xpRequired: 0,
     },
     {
@@ -114,7 +114,7 @@ export function getXpRewardTiers(
       isUnlocked: currentLevel >= 2,
       levelRequired: 2,
       perkBadge: 'VISUAL',
-      title: 'Tema Aura Glow',
+      title: 'Tema Brilho Solar',
       xpRequired: 100,
     },
     {
@@ -139,12 +139,12 @@ export function getXpRewardTiers(
     },
     {
       description:
-        'Passe Premium Kynio Aura: todas as ferramentas de longevidade e exportação avançada.',
+        'Passe Premium Kynio Sol: todas as ferramentas de longevidade e exportação avançada.',
       id: 'tier-5-pro-pass',
       isUnlocked: currentLevel >= 5,
       levelRequired: 5,
       perkBadge: 'PREMIUM PASS',
-      title: 'Kynio Aura Pass Pro',
+      title: 'Kynio Sol Pass Pro',
       xpRequired: 1600,
     },
     {
