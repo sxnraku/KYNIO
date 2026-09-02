@@ -266,10 +266,16 @@ export function FastingTimer({
       </View>
 
       {isActive ? (
-        <Text className="mt-2 text-center font-body text-xs text-muted">
+        <Text
+          className="mt-2 text-center font-body text-xs text-muted"
+          translate={false}
+        >
           {isOpenGoal
-            ? `Fase: ${currentPhase.title} · Sem limite pré-fixado`
-            : `${Math.round(progress * 100)}% · ${currentPhase.title}`}
+            ? translateText(
+                `Fase: ${currentPhase.title} · Sem limite pré-fixado`,
+                language,
+              )
+            : `${Math.round(progress * 100)}% · ${translateText(currentPhase.title, language)}`}
         </Text>
       ) : null}
     </View>

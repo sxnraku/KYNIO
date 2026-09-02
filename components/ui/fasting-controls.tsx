@@ -130,8 +130,9 @@ export function FastingControls({
             <Text
               className="font-label text-[10px] uppercase text-success"
               style={{ letterSpacing: 1.2 }}
+              translate={false}
             >
-              Objetivo · {currentGoal.label}
+              {translateText(`Objetivo · ${currentGoal.label}`, language)}
             </Text>
           </Pressable>
 
