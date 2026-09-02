@@ -5,14 +5,17 @@ import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FastingStartModal } from "@/components/ui/fasting-start-modal";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { COLORS } from "@/constants/colors";
 import { triggerMediumImpact, triggerSuccessFeedback } from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 import {
 
   FASTING_GOALS,
   type FastingGoalId,
+  PRO_FASTING_GOAL_IDS,
   useFastingStore,
 } from "@/store/useFastingStore";
 
@@ -40,11 +43,18 @@ export function FastingControls({
   const currentGoal =
     FASTING_GOALS.find((g) => g.id === currentGoalId) || FASTING_GOALS[0];
   const [isGoalPickerOpen, setIsGoalPickerOpen] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const isPro = useSubscriptionStore((state) => state.isPro);
   const [startModalMode, setStartModalMode] = useState<
     "edit" | "start" | null
   >(null);
 
   const selectGoal = (goalId: FastingGoalId) => {
+    if (!isPro && PRO_FASTING_GOAL_IDS.has(goalId)) {
+      setIsGoalPickerOpen(false);
+      setIsPaywallOpen(true);
+      return;
+    }
     setGoal(goalId);
     setIsGoalPickerOpen(false);
   };
@@ -183,6 +193,11 @@ export function FastingControls({
         />
       ) : null}
 
+      <PaywallModal
+        onClose={() => setIsPaywallOpen(false)}
+        visible={isPaywallOpen}
+      />
+
       <Modal
         animationType="fade"
         onRequestClose={() => setIsGoalPickerOpen(false)}
@@ -226,9 +241,15 @@ export function FastingControls({
               >
                 {FASTING_GOALS.map((goal) => {
                   const isSelected = goal.id === currentGoalId;
+                  const isLocked = !isPro && PRO_FASTING_GOAL_IDS.has(goal.id);
 
                   return (
                     <Pressable
+                      accessibilityLabel={
+                        isLocked
+                          ? `${goal.label} · ${translateText("Protocolo Sol Pro", language)}`
+                          : undefined
+                      }
                       accessibilityRole="radio"
                       accessibilityState={{ checked: isSelected }}
                       className="min-h-16 flex-row items-center justify-between rounded-2xl border bg-surface-raised px-4 py-3"
@@ -252,6 +273,18 @@ export function FastingControls({
                               </Text>
                             </View>
                           ) : null}
+                          {isLocked ? (
+                            <View className="ml-2 flex-row items-center rounded-full bg-xp/15 px-2 py-0.5">
+                              <Ionicons
+                                color={COLORS.xp}
+                                name="lock-closed"
+                                size={9}
+                              />
+                              <Text className="ml-1 font-label text-[10px] text-xp">
+                                PRO
+                              </Text>
+                            </View>
+                          ) : null}
                         </View>
                         <Text className="mt-0.5 font-body text-xs text-muted">
                           {goal.id === "open"
@@ -262,7 +295,11 @@ export function FastingControls({
                       <Ionicons
                         color={isSelected ? COLORS.success : COLORS.muted}
                         name={
-                          isSelected ? "radio-button-on" : "radio-button-off"
+                          isLocked
+                            ? "lock-closed-outline"
+                            : isSelected
+                              ? "radio-button-on"
+                              : "radio-button-off"
                         }
                         size={22}
                       />

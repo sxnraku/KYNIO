@@ -1,12 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { ActivityIndicator, Image, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { Card } from "@/components/ui/card";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { COLORS } from "@/constants/colors";
 import { useCloudAccount } from "@/hooks/use-cloud-account";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 
 interface CloudAccountCardProps {
   onLocalDataChanged: () => void | Promise<void>;
@@ -17,6 +20,8 @@ export function CloudAccountCard({
 }: CloudAccountCardProps) {
   const account = useCloudAccount(onLocalDataChanged);
   const language = useAppPreferencesStore((state) => state.language);
+  const isPro = useSubscriptionStore((state) => state.isPro);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
   return (
     <Card>
@@ -130,22 +135,36 @@ export function CloudAccountCard({
             </View>
           </View>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: account.isLoading }}
-            className="mt-4 min-h-14 flex-row items-center justify-center gap-3 rounded-xl border border-border bg-surface px-4 active:opacity-70 disabled:opacity-60"
-            disabled={account.isLoading}
-            onPress={() => void account.signIn()}
-          >
-            {account.isLoading ? (
-              <ActivityIndicator color={COLORS.foreground} size="small" />
-            ) : (
-              <Ionicons color="#4285F4" name="logo-google" size={20} />
-            )}
-            <Text className="font-headline text-sm text-foreground">
-              Continuar com Google
-            </Text>
-          </Pressable>
+          {isPro ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: account.isLoading }}
+              className="mt-4 min-h-14 flex-row items-center justify-center gap-3 rounded-xl border border-border bg-surface px-4 active:opacity-70 disabled:opacity-60"
+              disabled={account.isLoading}
+              onPress={() => void account.signIn()}
+            >
+              {account.isLoading ? (
+                <ActivityIndicator color={COLORS.foreground} size="small" />
+              ) : (
+                <Ionicons color="#4285F4" name="logo-google" size={20} />
+              )}
+              <Text className="font-headline text-sm text-foreground">
+                Continuar com Google
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              className="mt-4 min-h-14 flex-row items-center justify-center gap-3 rounded-xl border border-xp/40 bg-xp/10 px-4 active:opacity-70"
+              onPress={() => setIsPaywallOpen(true)}
+              testID="cloud-sync-pro-button"
+            >
+              <Ionicons color={COLORS.xp} name="lock-closed" size={18} />
+              <Text className="font-headline text-sm text-foreground">
+                Sincronização em nuvem · Sol Pro
+              </Text>
+            </Pressable>
+          )}
         </View>
       )}
 
@@ -159,6 +178,11 @@ export function CloudAccountCard({
           {account.message}
         </Text>
       ) : null}
+
+      <PaywallModal
+        onClose={() => setIsPaywallOpen(false)}
+        visible={isPaywallOpen}
+      />
     </Card>
   );
 }
