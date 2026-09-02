@@ -3,7 +3,9 @@ import { View } from "react-native";
 import { FastingControls } from "@/components/ui/fasting-controls";
 import { FastingScheduleModal } from "@/components/ui/fasting-schedule-modal";
 import { FastingTimer } from "@/components/ui/fasting-timer";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { useFastingScheduleStore } from "@/store/use-fasting-schedule-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 import type { FastingGoal } from "@/store/useFastingStore";
 import { useState } from "react";
 
@@ -27,6 +29,8 @@ export function FastingSummaryCard({
   targetDurationMs,
 }: FastingSummaryCardProps) {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const isPro = useSubscriptionStore((state) => state.isPro);
   const scheduleStore = useFastingScheduleStore();
 
   const scheduleLabel =
@@ -52,13 +56,20 @@ export function FastingSummaryCard({
         currentGoalId={goal.id}
         isActive={isActive}
         isSaving={isSaving}
-        onOpenSchedule={() => setIsScheduleModalOpen(true)}
+        onOpenSchedule={() =>
+          isPro ? setIsScheduleModalOpen(true) : setIsPaywallOpen(true)
+        }
         scheduleLabel={scheduleLabel}
       />
 
       <FastingScheduleModal
         onClose={() => setIsScheduleModalOpen(false)}
         visible={isScheduleModalOpen}
+      />
+
+      <PaywallModal
+        onClose={() => setIsPaywallOpen(false)}
+        visible={isPaywallOpen}
       />
     </View>
   );

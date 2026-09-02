@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { Card } from "@/components/ui/card";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { WeightChart } from "@/components/ui/weight-chart";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
@@ -31,6 +32,7 @@ import {
 } from "@/services/weightChartService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 
 export function WeightTrackingCard() {
   const language = useAppPreferencesStore((state) => state.language);
@@ -39,6 +41,8 @@ export function WeightTrackingCard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false);
+  const [isPaywallVisible, setIsPaywallVisible] = useState(false);
+  const isPro = useSubscriptionStore((state) => state.isPro);
   const [isSaving, setIsSaving] = useState(false);
   const [unit, setUnit] = useState<WeightUnit>("kg");
   const [weight, setWeight] = useState("");
@@ -157,13 +161,29 @@ export function WeightTrackingCard() {
 
           <View className="flex-row items-center gap-2">
             <Pressable
-              accessibilityLabel={translateText("Ver todos os registos", language)}
-              className="flex-row items-center py-1 pl-2 active:opacity-70"
-              onPress={() => setIsHistoryModalVisible(true)}
+              accessibilityLabel={translateText(
+                isPro
+                  ? "Ver todos os registos"
+                  : "Histórico completo de peso · Sol Pro",
+                language,
+              )}className="flex-row items-center py-1 pl-2 active:opacity-70"
+              onPress={() =>
+                isPro
+                  ? setIsHistoryModalVisible(true)
+                  : setIsPaywallVisible(true)
+              }
             >
               <Text className="font-label text-xs text-muted">
                 {language === "en" ? "All" : "Todos"}
               </Text>
+              {!isPro ? (
+                <Ionicons
+                  color={COLORS.xp}
+                  name="lock-closed"
+                  size={11}
+                  style={{ marginLeft: 3 }}
+                />
+              ) : null}
               <Ionicons color={COLORS.muted} name="chevron-forward" size={14} />
             </Pressable>
 
@@ -192,21 +212,41 @@ export function WeightTrackingCard() {
             ] as const
           ).map((filter) => {
             const isSelected = timeRange === filter.id;
+            const isLocked =
+              !isPro && (filter.id === "year" || filter.id === "all");
             return (
               <Pressable
-                className={`flex-1 items-center rounded-lg py-1.5 ${
+                accessibilityLabel={
+                  isLocked
+                    ? `${filter.label} · ${translateText("Tendências Sol Pro", language)}`
+                    : undefined
+                }
+                className={`flex-1 flex-row items-center justify-center rounded-lg py-1.5 ${
                   isSelected ? "bg-surface border border-border" : ""
                 }`}
                 key={filter.id}
-                onPress={() => setTimeRange(filter.id)}
+                onPress={() =>
+                  isLocked
+                    ? setIsPaywallVisible(true)
+                    : setTimeRange(filter.id)
+                }
               >
                 <Text
                   className={`font-label text-xs ${
                     isSelected ? "text-foreground font-semibold" : "text-muted"
                   }`}
+                  translate={false}
                 >
                   {filter.label}
                 </Text>
+                {isLocked ? (
+                  <Ionicons
+                    color={COLORS.xp}
+                    name="lock-closed"
+                    size={10}
+                    style={{ marginLeft: 3 }}
+                  />
+                ) : null}
               </Pressable>
             );
           })}
@@ -349,6 +389,11 @@ export function WeightTrackingCard() {
           </View>
         </View>
       </Modal>
+
+      <PaywallModal
+        onClose={() => setIsPaywallVisible(false)}
+        visible={isPaywallVisible}
+      />
     </>
   );
 }

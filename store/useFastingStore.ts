@@ -97,6 +97,14 @@ interface FastingState {
 }
 
 const DEFAULT_GOAL = FASTING_GOALS[0];
+
+/** Protocolos prolongados reservados ao plano Sol Pro. */
+export const PRO_FASTING_GOAL_IDS: ReadonlySet<FastingGoalId> = new Set([
+  "24:0",
+  "36:0",
+  "48:0",
+  "open",
+]);
 const HOURS_TO_MILLISECONDS = 60 * 60 * 1000;
 
 export const FASTING_STORAGE_KEY = 'kynio-fasting-state-v1';

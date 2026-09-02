@@ -11,6 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { MetabolicPhaseDetailModal } from "@/components/ui/metabolic-phase-detail-modal";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/services/fasting";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -43,7 +45,9 @@ export function MetabolicPhases({
   isActive,
 }: MetabolicPhasesProps) {
   const language = useAppPreferencesStore((state) => state.language);
+  const isPro = useSubscriptionStore((state) => state.isPro);
   const currentPhaseIndex = getEstimatedPhaseIndex(elapsedHours);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [selectedPhase, setSelectedPhase] =
     useState<EstimatedMetabolicPhase | null>(null);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number>(0);
@@ -74,6 +78,10 @@ export function MetabolicPhases({
     phase: EstimatedMetabolicPhase,
     index: number,
   ) => {
+    if (!isPro) {
+      setIsPaywallOpen(true);
+      return;
+    }
     setSelectedPhase(phase);
     setSelectedPhaseIndex(index);
   };
@@ -88,7 +96,9 @@ export function MetabolicPhases({
           A tua jornada
         </Text>
         <Text className="mt-1 font-body text-sm text-muted">
-          Fases metabólicas · Toca para ver o que acontece no corpo
+          {isPro
+            ? "Fases metabólicas · Toca para ver o que acontece no corpo"
+            : "Fases metabólicas · Detalhe biológico no Sol Pro"}
         </Text>
       </View>
 
@@ -156,9 +166,21 @@ export function MetabolicPhases({
               </Text>
 
               <View className="mt-3 flex-row items-center">
-                <Text className="font-body text-[11px] text-success">
-                  Ver biologia & dicas →
-                </Text>
+                {isPro ? (
+                  <Text className="font-body text-[11px] text-success">
+                    Ver biologia & dicas →
+                  </Text>
+                ) : (
+                  <>
+                    <Ionicons color={COLORS.xp} name="lock-closed" size={11} />
+                    <Text
+                      className="ml-1 font-body text-[11px] text-xp"
+                      translate={false}
+                    >
+                      {translateText("Ver biologia & dicas", language)} · PRO
+                    </Text>
+                  </>
+                )}
               </View>
             </Pressable>
           );
@@ -171,6 +193,11 @@ export function MetabolicPhases({
         onClose={() => setSelectedPhase(null)}
         phase={selectedPhase}
         phaseIndex={selectedPhaseIndex}
+      />
+
+      <PaywallModal
+        onClose={() => setIsPaywallOpen(false)}
+        visible={isPaywallOpen}
       />
     </View>
   );

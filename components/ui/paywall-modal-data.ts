@@ -26,9 +26,9 @@ export const PAYWALL_PRO_FEATURES: readonly PaywallFeature[] = [
     desc: 'Histórico completo de consistência, peso e estimativas nutricionais.',
   },
   {
-    icon: '✨',
-    title: 'Temas Exclusivos Sol',
-    desc: 'Personaliza a interface com visuais âmbar e acentos solares.',
+    icon: '🗓️',
+    title: 'Planeador de Jejum',
+    desc: 'Rotinas diárias, ADF e personalizadas planeadas automaticamente.',
   },
   {
     icon: '☁️',

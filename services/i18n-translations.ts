@@ -56,6 +56,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Open the live camera, choose a gallery image or describe what you ate.",
   "Abrir definições": "Open settings",
   "Abrir definições de privacidade": "Open privacy settings",
+  "Abrir estudo no PubMed": "Open study on PubMed",
   "Absorção dos macro e micronutrientes da última refeição":
     "Absorption of macro and micronutrients from the last meal",
   "Acesso a 36h Monge, 48h Reset, OMAD e Jejum Livre prolongado.":
@@ -183,8 +184,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Cetose Ativa": "Active Ketosis",
   "Cetose Estimada": "Estimated ketosis",
   Claro: "Light",
-  "Clareza mental aguçada e ausência de picos de fome":
-    "Sharp mental clarity and absence of hunger spikes",
+  "Muitas pessoas reportam clareza mental e menos picos de fome":
+    "Many people report mental clarity and fewer hunger spikes",
   "Cobrado mensalmente · Cancela quando quiseres":
     "Billed monthly · Cancel anytime",
   "Como queres aparecer?": "How would you like to appear?",
@@ -236,8 +237,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Dias com jejum": "Days with fasting",
   "Dias seguidos": "Days in a row",
   "Digestão & Absorção": "Digestion & Absorption",
-  "Diminuição acentuada de IGF-1 e ativação da apoptose de células danificadas com regeneração imunitária.":
-    "Marked drop in IGF-1 and activation of damaged cell clearance with immune rejuvenation.",
+  "Redução sustentada de IGF-1 e resistência à insulina, com aumento do rácio linfoide/mieloide (indicador de rejuvenescimento imunitário).":
+    "Sustained reduction of IGF-1 and insulin resistance, with an increased lymphoid-to-myeloid ratio (an immune rejuvenation indicator).",
   Disciplinado: "Disciplined",
   "Documentos e suporte": "Documents and support",
   "Duração em minutos": "Duration in minutes",
@@ -256,10 +257,10 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Eliminar todos os dados?": "Delete all data?",
   "Em Movimento": "On the Move",
   "EM BREVE": "COMING SOON",
-  "Em jejuns prolongados superiores a 48 horas, o corpo desencadeia a renovação de leucócitos e células do sistema imunitário através de células estaminais, promovendo regeneração sistémica.":
-    "In prolonged fasts over 48 hours, the body triggers white blood cell and immune renewal via stem cells, promoting systemic rejuvenation.",
-  "Elevação sustentada de cetonas no sangue e redução da dependência de glicose exógena.":
-    "Sustained rise of blood ketones and reduced dependence on exogenous glucose.",
+  "Jejuns prolongados ou dietas que os mimetizam foram testados em ensaios clínicos com humanos: ciclos de 5 dias reduziram IGF-1, pressão arterial e marcadores inflamatórios, e dois estudos independentes observaram uma redução de ~2,5 anos na idade biológica medida. São resultados promissores, mas a investigação continua.":
+    "Prolonged fasts or fasting-mimicking diets have been tested in human clinical trials: 5-day cycles lowered IGF-1, blood pressure and inflammatory markers, and two independent studies observed a ~2.5-year reduction in measured biological age. Promising results, but research is ongoing.",
+  "Subida das cetonas no sangue e menor dependência de glicose.":
+    "Rising blood ketones and reduced dependence on glucose.",
   "Enquadra a refeição": "Frame the meal",
   Entendido: "Understood",
   Entrar: "Enter",
@@ -307,6 +308,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Fase: "Phase",
   "Fases metabólicas · Toca para ver o que acontece no corpo":
     "Metabolic phases · Tap to see what happens in your body",
+  "Fases metabólicas · Detalhe biológico no Sol Pro":
+    "Metabolic phases · Biological detail in Sol Pro",
   "Fases Metabólicas Detalhadas": "Detailed Metabolic Phases",
   "Fases metabólicas estimadas": "Estimated metabolic phases",
   "Fases metabólicas estimadas com base em literatura geral. Varia de pessoa para pessoa.":
@@ -315,6 +318,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Metabolic phases estimated from fasting science literature. They vary from person to person. Tap the phases to see all biological details.",
   "Fechar": "Close",
   "Fechar câmara": "Close camera",
+  "Fontes científicas": "Scientific sources",
   "Fechar detalhes da fase": "Close phase details",
   "Fechar seleção da hora de início": "Close start time selection",
   "Fechar seleção de objetivo": "Close goal selection",
@@ -369,13 +373,13 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Enter the real time to recover the elapsed time.",
   Iniciado: "Initiated",
   "Iniciar Jejum": "Start Fast",
-  "Inicia-se a autofagia, um processo biológico nobre em que as células reciclam organelos danificados, vírus latentes e proteínas acumuladas, rejuvenescendo os tecidos.":
-    "Autophagy begins—a cellular process where damaged organelles, latent viruses, and aggregated proteins are recycled, rejuvenating tissues.",
+  "A autofagia está sempre ativa a nível basal, mas o jejum tende a intensificá-la: as células passam a reciclar mais organelos e proteínas danificadas. Em humanos, o ponto exato de intensificação ainda não foi medido diretamente — a estimativa de 24h+ é baseada sobretudo em estudos animais.":
+    "Autophagy is always active at a basal level, but fasting tends to intensify it: cells recycle more damaged organelles and proteins. In humans, the exact intensification point has not been measured directly — the 24h+ estimate is mostly based on animal studies.",
   "Início de Queima de Glicose": "Early glucose use",
   "Início ativo da queima de gordura corporal (lipólise)":
     "Active onset of body fat burning (lipolysis)",
-  "Inibição de mTOR e ativação de AMPK, desencadeando a reciclagem autofágica celular profunda.":
-    "Inhibition of mTOR and activation of AMPK, triggering deep cellular autophagic recycling.",
+  "O jejum reduz a sinalização de mTOR e ativa a AMPK, duas vias associadas ao aumento da atividade autofágica.":
+    "Fasting reduces mTOR signaling and activates AMPK, two pathways associated with increased autophagic activity.",
   "Insígnia de Prestígio Mestre e estatuto honorário permanente de pioneiro Kynio.":
     "Master Prestige badge and permanent honorary Kynio pioneer status.",
   Insígnias: "Badges",
@@ -402,12 +406,16 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Jornada iniciada": "Journey started",
   "Kynio Sol Pass Pro": "Kynio Sol Pass Pro",
   Leve: "Light",
+  "Leitura de contexto científico — não é uma promessa de resultados individuais.":
+    "Scientific background reading — not a promise of individual results.",
   "Leva o teu jejum e nutrição ao próximo nível com IA ilimitada.":
     "Take your fasting and nutrition to the next level with unlimited AI.",
   "Lembrar mais tarde": "Remind me later",
   "Ligar Google agora · opcional": "Connect Google now · optional",
   "Limpeza de mitocôndrias disfuncionais (mitofagia)":
     "Clearance of dysfunctional mitochondria (mitophagy)",
+  "Inclui a mitofagia: reciclagem de mitocôndrias disfuncionais":
+    "Includes mitophagy: recycling of dysfunctional mitochondria",
   "Linha de 7 Dias": "7-Day Line",
   "Linha de Consistência": "Consistency Line",
   "Lista vazia": "Empty list",
@@ -482,14 +490,15 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Novo registo": "New entry",
   "O acesso é usado apenas para enquadrar e fotografar esta refeição. A captura só acontece quando tocares no botão.":
     "Access is only used to frame and photograph this meal. A photo is only taken when you tap the button.",
-  "O fígado começa a produzir corpos cetónicos a partir da gordura. O cérebro utiliza as cetonas como combustível limpo e supereficiente, promovendo foco e bem-estar.":
-    "The liver starts producing ketone bodies from fat. The brain uses ketones as a clean, super-efficient fuel, boosting focus and wellbeing.",
+  "Com as reservas de glicogénio esgotadas, o fígado converte gordura em corpos cetónicos. O cérebro passa a usar cetonas como fonte alternativa de energia — o momento exato varia de pessoa para pessoa.":
+    "With glycogen stores depleted, the liver converts fat into ketone bodies. The brain starts using ketones as an alternative energy source — the exact timing varies from person to person.",
   "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos, peso e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
     "History starts on your device. If you connect a Google account, profile, friends, weight and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
   "O organismo está focado na digestão da última refeição. A glicose e os níveis de insulina sobem, permitindo às células utilizar o açúcar no sangue como fonte primária de energia.":
     "The body is focused on digesting the last meal. Glucose and insulin levels rise, allowing cells to use blood sugar as their primary energy source.",
   "O que comeste?": "What did you eat?",
   "O que está a acontecer no organismo": "What is happening in your body",
+  "O que a investigação observou": "What research has observed",
   "O que fizeste hoje?": "What did you do today?",
   "O registo de peso serve apenas para acompanhamento pessoal. Não avalia a tua saúde, não define um peso ideal e não substitui orientação profissional.":
     "Weight logging is only for personal tracking. It does not assess your health, define an ideal weight or replace professional guidance.",
@@ -504,8 +513,10 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Choose the target you want to start with. You can change it anytime.",
   "Opcional, descritivo e sem metas obrigatórias.":
     "Optional, descriptive and without mandatory targets.",
-  "Otimização profunda da sensibilidade à insulina":
-    "Deep optimisation of insulin sensitivity",
+  "Melhoria da sensibilidade à insulina em participantes de risco":
+    "Improved insulin sensitivity in at-risk participants",
+  "Melhoria de marcadores de idade biológica em dois estudos independentes":
+    "Improved biological-age markers in two independent studies",
   "Outra duração": "Other duration",
   Outro: "Other",
   "Ouve sempre os sinais do teu corpo. Jejuns prolongados (superiores a 24h) não são indicados para menores, grávidas ou sem acompanhamento médico. Todos os teus registos são 100% locais e confidenciais.":
@@ -527,8 +538,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Plano Mensal": "Monthly Plan",
   "Política de Privacidade": "Privacy Policy",
   "POUPA 42% · MAIS POPULAR": "SAVE 42% · MOST POPULAR",
-  "Potencial proteção neurodegenerativa e longevidade celular":
-    "Potential neuroprotective support and cellular longevity",
+  "Está a ser estudada por possível relação com longevidade celular":
+    "Being studied for a possible link to cellular longevity",
   "Pré-visualização em direto": "Live preview",
   Preferências: "Preferences",
   "PREMIUM PASS": "PREMIUM PASS",
@@ -541,8 +552,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Privacidade: "Privacy",
   "Privacidade e controlo": "Privacy and control",
   "Privacidade e dados": "Privacy and data",
-  "Produção consistente de corpos cetónicos (beta-hidroxibutirato)":
-    "Consistent production of ketone bodies (beta-hydroxybutyrate)",
+  "Produção de corpos cetónicos (beta-hidroxibutirato) pelo fígado":
+    "Production of ketone bodies (beta-hydroxybutyrate) by the liver",
   Progresso: "Progress",
   "Progresso indisponível": "Progress unavailable",
   "Pronto para iniciar jejum livre": "Ready to start open fasting",
@@ -571,12 +582,12 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Renovação": "Renewal",
   "Queima": "Burning",
-  "Reciclagem celular e degradação de proteínas senescentes":
-    "Cellular recycling and degradation of senescent proteins",
-  "Redução de marcadores inflamatórios sistémicos":
-    "Reduction of systemic inflammatory markers",
-  "Redução drástica do stress oxidativo e inflamação":
-    "Drastic reduction in oxidative stress and inflammation",
+  "Processo natural de reciclagem de componentes celulares danificados":
+    "Natural recycling of damaged cellular components",
+  "Estudos associam a cetose a marcadores inflamatórios mais baixos":
+    "Studies link ketosis to lower inflammatory markers",
+  "Possível redução de marcadores de stress oxidativo e inflamação":
+    "Possible reduction of oxidative stress and inflammation markers",
   "Redução progressiva da insulina plasmática":
     "Progressive reduction of plasma insulin",
   Refeições: "Meals",
@@ -618,6 +629,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Sensibilidade melhorada dos recetores de insulina":
     "Enhanced sensitivity of insulin receptors",
   "Sincronização em Nuvem": "Cloud Sync",
+  "Sincronização em nuvem · Sol Pro": "Cloud sync · Sol Pro",
   "Sincronizar agora": "Sync now",
   "Símbolo KYNIO": "KYNIO symbol",
   "Só a fotografia e a descrição desta análise são enviadas à API. A resposta não é armazenada remotamente pela app.":
@@ -636,6 +648,12 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Termos de Utilização": "Terms of Use",
   "Toca no valor para ajustar": "Tap the value to adjust",
   "Todos os Protocolos de Jejum": "All Fasting Protocols",
+  "Planeador de Jejum": "Fasting Planner",
+  "Protocolo Sol Pro": "Sol Pro protocol",
+  "Rotinas diárias, ADF e personalizadas planeadas automaticamente.":
+    "Daily, ADF and custom routines planned automatically.",
+  "Histórico completo de peso · Sol Pro": "Full weight history · Sol Pro",
+  "Tendências Sol Pro": "Sol Pro trends",
   "Totais dos registos confirmados. Sem metas prescritas.":
     "Totals from confirmed logs. No prescribed targets.",
   Treinos: "Workouts",
@@ -652,6 +670,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário.":
     "AI-estimated values for personal habit tracking. Adjust manually as needed.",
   "Ver biologia & dicas →": "View biology & tips →",
+  "Ver biologia & dicas": "View biology & tips",
   "Ver todos os registos": "View all entries",
   "Versão instalada:": "Installed version:",
   "VISUAL": "VISUAL",
