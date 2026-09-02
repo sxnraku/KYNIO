@@ -48,7 +48,7 @@ export function AppHeader() {
               style={{ flexShrink: 1, letterSpacing: 1.8 }}
               translate={false}
             >
-              {`NÍVEL ${progress.level} · ${progress.levelTitle.toUpperCase()}`}
+              {`${translateText("Nível", language).toUpperCase()} ${progress.level} · ${translateText(progress.levelTitle, language).toUpperCase()}`}
             </Text>
             {isPro ? (
               <View className="ml-2">
