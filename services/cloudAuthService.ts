@@ -1,4 +1,9 @@
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
@@ -153,7 +158,12 @@ export async function signInWithGoogle(): Promise<CloudAccount | null> {
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const response = await GoogleSignin.signIn();
-      const idToken = response.data?.idToken ?? (response as any).idToken;
+
+      if (!isSuccessResponse(response)) {
+        return null;
+      }
+
+      const idToken = response.data.idToken;
 
       if (idToken) {
         const { data, error } = await client.auth.signInWithIdToken({
@@ -167,10 +177,11 @@ export async function signInWithGoogle(): Promise<CloudAccount | null> {
           return account;
         }
       }
-    } catch (nativeError: any) {
+    } catch (nativeError: unknown) {
       if (
-        nativeError.code === statusCodes.SIGN_IN_CANCELLED ||
-        nativeError.message?.includes('CANCELLED')
+        (isErrorWithCode(nativeError) &&
+          nativeError.code === statusCodes.SIGN_IN_CANCELLED) ||
+        (nativeError instanceof Error && nativeError.message.includes('CANCELLED'))
       ) {
         return null;
       }

@@ -204,7 +204,7 @@ describe('MealScanCard', () => {
 
     await fireEvent.press(banner);
 
-    expect(await screen.findByText('KYNIO AURA PRO')).toBeTruthy();
+    expect(await screen.findByText('KYNIO SOL PRO')).toBeTruthy();
   });
 
   it('não mostra o aviso de última análise grátis a utilizadores Pro', async () => {

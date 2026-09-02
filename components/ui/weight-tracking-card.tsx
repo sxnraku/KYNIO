@@ -9,9 +9,9 @@ import {
   TextInput,
   View,
 } from "react-native";
-import Svg, { Circle, Line, Path, Text as SvgText } from "react-native-svg";
 
 import { Card } from "@/components/ui/card";
+import { WeightChart } from "@/components/ui/weight-chart";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import type { WeightEntryRecord } from "@/db/schema";
@@ -19,19 +19,18 @@ import {
   deleteWeightEntry,
   getUserProfile,
   getWeightEntries,
-  gramsToWeight,
   saveWeightEntry,
   type WeightUnit,
 } from "@/services/dbService";
 import { deleteRemoteWeightEntry } from "@/services/cloudSyncService";
+import {
+  createWeightChartData,
+  filterWeightEntries,
+  formatWeightValue,
+  type WeightTimeRange,
+} from "@/services/weightChartService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
-
-type TimeRange = "week" | "month" | "year" | "all";
-
-function formatWeightVal(weightGrams: number, unit: WeightUnit): number {
-  return Math.round(gramsToWeight(weightGrams, unit) * 10) / 10;
-}
 
 export function WeightTrackingCard() {
   const language = useAppPreferencesStore((state) => state.language);
@@ -43,7 +42,7 @@ export function WeightTrackingCard() {
   const [isSaving, setIsSaving] = useState(false);
   const [unit, setUnit] = useState<WeightUnit>("kg");
   const [weight, setWeight] = useState("");
-  const [timeRange, setTimeRange] = useState<TimeRange>("month");
+  const [timeRange, setTimeRange] = useState<WeightTimeRange>("month");
   const [targetWeightGrams, setTargetWeightGrams] = useState<number | null>(null);
 
   const reload = useCallback(async () => {
@@ -73,19 +72,10 @@ export function WeightTrackingCard() {
     }, [reload]),
   );
 
-  // Filter entries based on timeRange
-  const filteredEntries = useMemo(() => {
-    if (!entries.length) return [];
-    const now = Date.now();
-    const sorted = [...entries].sort((a, b) => a.timestamp - b.timestamp);
-
-    if (timeRange === "all") return sorted;
-
-    const daysMap = { week: 7, month: 30, year: 365 };
-    const cutoff = now - daysMap[timeRange] * 24 * 60 * 60 * 1000;
-    const filtered = sorted.filter((e) => e.timestamp >= cutoff);
-    return filtered.length ? filtered : sorted;
-  }, [entries, timeRange]);
+  const filteredEntries = useMemo(
+    () => filterWeightEntries(entries, timeRange),
+    [entries, timeRange],
+  );
 
   const save = async () => {
     if (isSaving) return;
@@ -118,7 +108,7 @@ export function WeightTrackingCard() {
   const confirmDelete = (entry: WeightEntryRecord) => {
     Alert.alert(
       "Eliminar este registo?",
-      `${formatWeightVal(entry.weightGrams, unit)} ${unit} · ${new Date(entry.timestamp).toLocaleDateString()}`,
+      `${formatWeightValue(entry.weightGrams, unit)} ${unit} · ${new Date(entry.timestamp).toLocaleDateString()}`,
       [
         { style: "cancel", text: "Cancelar" },
         {
@@ -142,74 +132,16 @@ export function WeightTrackingCard() {
     );
   };
 
-  // SVG Chart Dimensions
-  const chartWidth = 320;
-  const chartHeight = 160;
-  const paddingLeft = 32;
-  const paddingRight = 36;
-  const paddingTop = 20;
-  const paddingBottom = 28;
-
-  const chartData = useMemo(() => {
-    if (filteredEntries.length === 0) return null;
-
-    const weights = filteredEntries.map((e) => formatWeightVal(e.weightGrams, unit));
-    const targetVal = targetWeightGrams ? formatWeightVal(targetWeightGrams, unit) : null;
-    const allVals = targetVal ? [...weights, targetVal] : weights;
-
-    const minWeight = Math.floor(Math.min(...allVals) - 2);
-    const maxWeight = Math.ceil(Math.max(...allVals) + 2);
-    const weightSpan = Math.max(1, maxWeight - minWeight);
-
-    const availableWidth = chartWidth - paddingLeft - paddingRight;
-    const availableHeight = chartHeight - paddingTop - paddingBottom;
-
-    const points = filteredEntries.map((entry, idx) => {
-      const w = formatWeightVal(entry.weightGrams, unit);
-      const x =
-        filteredEntries.length === 1
-          ? paddingLeft + availableWidth / 2
-          : paddingLeft + (idx / (filteredEntries.length - 1)) * availableWidth;
-      const y =
-        paddingTop +
-        availableHeight -
-        ((w - minWeight) / weightSpan) * availableHeight;
-      return {
-        date: new Date(entry.timestamp).toLocaleDateString(
-          language === "en" ? "en-GB" : "pt-PT",
-          { day: "2-digit", month: "short" },
-        ),
-        weight: w,
-        x,
-        y,
-      };
-    });
-
-    const targetY =
-      targetVal !== null
-        ? paddingTop +
-          availableHeight -
-          ((targetVal - minWeight) / weightSpan) * availableHeight
-        : null;
-
-    let pathD = "";
-    if (points.length > 0) {
-      pathD = `M ${points[0].x} ${points[0].y}`;
-      for (let i = 1; i < points.length; i++) {
-        pathD += ` L ${points[i].x} ${points[i].y}`;
-      }
-    }
-
-    return {
-      maxWeight,
-      midWeight: Math.round((minWeight + maxWeight) / 2),
-      minWeight,
-      pathD,
-      points,
-      targetVal,
-      targetY,
-    };
-  }, [filteredEntries, targetWeightGrams, unit, language]);
+  const chartData = useMemo(
+    () =>
+      createWeightChartData({
+        entries: filteredEntries,
+        language,
+        targetWeightGrams,
+        unit,
+      }),
+    [filteredEntries, language, targetWeightGrams, unit],
+  );
 
   return (
     <>
@@ -285,171 +217,12 @@ export function WeightTrackingCard() {
           {language === "en" ? `Units: ${unit}` : `Unidades: ${unit}`}
         </Text>
 
-        {/* Chart View */}
-        {isLoading ? (
-          <ActivityIndicator className="my-10" color={COLORS.xp} />
-        ) : chartData && chartData.points.length > 0 ? (
-          <View className="mt-3 items-center">
-            <Svg height={chartHeight} width={chartWidth}>
-              {/* Y Axis Grid Lines & Labels */}
-              <Line
-                stroke={COLORS.border}
-                strokeDasharray="4 4"
-                x1={paddingLeft}
-                x2={chartWidth - paddingRight}
-                y1={paddingTop}
-                y2={paddingTop}
-              />
-              <SvgText
-                fill="#71717A"
-                fontSize="10"
-                textAnchor="start"
-                x={chartWidth - paddingRight + 4}
-                y={paddingTop + 4}
-              >
-                {chartData.maxWeight}
-              </SvgText>
-
-              <Line
-                stroke={COLORS.border}
-                strokeDasharray="4 4"
-                x1={paddingLeft}
-                x2={chartWidth - paddingRight}
-                y1={paddingTop + (chartHeight - paddingTop - paddingBottom) / 2}
-                y2={paddingTop + (chartHeight - paddingTop - paddingBottom) / 2}
-              />
-              <SvgText
-                fill="#71717A"
-                fontSize="10"
-                textAnchor="start"
-                x={chartWidth - paddingRight + 4}
-                y={paddingTop + (chartHeight - paddingTop - paddingBottom) / 2 + 4}
-              >
-                {chartData.midWeight}
-              </SvgText>
-
-              <Line
-                stroke={COLORS.border}
-                strokeDasharray="4 4"
-                x1={paddingLeft}
-                x2={chartWidth - paddingRight}
-                y1={chartHeight - paddingBottom}
-                y2={chartHeight - paddingBottom}
-              />
-              <SvgText
-                fill="#71717A"
-                fontSize="10"
-                textAnchor="start"
-                x={chartWidth - paddingRight + 4}
-                y={chartHeight - paddingBottom + 4}
-              >
-                {chartData.minWeight}
-              </SvgText>
-
-              {/* Goal Dotted Line */}
-              {chartData.targetY !== null ? (
-                <>
-                  <Line
-                    stroke="#EAB308"
-                    strokeDasharray="3 3"
-                    strokeWidth="1.5"
-                    x1={paddingLeft}
-                    x2={chartWidth - paddingRight}
-                    y1={chartData.targetY}
-                    y2={chartData.targetY}
-                  />
-                  <Circle
-                    cx={paddingLeft + 6}
-                    cy={chartData.targetY}
-                    fill="#EAB308"
-                    r="3"
-                  />
-                  <SvgText
-                    fill="#EAB308"
-                    fontSize="9"
-                    x={paddingLeft + 12}
-                    y={chartData.targetY - 4}
-                  >
-                    {language === "en" ? "Goal" : "Objetivo"}
-                  </SvgText>
-                </>
-              ) : null}
-
-              {/* Weight Data Line */}
-              {chartData.pathD ? (
-                <Path
-                  d={chartData.pathD}
-                  fill="none"
-                  stroke="#FACC15"
-                  strokeWidth="2.5"
-                />
-              ) : null}
-
-              {/* Data Point Dots & X-Labels */}
-              {chartData.points.map((pt, index) => {
-                const showLabel =
-                  chartData.points.length <= 4 ||
-                  index === 0 ||
-                  index === chartData.points.length - 1 ||
-                  index === Math.floor(chartData.points.length / 2);
-
-                return (
-                  <React.Fragment key={index}>
-                    <Circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      fill="#FACC15"
-                      r="4"
-                      stroke={COLORS.foreground}
-                      strokeWidth="2"
-                    />
-                    {showLabel ? (
-                      <SvgText
-                        fill="#71717A"
-                        fontSize="9"
-                        textAnchor="middle"
-                        x={pt.x}
-                        y={chartHeight - 6}
-                      >
-                        {pt.date}
-                      </SvgText>
-                    ) : null}
-                  </React.Fragment>
-                );
-              })}
-            </Svg>
-
-            {/* Chart Legend */}
-            <View className="mt-3 flex-row items-center justify-center gap-4">
-              <View className="flex-row items-center gap-1.5">
-                <View className="h-2.5 w-2.5 rounded-full bg-[#FACC15]" />
-                <Text className="font-label text-[11px] text-muted">
-                  {language === "en" ? "Weight" : "Peso"}
-                </Text>
-              </View>
-              {chartData.targetVal ? (
-                <View className="flex-row items-center gap-1.5">
-                  <View className="h-0.5 w-3 bg-[#EAB308]" />
-                  <Text className="font-label text-[11px] text-[#EAB308]">
-                    {language === "en" ? "Goal" : "Objetivo"} (
-                    {chartData.targetVal} {unit})
-                  </Text>
-                </View>
-              ) : null}
-            </View>
-          </View>
-        ) : (
-          <View className="mt-4 rounded-2xl border border-dashed border-border bg-background p-5 text-center">
-            <Text className="font-headline text-base text-foreground text-center">
-              {language === "en" ? "No weight logs yet" : "Sem registos de peso"}
-            </Text>
-            <Text className="mt-1 font-body text-xs text-muted text-center">
-              {language === "en"
-                ? "Tap + to track your weight over time."
-                : "Toca em + para acompanhar a tua evolução ao longo do tempo."}
-            </Text>
-          </View>
-        )}
+        <WeightChart
+          chartData={chartData}
+          isLoading={isLoading}
+          language={language}
+          unit={unit}
+        />
       </Card>
 
       {/* Add Weight Modal */}
@@ -551,7 +324,7 @@ export function WeightTrackingCard() {
                   >
                     <View>
                       <Text className="font-headline text-base text-foreground">
-                        {formatWeightVal(entry.weightGrams, unit)} {unit}
+                        {formatWeightValue(entry.weightGrams, unit)} {unit}
                       </Text>
                       <Text className="mt-0.5 font-body text-xs text-muted">
                         {new Date(entry.timestamp).toLocaleDateString()} ·{" "}

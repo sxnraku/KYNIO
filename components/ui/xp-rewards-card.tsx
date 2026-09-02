@@ -30,7 +30,7 @@ export function XpRewardsCard({ level, totalXp }: XpRewardsCardProps) {
             </Text>
           </View>
           <Text className="mt-1 font-body text-xs text-muted">
-            Desbloqueia vantagens Aura e passes premium com o teu progresso.
+            Desbloqueia vantagens Sol e passes premium com o teu progresso.
           </Text>
         </View>
         <View className="rounded-full bg-xp/15 px-2.5 py-1 border border-xp/30">

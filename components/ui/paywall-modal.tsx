@@ -10,6 +10,7 @@ import {
   Linking,
 } from "react-native";
 import { AppText } from "@/components/ui/text";
+import { PAYWALL_PRO_FEATURES } from "@/components/ui/paywall-modal-data";
 import { useSubscriptionStore, SubscriptionTier } from "@/store/use-subscription-store";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
@@ -28,39 +29,6 @@ interface PaywallModalProps {
   onClose: () => void;
   featureTrigger?: string;
 }
-
-const PRO_FEATURES = [
-  {
-    icon: "🥗",
-    title: "Análises de IA Ilimitadas",
-    desc: "Fotografa e analisa refeições sem limites diários de tokens.",
-  },
-  {
-    icon: "⏱️",
-    title: "Todos os Protocolos de Jejum",
-    desc: "Acesso a 36h Monge, 48h Reset, OMAD e Jejum Livre prolongado.",
-  },
-  {
-    icon: "🧬",
-    title: "Fases Metabólicas Detalhadas",
-    desc: "Explicações biológicas aprofundadas, cetose e autofagia celular.",
-  },
-  {
-    icon: "📊",
-    title: "Métricas & Tendências Avançadas",
-    desc: "Histórico completo de consistência, peso e estimativas nutricionais.",
-  },
-  {
-    icon: "✨",
-    title: "Temas Exclusivos Aura",
-    desc: "Personaliza a interface com visuais Obsidian Glow e Emerald Neon.",
-  },
-  {
-    icon: "☁️",
-    title: "Sincronização em Nuvem",
-    desc: "Cópia de segurança encriptada e sincronização multi-dispositivo.",
-  },
-];
 
 export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalProps) {
   const language = useAppPreferencesStore((state) => state.language);
@@ -98,7 +66,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           activateSubscription(selectedPlan);
         }
         Alert.alert(
-          language === "en" ? "Welcome to Kynio Aura Pro! 👑" : "Bem-vindo ao Kynio Aura Pro! 👑",
+          language === "en" ? "Welcome to Kynio Sol Pro! 👑" : "Bem-vindo ao Kynio Sol Pro! 👑",
           language === "en"
             ? "Your Pro plan is now active across all features and logs."
             : "O teu plano Pro está ativo em todos os teus registos e funcionalidades.",
@@ -154,7 +122,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
         );
 
         Alert.alert(
-          language === "en" ? "Welcome to Kynio Aura Pro! 👑" : "Bem-vindo ao Kynio Aura Pro! 👑",
+          language === "en" ? "Welcome to Kynio Sol Pro! 👑" : "Bem-vindo ao Kynio Sol Pro! 👑",
           language === "en"
             ? "Your Pro plan is now active across all features and logs."
             : "O teu plano Pro está ativo em todos os teus registos e funcionalidades.",
@@ -273,7 +241,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                 👑
               </AppText>
             </View>
-            <AppText style={styles.title}>KYNIO AURA PRO</AppText>
+            <AppText style={styles.title}>KYNIO SOL PRO</AppText>
             <AppText style={styles.subtitle}>
               {featureTrigger
                 ? `Desbloqueia ${featureTrigger} e todas as ferramentas premium.`
@@ -287,8 +255,8 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Feature List */}
             <View style={styles.featuresContainer}>
-              {PRO_FEATURES.map((item, index) => (
-                <View key={index} style={styles.featureRow}>
+              {PAYWALL_PRO_FEATURES.map((item) => (
+                <View key={item.title} style={styles.featureRow}>
                   <AppText
                     accessibilityElementsHidden
                     importantForAccessibility="no-hide-descendants"
@@ -414,7 +382,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                   ? "Experimentar 7 Dias Grátis"
                   : isProcessing
                   ? "A processar…"
-                  : "Desbloquear Aura Pro"}
+                  : "Desbloquear Sol Pro"}
               </AppText>
             </Pressable>
 

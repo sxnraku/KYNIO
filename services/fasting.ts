@@ -8,11 +8,24 @@ export type EstimatedMetabolicPhaseId =
   | 'autophagy'
   | 'deep_renewal';
 
+export interface PhaseReference {
+  /** Identificador PubMed (PMID). */
+  pmid: string;
+  /** Nota curta sobre o que o estudo observou e as suas limitações. */
+  note: string;
+  /** Título do artigo científico. */
+  title: string;
+  /** Ano de publicação. */
+  year: number;
+}
+
 export interface EstimatedMetabolicPhase {
   benefits: readonly string[];
   description: string;
   id: EstimatedMetabolicPhaseId;
   physiologicalEffect: string;
+  /** Referências bibliográficas de apoio (leitura de contexto, não promessa de resultado). */
+  references?: readonly PhaseReference[];
   startHour: number;
   timeRange: string;
   tip: string;
@@ -83,15 +96,29 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
   },
   {
     benefits: [
-      'Produção consistente de corpos cetónicos (beta-hidroxibutirato)',
-      'Clareza mental aguçada e ausência de picos de fome',
-      'Redução de marcadores inflamatórios sistémicos',
+      'Produção de corpos cetónicos (beta-hidroxibutirato) pelo fígado',
+      'Muitas pessoas reportam clareza mental e menos picos de fome',
+      'Estudos associam a cetose a marcadores inflamatórios mais baixos',
     ],
     description:
-      'O fígado começa a produzir corpos cetónicos a partir da gordura. O cérebro utiliza as cetonas como combustível limpo e supereficiente, promovendo foco e bem-estar.',
+      'Com as reservas de glicogénio esgotadas, o fígado converte gordura em corpos cetónicos. O cérebro passa a usar cetonas como fonte alternativa de energia — o momento exato varia de pessoa para pessoa.',
     id: 'ketosis',
     physiologicalEffect:
-      'Elevação sustentada de cetonas no sangue e redução da dependência de glicose exógena.',
+      'Subida das cetonas no sangue e menor dependência de glicose.',
+    references: [
+      {
+        note: 'Review de referência sobre o "metabolic switch" do jejum intermitente: a transição para cetonas ocorre tipicamente entre 12–36h, dependendo das reservas de glicogénio e atividade física.',
+        pmid: '31881139',
+        title: 'Effects of Intermittent Fasting on Health, Aging, and Disease (de Cabo & Mattson, NEJM)',
+        year: 2019,
+      },
+      {
+        note: 'Estudo-piloto com 5 adultos saudáveis num jejum de 72h: confirma a queda de insulina e glicose e remodelação metabólica; amostra pequena, resultados preliminares.',
+        pmid: '42286908',
+        title: 'Systemic metabolic, hormonal, and glycomic remodeling during a 72-hour fast in healthy adults',
+        year: 2026,
+      },
+    ],
     startHour: 18,
     timeRange: '18h–24h',
     tip: 'Adiciona uma pitada de sal marinho na água para manter o equilíbrio eletrolítico.',
@@ -99,15 +126,29 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
   },
   {
     benefits: [
-      'Reciclagem celular e degradação de proteínas senescentes',
-      'Limpeza de mitocôndrias disfuncionais (mitofagia)',
-      'Potencial proteção neurodegenerativa e longevidade celular',
+      'Processo natural de reciclagem de componentes celulares danificados',
+      'Inclui a mitofagia: reciclagem de mitocôndrias disfuncionais',
+      'Está a ser estudada por possível relação com longevidade celular',
     ],
     description:
-      'Inicia-se a autofagia, um processo biológico nobre em que as células reciclam organelos danificados, vírus latentes e proteínas acumuladas, rejuvenescendo os tecidos.',
+      'A autofagia está sempre ativa a nível basal, mas o jejum tende a intensificá-la: as células passam a reciclar mais organelos e proteínas danificadas. Em humanos, o ponto exato de intensificação ainda não foi medido diretamente — a estimativa de 24h+ é baseada sobretudo em estudos animais.',
     id: 'autophagy',
     physiologicalEffect:
-      'Inibição de mTOR e ativação de AMPK, desencadeando a reciclagem autofágica celular profunda.',
+      'O jejum reduz a sinalização de mTOR e ativa a AMPK, duas vias associadas ao aumento da atividade autofágica.',
+    references: [
+      {
+        note: 'Trial clínico piloto (30 participantes) que mediu fluxo autofágico em células sanguíneas humanas durante uma dieta que mimetiza o jejum — dos poucos estudos com medição direta em humanos; amostra pequena.',
+        pmid: '41372565',
+        title: 'Effect of fasting-mimicking diet on markers of autophagy and metabolic health in human subjects (GeroScience)',
+        year: 2025,
+      },
+      {
+        note: 'Jejum de 72h em 5 adultos criou um ambiente metabólico "conducente à autofagia" — mas os autores sublinham que a autofagia não foi medida diretamente.',
+        pmid: '42286908',
+        title: 'Systemic metabolic, hormonal, and glycomic remodeling during a 72-hour fast in healthy adults',
+        year: 2026,
+      },
+    ],
     startHour: 24,
     timeRange: '24h–48h',
     tip: 'Repouso e hidratação com eletrólitos (sódio, potássio, magnésio) são essenciais em jejuns de dia completo.',
@@ -115,15 +156,29 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
   },
   {
     benefits: [
-      'Renovação de células estaminais e reset do sistema imunitário',
-      'Redução drástica do stress oxidativo e inflamação',
-      'Otimização profunda da sensibilidade à insulina',
+      'Redução de IGF-1, pressão arterial e gordura corporal observada em ensaios clínicos',
+      'Melhoria de marcadores de idade biológica em dois estudos independentes',
+      'Melhoria da sensibilidade à insulina em participantes de risco',
     ],
     description:
-      'Em jejuns prolongados superiores a 48 horas, o corpo desencadeia a renovação de leucócitos e células do sistema imunitário através de células estaminais, promovendo regeneração sistémica.',
+      'Jejuns prolongados ou dietas que os mimetizam foram testados em ensaios clínicos com humanos: ciclos de 5 dias reduziram IGF-1, pressão arterial e marcadores inflamatórios, e dois estudos independentes observaram uma redução de ~2,5 anos na idade biológica medida. São resultados promissores, mas a investigação continua.',
     id: 'deep_renewal',
     physiologicalEffect:
-      'Diminuição acentuada de IGF-1 e ativação da apoptose de células danificadas com regeneração imunitária.',
+      'Redução sustentada de IGF-1 e resistência à insulina, com aumento do rácio linfoide/mieloide (indicador de rejuvenescimento imunitário).',
+    references: [
+      {
+        note: 'Ensaio randomizado com 100 participantes: 3 ciclos mensais de 5 dias de dieta que mimetiza o jejum reduziram peso, pressão arterial e IGF-1, sem efeitos adversos graves.',
+        pmid: '28202779',
+        title: 'Fasting-mimicking diet and markers/risk factors for aging, diabetes, cancer, and cardiovascular disease (Science Translational Medicine)',
+        year: 2017,
+      },
+      {
+        note: 'Análise de dois ensaios clínicos em humanos: 3 ciclos de FMD associaram-se a ~2,5 anos de redução na mediana da idade biológica e a melhoria do rácio linfoide/mieloide (indicador de idade imunitária).',
+        pmid: '38378685',
+        title: 'Fasting-mimicking diet causes hepatic and blood markers changes indicating reduced biological age and disease risk (Nature Communications)',
+        year: 2024,
+      },
+    ],
     startHour: 48,
     timeRange: '48h+',
     tip: 'Quebra o jejum prolongado com caldos nutritivos e porções pequenas de fácil digestão.',
