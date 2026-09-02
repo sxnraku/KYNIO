@@ -6,6 +6,8 @@ import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
   EFFORT_LABELS,
   type WorkoutEffort,
@@ -37,6 +39,7 @@ interface WorkoutEntryCardProps {
   onChangeType: (value: string) => void;
   onSave: () => void;
   selectedType: string;
+  xpLogsRemaining?: number;
 }
 
 export function WorkoutEntryCard({
@@ -50,7 +53,10 @@ export function WorkoutEntryCard({
   onChangeType,
   onSave,
   selectedType,
+  xpLogsRemaining = 3,
 }: WorkoutEntryCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
+  const xpAvailable = xpLogsRemaining > 0;
   return (
     <Card>
       <View className="flex-row items-center justify-between">
@@ -63,7 +69,14 @@ export function WorkoutEntryCard({
           </Text>
         </View>
         <View className="rounded-full bg-xp/10 px-3 py-2">
-          <Text className="font-label text-[10px] text-xp">+50 XP</Text>
+          <Text
+            className="font-label text-[10px] text-xp"
+            translate={false}
+          >
+            {xpAvailable
+              ? `+50 XP · ${xpLogsRemaining}/3`
+              : translateText("Limite XP diário", language)}
+          </Text>
         </View>
       </View>
 
@@ -211,8 +224,15 @@ export function WorkoutEntryCard({
         ) : (
           <Ionicons color="#FFFFFF" name="add" size={20} />
         )}
-        <Text className="ml-2 font-headline text-sm text-white">
-          {isSaving ? "A guardar…" : "Guardar atividade · +50 XP"}
+        <Text
+          className="ml-2 font-headline text-sm text-white"
+          translate={false}
+        >
+          {isSaving
+            ? translateText("A guardar…", language)
+            : xpAvailable
+              ? translateText("Guardar atividade · +50 XP", language)
+              : translateText("Guardar atividade · sem XP", language)}
         </Text>
       </Pressable>
 
