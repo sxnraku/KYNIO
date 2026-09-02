@@ -137,7 +137,12 @@ export async function fetchStoreOfferings(): Promise<{
         let hasFreeTrial = false;
 
         if (offerDetails && offerDetails.length > 0) {
-          const firstOffer = offerDetails[0];
+          // Prefere oferta com trial/intro (mais fases); fallback: primeira.
+          const firstOffer =
+            offerDetails.find(
+              (offer) =>
+                (offer.pricingPhases?.pricingPhaseList?.length ?? 0) > 1,
+            ) ?? offerDetails[0];
           offerToken = firstOffer.offerToken;
           const phases = firstOffer.pricingPhases?.pricingPhaseList || [];
           
