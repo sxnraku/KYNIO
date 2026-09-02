@@ -2,7 +2,7 @@
   "expo": {
     "name": "KYNIO",
     "slug": "kynio",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon-kynio-v1.png",
     "scheme": "kynio",
@@ -13,7 +13,7 @@
     },
     "android": {
       "package": "com.kynio.app",
-      "versionCode": 21,
+      "versionCode": 22,
       "adaptiveIcon": {
         "backgroundColor": "#EDE6D3",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -1,17 +1,17 @@
 {
   "minimumVersionCode": 1,
-  "latestVersionCode": 21,
-  "latestVersionName": "1.2.1",
+  "latestVersionCode": 22,
+  "latestVersionName": "1.2.2",
   "forceUpdate": true,
   "title": "Atualização Obrigatória",
   "title_en": "Mandatory Update",
   "message": "Uma nova versão do KYNIO é necessária para continuares a usar a IA, novas fases de jejum e manter os teus dados seguros.",
   "message_en": "A new version of KYNIO is required to continue using AI meal analysis, metabolic phases, and secure data sync.",
   "releaseNotes": [
-    "Google Play Billing 8 e subscrições Kynio Sol Pro",
-    "Fases metabólicas biológicas com animações",
-    "Jejum livre flexível e jejuns de 36h/48h",
-    "Recompensas e vantagens Sol por XP"
+    "Sol Pro real: protocolos prolongados, planeador de jejum, fases detalhadas, cloud sync e histórico completo",
+    "Limites anti-abuso de XP e duração em atividades",
+    "Fontes científicas PubMed nas fases metabólicas",
+    "Correções de tradução EN"
   ],
   "storeUrl": "market://details?id=com.kynio.app"
 }
