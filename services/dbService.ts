@@ -15,7 +15,11 @@ import {
   type WeightEntryRecord,
   weightEntries,
 } from '@/db/schema';
-import { calculateLevel, getXpReward } from '@/services/gamificationService';
+import {
+  calculateLevel,
+  getWorkoutXpForLog,
+  getXpReward,
+} from '@/services/gamificationService';
 import { requestCloudSync } from '@/services/cloudSyncScheduler';
 
 export interface SaveFastRecordInput {
@@ -287,9 +291,15 @@ export async function saveWorkoutRecord(
 export async function saveLoggedWorkoutRecord(
   input: Omit<SaveWorkoutRecordInput, 'xpEarned'>,
 ): Promise<WorkoutRecord> {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const loggedToday = (await getWorkoutRecords()).filter(
+    (record) => record.timestamp >= startOfToday.getTime(),
+  ).length;
+
   return saveWorkoutRecord({
     ...input,
-    xpEarned: getXpReward('workoutLogged'),
+    xpEarned: getWorkoutXpForLog(loggedToday),
   });
 }
 

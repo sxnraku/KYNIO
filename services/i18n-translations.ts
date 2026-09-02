@@ -348,6 +348,13 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Hora de início do jejum": "Fasting start time",
   "Horas de Jejum (7 Dias)": "Fasting Hours (7 Days)",
   "Guardar atividade · +50 XP": "Save activity · +50 XP",
+  "Guardar atividade · sem XP": "Save activity · no XP",
+  "Limite XP diário": "Daily XP limit",
+  "Uma atividade não pode ultrapassar 4 horas.":
+    "An activity cannot exceed 4 hours.",
+  "Atividade guardada. Limite diário de XP de atividades atingido (3 por dia).":
+    "Activity saved. Daily activity XP limit reached (3 per day).",
+  "Atividade guardada no dispositivo. +50 XP": "Activity saved on device. +50 XP",
   "Guardar perfil": "Save profile",
   "Guardar registo": "Save entry",
   "Guarda pessoas importantes e sincroniza a lista entre os teus dispositivos. Não são partilhados jejuns, refeições ou treinos automaticamente.":

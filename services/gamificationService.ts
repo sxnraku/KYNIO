@@ -6,6 +6,17 @@ export const XP_REWARDS = {
   workoutLogged: 50,
 } as const;
 
+// Limites anti-abuso: sessões realistas e XP de atividade limitado por dia.
+export const MAX_WORKOUT_DURATION_MINUTES = 4 * 60;
+export const MAX_DAILY_WORKOUT_MINUTES = 6 * 60;
+export const WORKOUT_XP_ACTIVITIES_PER_DAY = 3;
+
+export function getWorkoutXpForLog(activitiesLoggedToday: number): number {
+  return activitiesLoggedToday < WORKOUT_XP_ACTIVITIES_PER_DAY
+    ? XP_REWARDS.workoutLogged
+    : 0;
+}
+
 export type GamificationEvent = keyof typeof XP_REWARDS;
 
 export interface LevelProgress {

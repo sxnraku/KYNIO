@@ -63,6 +63,9 @@ export function translateText(value: string, language: AppLanguage): string {
       /^(\S+), (.+), fase estimada atual$/i,
     );
     const phaseLabel = normalized.match(/^(\S+), (.+)$/i);
+    const dailyWorkoutLimit = normalized.match(
+      /^Limite diário de 6 horas de atividade\. Hoje já registaste (\d+)h (\d+)m\.$/i,
+    );
 
     if (levelLabel) {
       translation = `Level ${levelLabel[1]} - ${translateText(levelLabel[2], language)}`;
@@ -122,6 +125,8 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `${currentPhaseLabel[1]}, ${translateText(currentPhaseLabel[2], language)}, current estimated phase`;
     } else if (phaseLabel) {
       translation = `${phaseLabel[1]}, ${translateText(phaseLabel[2], language)}`;
+    } else if (dailyWorkoutLimit) {
+      translation = `Daily limit of 6 hours of activity. You have already logged ${dailyWorkoutLimit[1]}h ${dailyWorkoutLimit[2]}m today.`;
     } else if (normalized.startsWith("Rotina: ")) {
       const routineContent = normalized.replace(/^Rotina:\s*/i, "");
       translation = `Routine: ${translateText(routineContent, language)}`;

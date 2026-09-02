@@ -4,6 +4,7 @@ import {
   calculateLevelProgress,
   getGamificationBadges,
   getLevelTitle,
+  getWorkoutXpForLog,
   getXpReward,
   getXpRewardTiers,
   summarizeLocalGamificationStats,
@@ -91,6 +92,14 @@ describe('gamificationService', () => {
 
     const tiersLevel7 = getXpRewardTiers(3600, 7);
     expect(tiersLevel7.every((t) => t.isUnlocked)).toBe(true);
+  });
+
+  it('limita o XP de atividades às 3 primeiras do dia', () => {
+    expect(getWorkoutXpForLog(0)).toBe(50);
+    expect(getWorkoutXpForLog(1)).toBe(50);
+    expect(getWorkoutXpForLog(2)).toBe(50);
+    expect(getWorkoutXpForLog(3)).toBe(0);
+    expect(getWorkoutXpForLog(10)).toBe(0);
   });
 
   it('calcula estatísticas incluindo refeições e treinos', () => {

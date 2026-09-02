@@ -7,16 +7,24 @@ import {
   getWorkoutRecords,
   saveLoggedWorkoutRecord,
 } from '@/services/dbService';
+import {
+  MAX_DAILY_WORKOUT_MINUTES,
+  MAX_WORKOUT_DURATION_MINUTES,
+  WORKOUT_XP_ACTIVITIES_PER_DAY,
+} from '@/services/gamificationService';
 import { useUserProgressStore } from '@/store/user-progress-store';
 import type { WorkoutEffort } from '@/types/workout';
 
-const MAX_DURATION_MINUTES = 24 * 60;
+const MAX_DURATION_MINUTES = MAX_WORKOUT_DURATION_MINUTES;
 
 export interface WorkoutSummary {
+  todayCount: number;
+  todayMinutes: number;
   totalMinutes: number;
   weekCount: number;
   weekMinutes: number;
   weekXp: number;
+  xpLogsRemainingToday: number;
 }
 
 export function useWorkoutTracker() {
@@ -67,14 +75,27 @@ export function useWorkoutTracker() {
   const summary = useMemo<WorkoutSummary>(() => {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
-    const weekStart = startOfToday.getTime() - 6 * 24 * 60 * 60 * 1000;
+    const todayStart = startOfToday.getTime();
+    const weekStart = todayStart - 6 * 24 * 60 * 60 * 1000;
+    const todayRecords = records.filter(
+      (record) => record.timestamp >= todayStart,
+    );
     const weekRecords = records.filter((record) => record.timestamp >= weekStart);
 
     return {
+      todayCount: todayRecords.length,
+      todayMinutes: todayRecords.reduce(
+        (total, record) => total + record.durationMinutes,
+        0,
+      ),
       totalMinutes: records.reduce((total, record) => total + record.durationMinutes, 0),
       weekCount: weekRecords.length,
       weekMinutes: weekRecords.reduce((total, record) => total + record.durationMinutes, 0),
       weekXp: weekRecords.reduce((total, record) => total + record.xpEarned, 0),
+      xpLogsRemainingToday: Math.max(
+        0,
+        WORKOUT_XP_ACTIVITIES_PER_DAY - todayRecords.length,
+      ),
     };
   }, [records]);
 
@@ -87,7 +108,14 @@ export function useWorkoutTracker() {
     }
 
     if (parsedDuration > MAX_DURATION_MINUTES) {
-      setError('A duração não pode ultrapassar 24 horas.');
+      setError('Uma atividade não pode ultrapassar 4 horas.');
+      return;
+    }
+
+    if (summary.todayMinutes + parsedDuration > MAX_DAILY_WORKOUT_MINUTES) {
+      setError(
+        `Limite diário de 6 horas de atividade. Hoje já registaste ${Math.floor(summary.todayMinutes / 60)}h ${String(summary.todayMinutes % 60).padStart(2, '0')}m.`,
+      );
       return;
     }
 
@@ -108,7 +136,11 @@ export function useWorkoutTracker() {
       setRecords((current) => [savedRecord, ...current]);
       syncProfile(profile);
       setNotes('');
-      setSuccess('Atividade guardada no dispositivo. +50 XP');
+      setSuccess(
+        savedRecord.xpEarned > 0
+          ? `Atividade guardada no dispositivo. +${savedRecord.xpEarned} XP`
+          : 'Atividade guardada. Limite diário de XP de atividades atingido (3 por dia).',
+      );
     } catch (saveError: unknown) {
       setError(
         saveError instanceof Error
@@ -118,7 +150,7 @@ export function useWorkoutTracker() {
     } finally {
       setIsSaving(false);
     }
-  }, [duration, effort, notes, selectedType, syncProfile]);
+  }, [duration, effort, notes, selectedType, summary, syncProfile]);
 
   return {
     duration,

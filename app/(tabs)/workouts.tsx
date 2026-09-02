@@ -77,6 +77,7 @@ export default function WorkoutsScreen() {
           onChangeType={setSelectedType}
           onSave={saveWorkout}
           selectedType={selectedType}
+          xpLogsRemaining={summary.xpLogsRemainingToday}
         />
       </View>
 
