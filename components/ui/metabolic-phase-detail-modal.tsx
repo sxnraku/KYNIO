@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { ComponentProps } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Linking, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Text } from "@/components/ui/text";
@@ -138,7 +138,7 @@ export function MetabolicPhaseDetailModal({
                 <View className="mb-3 flex-row items-center">
                   <Ionicons color={COLORS.success} name="shield-checkmark-outline" size={18} />
                   <Text className="ml-2 font-headline text-sm text-foreground">
-                    Benefícios comprovados
+                    O que a investigação observou
                   </Text>
                 </View>
                 <View className="gap-2.5">
@@ -167,6 +167,46 @@ export function MetabolicPhaseDetailModal({
                   {phase.tip}
                 </Text>
               </View>
+
+              {/* Fontes científicas */}
+              {phase.references && phase.references.length > 0 ? (
+                <View className="rounded-2xl border border-border bg-surface-raised p-4">
+                  <View className="mb-3 flex-row items-center">
+                    <Ionicons color={COLORS.muted} name="library-outline" size={18} />
+                    <Text className="ml-2 font-headline text-sm text-foreground">
+                      Fontes científicas
+                    </Text>
+                  </View>
+                  <View className="gap-3">
+                    {phase.references.map((reference) => (
+                      <Pressable
+                        accessibilityLabel={translateText("Abrir estudo no PubMed", language)}
+                        accessibilityRole="link"
+                        className="rounded-xl border border-border bg-background p-3 active:opacity-70"
+                        key={reference.pmid}
+                        onPress={() => {
+                          void Linking.openURL(
+                            `https://pubmed.ncbi.nlm.nih.gov/${reference.pmid}/`,
+                          );
+                        }}
+                      >
+                        <Text className="font-body text-xs font-semibold leading-4 text-foreground">
+                          {reference.title} ({reference.year})
+                        </Text>
+                        <Text className="mt-1 font-body text-[11px] leading-4 text-muted">
+                          {reference.note}
+                        </Text>
+                        <Text className="mt-1 font-body text-[10px] leading-3 text-success">
+                          PubMed PMID: {reference.pmid} ↗
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                  <Text className="mt-3 font-body text-[10px] leading-4 text-muted">
+                    Leitura de contexto científico — não é uma promessa de resultados individuais.
+                  </Text>
+                </View>
+              ) : null}
 
               {/* Aviso Médico e Proteção de Dados RGPD */}
               <View className="rounded-2xl border border-border bg-background p-3.5">
