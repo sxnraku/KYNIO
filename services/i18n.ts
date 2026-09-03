@@ -41,6 +41,7 @@ export function translateText(value: string, language: AppLanguage): string {
     const activePlanTier = normalized.match(/^Plano ativo \((.+)\) · Acesso total$/i);
     const exportPrepared = normalized.match(/^Exportação preparada: (.+)$/i);
     const dailyHours = normalized.match(/^Diário · (\d+)h$/i);
+    const customHours = normalized.match(/^Personalizado · (\d+)h$/i);
     const phaseNoLimit = normalized.match(/^Fase: (.+) · Sem limite pré-fixado$/i);
     const weightUnitPrompt = normalized.match(
       /^Introduz o teu peso em (kg|lb)\.$/i,
@@ -65,6 +66,12 @@ export function translateText(value: string, language: AppLanguage): string {
     const phaseLabel = normalized.match(/^(\S+), (.+)$/i);
     const dailyWorkoutLimit = normalized.match(
       /^Limite diário de 6 horas de atividade\. Hoje já registaste (\d+)h (\d+)m\.$/i,
+    );
+    const weeklyWorkoutLimit = normalized.match(
+      /^Limite de segurança semanal de atividade atingido \(máximo 20 horas por semana\)\. Já registaste (\d+)h nesta semana\.$/i,
+    );
+    const savedActivityXp = normalized.match(
+      /^Atividade guardada no dispositivo\. \+(\d+) XP$/i,
     );
 
     if (levelLabel) {
@@ -105,6 +112,8 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `Export ready: ${exportPrepared[1]}`;
     } else if (dailyHours) {
       translation = `Daily · ${dailyHours[1]}h`;
+    } else if (customHours) {
+      translation = `Custom · ${customHours[1]}h`;
     } else if (phaseNoLimit) {
       translation = `Phase: ${translateText(phaseNoLimit[1], language)} · No preset limit`;
     } else if (weightUnitPrompt) {
@@ -127,6 +136,10 @@ export function translateText(value: string, language: AppLanguage): string {
       translation = `${phaseLabel[1]}, ${translateText(phaseLabel[2], language)}`;
     } else if (dailyWorkoutLimit) {
       translation = `Daily limit of 6 hours of activity. You have already logged ${dailyWorkoutLimit[1]}h ${dailyWorkoutLimit[2]}m today.`;
+    } else if (weeklyWorkoutLimit) {
+      translation = `Weekly activity safety limit reached (20 hours max per week). You have already logged ${weeklyWorkoutLimit[1]}h this week.`;
+    } else if (savedActivityXp) {
+      translation = `Activity saved to device. +${savedActivityXp[1]} XP`;
     } else if (normalized.startsWith("Rotina: ")) {
       const routineContent = normalized.replace(/^Rotina:\s*/i, "");
       translation = `Routine: ${translateText(routineContent, language)}`;

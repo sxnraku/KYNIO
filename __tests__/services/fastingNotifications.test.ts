@@ -8,9 +8,12 @@ import {
   scheduleHydrationReminders,
 } from '@/services/fastingNotificationService';
 
+import { useSubscriptionStore } from '@/store/use-subscription-store';
+
 describe('fastingNotificationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useSubscriptionStore.setState({ isPro: true });
     (Notifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
   });
 
@@ -62,9 +65,10 @@ describe('fastingNotificationService', () => {
         'fasting-phase-24',
         'fasting-goal',
         'fasting-routine-reminder',
+        'fasting-ongoing-status',
       ]),
     );
-    expect(cancelledIds).toHaveLength(6);
+    expect(cancelledIds).toHaveLength(7);
     expect(cancelledIds.some((id) => String(id).startsWith('hydration-'))).toBe(false);
   });
 

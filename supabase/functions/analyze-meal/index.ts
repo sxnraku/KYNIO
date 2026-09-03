@@ -58,6 +58,7 @@ const RESPONSE_SCHEMA = {
 interface AnalysisInput {
   description?: string;
   image?: { base64: string; mimeType: string };
+  language?: 'en' | 'pt';
 }
 
 // Erros de validação do pedido: só estas mensagens (fixas e em PT) podem chegar
@@ -124,7 +125,12 @@ function parseInput(value: unknown): AnalysisInput {
     throw new InputError('A descrição deve ter até 1000 caracteres.');
   }
 
-  return { description, image };
+  const language =
+    value.language === 'en' || value.language === 'pt'
+      ? value.language
+      : 'pt';
+
+  return { description, image, language };
 }
 
 function parseAnalysis(value: unknown): MealAnalysis {
@@ -295,11 +301,16 @@ async function consumeRateLimit(request: Request): Promise<boolean> {
 function buildGeminiParts(
   input: AnalysisInput,
 ): Array<Record<string, unknown>> {
+  const isEn = input.language === 'en';
   const parts: Array<Record<string, unknown>> = [
     {
       text: input.description
-        ? `Descrição da refeição: ${input.description}`
-        : 'Identifica e estima a refeição visível na imagem.',
+        ? isEn
+          ? `Meal description: ${input.description}. IMPORTANT: Return dish_name and tags in English.`
+          : `Descrição da refeição: ${input.description}.`
+        : isEn
+          ? 'Identify and estimate the meal visible in the image. IMPORTANT: Return dish_name and tags in English.'
+          : 'Identifica e estima a refeição visível na imagem.',
     },
   ];
 

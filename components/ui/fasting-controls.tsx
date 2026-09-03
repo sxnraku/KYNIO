@@ -68,24 +68,44 @@ export function FastingControls({
     <>
       <View className="mt-5">
         {!isActive ? (
-          <Pressable
-            accessibilityLabel={translateText("Iniciar Jejum", language)}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isSaving }}
-            className="min-h-14 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80"
-            disabled={isSaving}
-            onPress={() => {
-              triggerMediumImpact();
-              startFasting();
-            }}
-            style={{ opacity: isSaving ? 0.45 : 1 }}
-            testID="start-fasting-button"
-          >
-            <Ionicons color="#3A2200" name="play" size={18} />
-            <Text className="ml-2 font-headline text-base text-[#3A2200]">
-              Iniciar Jejum
-            </Text>
-          </Pressable>
+          <View className="flex-row gap-2">
+            {/* Início imediato */}
+            <Pressable
+              accessibilityLabel={translateText("Iniciar Jejum agora", language)}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isSaving }}
+              className="min-h-14 flex-1 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80"
+              disabled={isSaving}
+              onPress={() => {
+                triggerMediumImpact();
+                startFasting();
+              }}
+              style={{ opacity: isSaving ? 0.45 : 1 }}
+              testID="start-fasting-button"
+            >
+              <Ionicons color="#3A2200" name="play" size={18} />
+              <Text className="ml-2 font-headline text-base text-[#3A2200]">
+                {translateText("Iniciar Jejum", language)}
+              </Text>
+            </Pressable>
+
+            {/* Hora personalizada */}
+            <Pressable
+              accessibilityLabel={translateText("Iniciar jejum a outra hora", language)}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: isSaving }}
+              className="min-h-14 items-center justify-center rounded-full border border-success/60 bg-success/10 px-4 active:opacity-70"
+              disabled={isSaving}
+              onPress={() => {
+                triggerMediumImpact();
+                setStartModalMode("start");
+              }}
+              testID="start-fasting-custom-time-button"
+            >
+              <Ionicons color={COLORS.success} name="time-outline" size={20} />
+            </Pressable>
+          </View>
+
         ) : (
           <Pressable
             accessibilityLabel={translateText("Terminar Jejum", language)}
@@ -103,7 +123,9 @@ export function FastingControls({
           >
             <Ionicons color={COLORS.background} name="stop" size={17} />
             <Text className="ml-2 font-headline text-base text-background">
-              {isSaving ? "A guardar…" : "Terminar Jejum"}
+              {isSaving
+                ? translateText("A guardar…", language)
+                : translateText("Terminar Jejum", language)}
             </Text>
           </Pressable>
         )}
@@ -162,7 +184,7 @@ export function FastingControls({
                 className="font-label text-[10px] uppercase text-success"
                 style={{ letterSpacing: 1.2 }}
               >
-                Já comecei antes
+                {translateText("Já comecei antes", language)}
               </Text>
             </Pressable>
           ) : (
@@ -177,7 +199,7 @@ export function FastingControls({
                 className="font-label text-[10px] uppercase text-success"
                 style={{ letterSpacing: 1.2 }}
               >
-                Editar início
+                {translateText("Editar início", language)}
               </Text>
             </Pressable>
           )}
@@ -219,10 +241,12 @@ export function FastingControls({
               <View className="mb-4 flex-row items-start justify-between">
                 <View className="flex-1 pr-4">
                   <Text className="font-headline text-2xl text-foreground">
-                    Objetivo de jejum
+                    {language === "en" ? "Fasting Goal" : "Objetivo de jejum"}
                   </Text>
                   <Text className="mt-1 font-body text-sm leading-5 text-muted">
-                    Escolhe o protocolo ou opta por jejum livre sem limite fixo.
+                    {language === "en"
+                      ? "Choose a protocol or opt for open fasting without a fixed limit."
+                      : "Escolhe o protocolo ou opta por jejum livre sem limite fixo."}
                   </Text>
                 </View>
                 <Pressable
@@ -264,12 +288,12 @@ export function FastingControls({
                       <View className="flex-1 pr-3">
                         <View className="flex-row items-center">
                           <Text className="font-headline text-lg text-foreground">
-                            {goal.label}
+                            {translateText(goal.label, language)}
                           </Text>
                           {goal.id === "open" ? (
                             <View className="ml-2 rounded-full bg-success/15 px-2 py-0.5">
                               <Text className="font-label text-[10px] text-success">
-                                FLEXÍVEL
+                                {language === "en" ? "FLEXIBLE" : "FLEXÍVEL"}
                               </Text>
                             </View>
                           ) : null}
@@ -288,7 +312,11 @@ export function FastingControls({
                         </View>
                         <Text className="mt-0.5 font-body text-xs text-muted">
                           {goal.id === "open"
-                            ? "Sem meta pré-fixada · Conta até decidires terminar"
+                            ? language === "en"
+                              ? "No preset goal · Counts until you decide to finish"
+                              : "Sem meta pré-fixada · Conta até decidires terminar"
+                            : language === "en"
+                            ? `${goal.fastingHours}h fast · ${goal.eatingHours}h window · ${translateText(goal.description ?? "", language)}`
                             : `${goal.fastingHours}h de jejum · ${goal.eatingHours}h janela · ${goal.description}`}
                         </Text>
                       </View>
@@ -315,15 +343,16 @@ export function FastingControls({
                       size={15}
                     />
                     <Text className="ml-1.5 font-headline text-xs text-foreground">
-                      Segurança de Saúde & Privacidade RGPD
+                      {language === "en"
+                        ? "Health Safety & GDPR Privacy"
+                        : "Segurança de Saúde & Privacidade RGPD"}
                     </Text>
                   </View>
                   <Text className="mt-1 font-body text-xs leading-4 text-muted">
-                    Ouve sempre os sinais do teu corpo. Jejuns prolongados (superiores a 24h)
-                    não são indicados para menores, grávidas ou sem acompanhamento
-                    médico. Todos os teus registos são 100% locais e confidenciais.
+                    {language === "en"
+                      ? "Always listen to your body signals. Prolonged fasts (over 24h) are not suitable for minors, pregnant individuals, or without medical supervision. All your records are 100% local and private."
+                      : "Ouve sempre os sinais do teu corpo. Jejuns prolongados (superiores a 24h) não são indicados para menores, grávidas ou sem acompanhamento médico. Todos os teus registos são 100% locais e confidenciais."}
                   </Text>
-
                 </View>
               </ScrollView>
             </View>

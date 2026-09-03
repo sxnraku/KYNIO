@@ -140,7 +140,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
         bullets: [
           {
             description:
-              'O perfil, a bio, os amigos e o peso opcional começam no dispositivo.',
+              'O perfil, a bio e o peso opcional começam no dispositivo.',
             icon: 'person-outline',
             title: 'Perfil pessoal',
           },
@@ -266,7 +266,7 @@ const TUTORIAL_COPY: Record<AppLanguage, TutorialCopy> = {
         bullets: [
           {
             description:
-              'Your profile, bio, friends and optional weight tracking begin on your device.',
+              'Your profile, bio and optional weight tracking begin on your device.',
             icon: 'person-outline',
             title: 'Personal profile',
           },

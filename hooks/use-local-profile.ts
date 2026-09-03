@@ -2,15 +2,11 @@ import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 
-import type { FriendRecord, UserProfileRecord } from '@/db/schema';
+import type { UserProfileRecord } from '@/db/schema';
 import {
-  deleteFriendRecord,
-  getFriendRecords,
   getUserProfile,
-  saveFriendRecord,
   updateLocalProfile,
 } from '@/services/dbService';
-import { deleteRemoteFriendContact } from '@/services/cloudSyncService';
 import {
   deleteProfileImage,
   persistProfileImage,
@@ -23,7 +19,6 @@ interface SaveProfileDetailsInput {
 
 interface LocalProfileState {
   error: string | null;
-  friends: FriendRecord[];
   isLoading: boolean;
   isSaving: boolean;
   profile: UserProfileRecord | null;
@@ -36,7 +31,6 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 const INITIAL_STATE: LocalProfileState = {
   error: null,
-  friends: [],
   isLoading: true,
   isSaving: false,
   profile: null,
@@ -50,8 +44,8 @@ export function useLocalProfile() {
     setState((current) => ({ ...current, error: null, isLoading: true }));
 
     try {
-      const [profile, friends] = await Promise.all([getUserProfile(), getFriendRecords()]);
-      setState((current) => ({ ...current, friends, isLoading: false, profile }));
+      const profile = await getUserProfile();
+      setState((current) => ({ ...current, isLoading: false, profile }));
     } catch (error) {
       setState((current) => ({
         ...current,
@@ -67,12 +61,11 @@ export function useLocalProfile() {
 
       setState((current) => ({ ...current, error: null, isLoading: true }));
 
-      void Promise.all([getUserProfile(), getFriendRecords()])
-        .then(([profile, friends]) => {
+      void getUserProfile()
+        .then((profile) => {
           if (isMounted) {
             setState({
               error: null,
-              friends,
               isLoading: false,
               isSaving: false,
               profile,
@@ -231,74 +224,10 @@ export function useLocalProfile() {
     }
   }, [state.isSaving, state.profile]);
 
-  const addFriend = useCallback(
-    async (displayName: string) => {
-      if (state.isSaving) {
-        return false;
-      }
-
-      setState((current) => ({ ...current, error: null, isSaving: true, success: null }));
-
-      try {
-        const friend = await saveFriendRecord(displayName);
-        setState((current) => ({
-          ...current,
-          friends: [friend, ...current.friends],
-          isSaving: false,
-          success: `${friend.displayName} foi adicionado à tua lista local.`,
-        }));
-        return true;
-      } catch (error) {
-        setState((current) => ({
-          ...current,
-          error: getErrorMessage(error, 'Não foi possível adicionar este amigo.'),
-          isSaving: false,
-        }));
-        return false;
-      }
-    },
-    [state.isSaving],
-  );
-
-  const removeFriend = useCallback(
-    async (id: number) => {
-      if (state.isSaving) {
-        return;
-      }
-
-      setState((current) => ({ ...current, error: null, isSaving: true, success: null }));
-
-      try {
-        const friend = state.friends.find((entry) => entry.id === id);
-
-        if (friend?.id && state.profile?.cloudUserId) {
-          await deleteRemoteFriendContact(friend.createdAt, friend.displayName);
-        }
-
-        await deleteFriendRecord(id);
-        setState((current) => ({
-          ...current,
-          friends: current.friends.filter((friend) => friend.id !== id),
-          isSaving: false,
-          success: 'Amigo removido da lista local.',
-        }));
-      } catch (error) {
-        setState((current) => ({
-          ...current,
-          error: getErrorMessage(error, 'Não foi possível remover este amigo.'),
-          isSaving: false,
-        }));
-      }
-    },
-    [state.friends, state.isSaving, state.profile?.cloudUserId],
-  );
-
   return {
     ...state,
-    addFriend,
     pickAvatar,
     removeAvatar,
-    removeFriend,
     reload,
     saveDetails,
   };

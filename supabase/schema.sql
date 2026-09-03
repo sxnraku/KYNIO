@@ -62,15 +62,6 @@ create table if not exists public.workouts (
   primary key (user_id, record_key)
 );
 
-create table if not exists public.friend_contacts (
-  user_id uuid not null references auth.users(id) on delete cascade,
-  record_key text not null,
-  display_name text not null,
-  created_at bigint not null,
-  updated_at bigint not null,
-  primary key (user_id, record_key)
-);
-
 create table if not exists public.weight_entries (
   user_id uuid not null references auth.users(id) on delete cascade,
   record_key text not null,
@@ -84,21 +75,19 @@ alter table public.profiles enable row level security;
 alter table public.fasts enable row level security;
 alter table public.meals enable row level security;
 alter table public.workouts enable row level security;
-alter table public.friend_contacts enable row level security;
 alter table public.weight_entries enable row level security;
 
 grant select, insert, update, delete on public.profiles to authenticated;
 grant select, insert, update, delete on public.fasts to authenticated;
 grant select, insert, update, delete on public.meals to authenticated;
 grant select, insert, update, delete on public.workouts to authenticated;
-grant select, insert, update, delete on public.friend_contacts to authenticated;
 grant select, insert, update, delete on public.weight_entries to authenticated;
 
 do $$
 declare
   table_name text;
 begin
-  foreach table_name in array array['profiles', 'fasts', 'meals', 'workouts', 'friend_contacts', 'weight_entries']
+  foreach table_name in array array['profiles', 'fasts', 'meals', 'workouts', 'weight_entries']
   loop
     execute format('drop policy if exists "owner_all" on public.%I', table_name);
     execute format(

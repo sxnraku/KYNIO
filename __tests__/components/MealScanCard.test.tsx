@@ -238,7 +238,7 @@ describe('MealScanCard', () => {
         fatGrams: 14,
         imageUrl: null,
         proteinGrams: 42,
-        tags: ['+Proteína', 'Refeição Completa'],
+        tags: ['Bowl de frango e arroz', '+Proteína', 'Refeição Completa'],
         timestamp: expect.any(Number),
       });
     });

@@ -3,7 +3,21 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 export type AppLanguage = "en" | "pt";
-export type AppThemeMode = "dark" | "light";
+export type AppThemeMode =
+  | "light"
+  | "dark"
+  | "amoled"
+  | "midnight"
+  | "matcha"
+  | "eink";
+
+/** Temas visuais exclusivos reservados aos subscritores do plano Sol Pro. */
+export const PRO_THEME_IDS: ReadonlySet<AppThemeMode> = new Set([
+  "amoled",
+  "midnight",
+  "matcha",
+  "eink",
+]);
 
 export function getDefaultAppLanguage(): AppLanguage {
   try {
@@ -21,8 +35,10 @@ export function getDefaultAppLanguage(): AppLanguage {
 }
 
 interface AppPreferencesState {
+  healthConnectEnabled: boolean;
   hydrationRemindersEnabled: boolean;
   language: AppLanguage;
+  setHealthConnectEnabled: (enabled: boolean) => void;
   setHydrationRemindersEnabled: (enabled: boolean) => void;
   setLanguage: (language: AppLanguage) => void;
   setThemeMode: (themeMode: AppThemeMode) => void;
@@ -32,8 +48,11 @@ interface AppPreferencesState {
 export const useAppPreferencesStore = create<AppPreferencesState>()(
   persist(
     (set) => ({
+      healthConnectEnabled: false,
       hydrationRemindersEnabled: false,
       language: getDefaultAppLanguage(),
+      setHealthConnectEnabled: (healthConnectEnabled) =>
+        set({ healthConnectEnabled }),
       setHydrationRemindersEnabled: (hydrationRemindersEnabled) =>
         set({ hydrationRemindersEnabled }),
       setLanguage: (language) => set({ language }),
@@ -43,7 +62,13 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
 
     {
       name: "kynio-app-preferences-v1",
-      partialize: ({ hydrationRemindersEnabled, language, themeMode }) => ({
+      partialize: ({
+        healthConnectEnabled,
+        hydrationRemindersEnabled,
+        language,
+        themeMode,
+      }) => ({
+        healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
         themeMode,

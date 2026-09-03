@@ -3,7 +3,6 @@ import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { getInitializedDatabase } from '@/db/client';
 import {
   fasts,
-  friends,
   meals,
   userProfile,
   weightEntries,
@@ -12,7 +11,6 @@ import {
 import { calculateLevel } from '@/services/gamificationService';
 import {
   fastKey,
-  friendKey,
   mealKey,
   weightKey,
   workoutKey,
@@ -20,7 +18,6 @@ import {
 import type {
   CloudSyncResult,
   RemoteFastRow,
-  RemoteFriendRow,
   RemoteMealRow,
   RemoteProfileRow,
   RemoteWeightRow,
@@ -35,28 +32,6 @@ import { getPersistedWaterXp } from '@/services/waterXpService';
 import { getPersistedChallengeXp } from '@/services/weeklyChallengesService';
 
 export type { CloudSyncResult } from '@/services/cloudSync.types';
-
-export async function deleteRemoteFriendContact(
-  createdAt: number,
-  displayName: string,
-): Promise<void> {
-  const client = requireSupabase();
-  const { data } = await client.auth.getSession();
-
-  if (!data.session?.user) {
-    return;
-  }
-
-  const result = await client
-    .from('friend_contacts')
-    .delete()
-    .eq('user_id', data.session.user.id)
-    .eq('record_key', friendKey(createdAt, displayName));
-  requireNoError(
-    result.error,
-    'Não foi possível remover o amigo da sincronização.',
-  );
-}
 
 export async function deleteRemoteWeightEntry(
   timestamp: number,
@@ -272,12 +247,11 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     );
   }
 
-  const [localFasts, localMeals, localWorkouts, localFriends, localWeights] =
+  const [localFasts, localMeals, localWorkouts, localWeights] =
     await Promise.all([
       database.select().from(fasts),
       database.select().from(meals),
       database.select().from(workouts),
-      database.select().from(friends),
       database.select().from(weightEntries),
     ]);
   const syncTimestamp = Date.now();
@@ -346,13 +320,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     user_id: user.id,
     xp_earned: workout.xpEarned,
   }));
-  const friendUploads = localFriends.map((friend) => ({
-    created_at: friend.createdAt,
-    display_name: friend.displayName,
-    record_key: friendKey(friend.createdAt, friend.displayName),
-    updated_at: friend.createdAt,
-    user_id: user.id,
-  }));
   const weightUploads = localWeights.map((entry) => ({
     record_key: weightKey(entry.timestamp),
     timestamp: entry.timestamp,
@@ -387,11 +354,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
           .from('workouts')
           .upsert(workoutUploads, { onConflict: 'user_id,record_key' })
       : Promise.resolve({ error: null }),
-    friendUploads.length
-      ? client
-          .from('friend_contacts')
-          .upsert(friendUploads, { onConflict: 'user_id,record_key' })
-      : Promise.resolve({ error: null }),
     weightUploads.length
       ? client
           .from('weight_entries')
@@ -408,13 +370,11 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     fastDownload,
     mealDownload,
     workoutDownload,
-    friendDownload,
     weightDownload,
   ] = await Promise.all([
     client.from('fasts').select('*').eq('user_id', user.id),
     client.from('meals').select('*').eq('user_id', user.id),
     client.from('workouts').select('*').eq('user_id', user.id),
-    client.from('friend_contacts').select('*').eq('user_id', user.id),
     client.from('weight_entries').select('*').eq('user_id', user.id),
   ]);
 
@@ -424,15 +384,12 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
     workoutDownload.error,
     'Não foi possível descarregar atividades.',
   );
-  requireNoError(friendDownload.error, 'Não foi possível descarregar amigos.');
   requireNoError(weightDownload.error, 'Não foi possível descarregar pesos.');
 
   const remoteFasts = (fastDownload.data ?? []) as unknown as RemoteFastRow[];
   const remoteMeals = (mealDownload.data ?? []) as unknown as RemoteMealRow[];
   const remoteWorkouts = (workoutDownload.data ??
     []) as unknown as RemoteWorkoutRow[];
-  const remoteFriends = (friendDownload.data ??
-    []) as unknown as RemoteFriendRow[];
   const remoteWeights = (weightDownload.data ??
     []) as unknown as RemoteWeightRow[];
   const remoteActiveFasts = remoteFasts.filter(
@@ -456,11 +413,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
   const localWorkoutKeys = new Set(
     localWorkouts.map((workout) => workoutKey(workout.timestamp)),
   );
-  const localFriendKeys = new Set(
-    localFriends.map((friend) =>
-      friendKey(friend.createdAt, friend.displayName),
-    ),
-  );
   const localWeightKeys = new Set(
     localWeights.map((entry) => weightKey(entry.timestamp)),
   );
@@ -472,9 +424,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
   );
   const missingWorkouts = remoteWorkouts.filter(
     (workout) => !localWorkoutKeys.has(workout.record_key),
-  );
-  const missingFriends = remoteFriends.filter(
-    (friend) => !localFriendKeys.has(friend.record_key),
   );
   const missingWeights = remoteWeights.filter(
     (entry) => !localWeightKeys.has(entry.record_key),
@@ -523,15 +472,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
           timestamp: Number(workout.timestamp),
           type: workout.type,
           xpEarned: workout.xp_earned,
-        })),
-      );
-    }
-
-    if (missingFriends.length) {
-      await transaction.insert(friends).values(
-        missingFriends.map((friend) => ({
-          createdAt: Number(friend.created_at),
-          displayName: friend.display_name,
         })),
       );
     }
@@ -642,7 +582,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
       missingFasts.length +
       missingMeals.length +
       missingWorkouts.length +
-      missingFriends.length +
       missingWeights.length,
     syncedAt: syncTimestamp,
     uploadedRecords:
@@ -651,7 +590,6 @@ export async function syncAllUserData(): Promise<CloudSyncResult> {
       mealUploads.length +
       mealTombstoneUploads.length +
       workoutUploads.length +
-      friendUploads.length +
       weightUploads.length,
   };
 }

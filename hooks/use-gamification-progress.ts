@@ -19,6 +19,7 @@ import {
   type LocalGamificationStats,
   summarizeLocalGamificationStats,
 } from '@/services/gamificationService';
+import { useSubscriptionStore } from '@/store/use-subscription-store';
 import { useUserProgressStore } from '@/store/user-progress-store';
 
 export interface GamificationProgressSnapshot {
@@ -58,7 +59,13 @@ export function useGamificationProgress(): GamificationProgressState {
             getUserProfile(),
             getWorkoutRecords(),
           ]);
-          const stats = summarizeLocalGamificationStats(fastRecords, mealRecords, workoutRecords);
+          const isPro = useSubscriptionStore.getState().isPro;
+          const stats = summarizeLocalGamificationStats(
+            fastRecords,
+            mealRecords,
+            workoutRecords,
+            isPro,
+          );
           const profile =
             storedProfile.streakDays === stats.streakDays
               ? storedProfile

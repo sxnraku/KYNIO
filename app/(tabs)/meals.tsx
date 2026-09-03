@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { MealAnalysisCard } from "@/components/ui/meal-analysis-card";
 import { MealCameraModal } from "@/components/ui/meal-camera-modal";
 import { MealCaptureCard } from "@/components/ui/meal-capture-card";
+import { MealHistoryList } from "@/components/ui/meal-history-list";
 import { PageTitle } from "@/components/ui/page-title";
 import { PaywallModal } from "@/components/ui/paywall-modal";
 import { PrivacyNote } from "@/components/ui/privacy-note";
@@ -17,8 +18,10 @@ import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
 import { useDailyMealSummary } from "@/hooks/use-daily-meal-summary";
 import { useMealAnalysis } from "@/hooks/use-meal-analysis";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 export default function MealsScreen() {
+  const language = useAppPreferencesStore((state) => state.language);
   const [summaryRevision, setSummaryRevision] = useState(0);
   const refreshSummary = useCallback(() => {
     setSummaryRevision((current) => current + 1);
@@ -84,14 +87,24 @@ export default function MealsScreen() {
           ) : (
             <Text className="font-label text-xs uppercase tracking-wider text-muted">
               {remainingScans > 0
-                ? `${remainingScans} análises grátis hoje`
+                ? language === "en"
+                  ? `${remainingScans} free ${remainingScans === 1 ? 'scan' : 'scans'} today`
+                  : `${remainingScans} análises grátis hoje`
+                : language === "en"
+                ? "Daily AI quota reached"
                 : "Quota diária de IA atingida"}
             </Text>
           )}
         </View>
         <Pressable onPress={openPaywall} className="flex-row items-center gap-1">
           <Text className="font-label text-xs font-bold text-success">
-            {isPro ? "Sol Pro Ativo ✦" : "Desbloquear Pro →"}
+            {isPro
+              ? language === "en"
+                ? "Sol Pro Active ✦"
+                : "Sol Pro Ativo ✦"
+              : language === "en"
+              ? "Unlock Pro →"
+              : "Desbloquear Pro →"}
           </Text>
         </Pressable>
       </View>
@@ -190,6 +203,11 @@ export default function MealsScreen() {
           </Card>
         )}
       </View>
+
+      <MealHistoryList
+        onMealDeleted={refreshSummary}
+        refreshToken={summaryRevision}
+      />
 
       <PrivacyNote />
     </Screen>

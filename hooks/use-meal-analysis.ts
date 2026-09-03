@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { getUserProfile, saveScannedMealRecord } from "@/services/dbService";
 import { analyzeMeal } from "@/services/aiMealService";
 import { persistMealImage } from "@/services/localMealImageService";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useSubscriptionStore } from "@/store/use-subscription-store";
 import { useUserProgressStore } from "@/store/user-progress-store";
 import type {
@@ -70,6 +71,7 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
     null,
   );
   const [paywallVisible, setPaywallVisible] = useState(false);
+  const language = useAppPreferencesStore((state) => state.language);
   const syncProfile = useUserProgressStore((state) => state.syncProfile);
   const canPerformAiScan = useSubscriptionStore((state) => state.canPerformAiScan);
   const consumeAiScan = useSubscriptionStore((state) => state.consumeAiScan);
@@ -208,6 +210,7 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
         image: selectedImage
           ? { base64: selectedImage.base64, mimeType: selectedImage.mimeType }
           : undefined,
+        ...(language === "en" ? { language: "en" as const } : {}),
       });
 
       consumeAiScan();
@@ -217,12 +220,17 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
       setAnalysis(null);
       setEditableNutrition(EMPTY_NUTRITION);
       setErrorMessage(
-        getErrorMessage(error, "Não foi possível analisar a refeição."),
+        getErrorMessage(
+          error,
+          language === "en"
+            ? "Could not analyze the meal."
+            : "Não foi possível analisar a refeição.",
+        ),
       );
     } finally {
       setIsAnalyzing(false);
     }
-  }, [canPerformAiScan, consumeAiScan, description, portionQuantity, selectedImage]);
+  }, [canPerformAiScan, consumeAiScan, description, language, portionQuantity, selectedImage]);
 
   const refineAnalysis = useCallback(
     async (clarificationText: string) => {
@@ -254,6 +262,7 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
           image: selectedImage
             ? { base64: selectedImage.base64, mimeType: selectedImage.mimeType }
             : undefined,
+          ...(language === "en" ? { language: "en" as const } : {}),
         });
 
         consumeAiScan();
@@ -261,13 +270,18 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
         setEditableNutrition(toEditableNutrition(result));
       } catch (error) {
         setErrorMessage(
-          getErrorMessage(error, "Não foi possível refinar a análise."),
+          getErrorMessage(
+            error,
+            language === "en"
+              ? "Could not refine the analysis."
+              : "Não foi possível refinar a análise.",
+          ),
         );
       } finally {
         setIsAnalyzing(false);
       }
     },
-    [canPerformAiScan, consumeAiScan, description, portionQuantity, selectedImage],
+    [canPerformAiScan, consumeAiScan, description, language, portionQuantity, selectedImage],
   );
 
 
@@ -310,13 +324,18 @@ export function useMealAnalysis(options: UseMealAnalysisOptions = {}) {
           )
         : null;
 
+      const dishName = analysis.dish_name?.trim();
+      const tagsToSave = dishName
+        ? [dishName, ...analysis.tags.filter((t) => t.trim().toLowerCase() !== dishName.toLowerCase())]
+        : analysis.tags;
+
       await saveScannedMealRecord({
         carbsGrams,
         estimatedCalories,
         fatGrams,
         imageUrl,
         proteinGrams,
-        tags: analysis.tags,
+        tags: tagsToSave,
         timestamp: Date.now(),
       });
 

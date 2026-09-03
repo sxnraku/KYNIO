@@ -3,7 +3,6 @@ import { SQLiteSyncDialect } from 'drizzle-orm/sqlite-core';
 import { getInitializedDatabase } from '@/db/client';
 import {
   fasts,
-  friends,
   meals,
   userProfile,
   weightEntries,
@@ -42,7 +41,6 @@ function thenable<T>(value: T, extra: object = {}): T & PromiseLike<T> {
 
 interface FakeDatabaseSeed {
   fasts?: Row[];
-  friends?: Row[];
   meals?: Row[];
   profile: Row;
   weightEntries?: Row[];
@@ -52,7 +50,6 @@ interface FakeDatabaseSeed {
 function createFakeDatabase(seed: FakeDatabaseSeed) {
   const tables = new Map<object, Row[]>([
     [fasts, [...(seed.fasts ?? [])]],
-    [friends, [...(seed.friends ?? [])]],
     [meals, [...(seed.meals ?? [])]],
     [userProfile, [seed.profile]],
     [weightEntries, [...(seed.weightEntries ?? [])]],
@@ -230,7 +227,6 @@ function createProfile(): Row {
 
 const EMPTY_REMOTE = {
   fasts: [],
-  friend_contacts: [],
   meals: [],
   profiles: [],
   weight_entries: [],

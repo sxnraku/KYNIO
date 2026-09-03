@@ -7,6 +7,8 @@ import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type {
   EditableMealNutrition,
   EditableMealNutritionField,
@@ -24,7 +26,6 @@ interface MealAnalysisCardProps {
   onRefine?: (clarificationText: string) => void;
 }
 
-
 interface NutritionInputProps {
   field: EditableMealNutritionField;
   label: string;
@@ -33,10 +34,10 @@ interface NutritionInputProps {
   value: string;
 }
 
-const CONFIDENCE_LABELS: Record<MealAnalysisConfidence, string> = {
-  high: "Confiança alta",
-  medium: "Confiança média",
-  low: "Confiança baixa",
+const CONFIDENCE_LABELS: Record<MealAnalysisConfidence, { en: string; pt: string }> = {
+  high: { en: "High confidence", pt: "Confiança alta" },
+  medium: { en: "Medium confidence", pt: "Confiança média" },
+  low: { en: "Low confidence", pt: "Confiança baixa" },
 };
 
 function NutritionInput({
@@ -76,6 +77,7 @@ export function MealAnalysisCard({
   onConfirm,
   onRefine,
 }: MealAnalysisCardProps) {
+  const language = useAppPreferencesStore((state) => state.language);
   const [clarificationText, setClarificationText] = useState("");
   const [showRefineInput, setShowRefineInput] = useState(
     analysis.confidence === "low",
@@ -86,15 +88,15 @@ export function MealAnalysisCard({
       <View className="flex-row items-start justify-between gap-4">
         <View className="min-w-0 flex-1">
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
-            Resultado estruturado
+            {translateText("Resultado estruturado", language)}
           </Text>
           <Text className="mt-2 font-headline text-2xl text-foreground">
-            {analysis.dish_name}
+            {translateText(analysis.dish_name, language)}
           </Text>
         </View>
         <View className="rounded-full bg-success/10 px-3 py-1.5">
           <Text className="font-label text-[9px] uppercase text-success">
-            {CONFIDENCE_LABELS[analysis.confidence]}
+            {CONFIDENCE_LABELS[analysis.confidence][language]}
           </Text>
         </View>
       </View>
@@ -103,15 +105,19 @@ export function MealAnalysisCard({
         <View className="flex-row items-center gap-4">
           <View className="min-w-0 flex-1">
             <Text className="font-label text-[10px] uppercase tracking-widest text-muted">
-              Calorias estimadas
+              {translateText("Calorias estimadas", language)}
             </Text>
             <Text className="mt-1 font-body text-xs text-muted">
-              Toca no valor para ajustar
+              {translateText("Toca no valor para ajustar", language)}
             </Text>
           </View>
           <View className="flex-row items-end" style={{ flexShrink: 0 }}>
             <TextInput
-              accessibilityLabel="Calorias estimadas, editável"
+              accessibilityLabel={
+                language === "en"
+                  ? "Estimated calories, editable"
+                  : "Calorias estimadas, editável"
+              }
               className="p-0 text-right font-headline text-3xl text-success"
               inputMode="numeric"
               keyboardType="number-pad"
@@ -128,26 +134,28 @@ export function MealAnalysisCard({
       </View>
 
       <Text className="mb-2 mt-5 font-label text-[10px] uppercase tracking-widest text-muted">
-        Macros estimados · editáveis
+        {language === "en"
+          ? "Estimated macros · editable"
+          : "Macros estimados · editáveis"}
       </Text>
       <View className="flex-row gap-2">
         <NutritionInput
           field="proteinGrams"
-          label="Proteína"
+          label={language === "en" ? "Protein" : "Proteína"}
           onChange={onChangeNutrition}
           suffix="g"
           value={editableNutrition.proteinGrams}
         />
         <NutritionInput
           field="carbsGrams"
-          label="Hidratos"
+          label={language === "en" ? "Carbs" : "Hidratos"}
           onChange={onChangeNutrition}
           suffix="g"
           value={editableNutrition.carbsGrams}
         />
         <NutritionInput
           field="fatGrams"
-          label="Gordura"
+          label={language === "en" ? "Fat" : "Gordura"}
           onChange={onChangeNutrition}
           suffix="g"
           value={editableNutrition.fatGrams}
@@ -162,7 +170,7 @@ export function MealAnalysisCard({
               key={`${tag}-${index}`}
             >
               <Text className="font-label text-[10px] text-foreground">
-                {tag}
+                {translateText(tag, language)}
               </Text>
             </View>
           ))}
@@ -181,7 +189,9 @@ export function MealAnalysisCard({
               />
               <Text className="font-headline text-xs text-foreground">
                 {analysis.confidence === "low"
-                  ? "A imagem não ficou clara? Clarifica aqui:"
+                  ? translateText("A imagem não ficou clara? Clarifica aqui:", language)
+                  : language === "en"
+                  ? "Want to adjust ingredients or portion?"
                   : "Queres ajustar ingredientes ou porção?"}
               </Text>
             </View>
@@ -190,7 +200,9 @@ export function MealAnalysisCard({
                 onPress={() => setShowRefineInput(true)}
                 className="rounded-md bg-surface px-2 py-1 border border-border"
               >
-                <Text className="font-label text-[10px] text-muted">Ajustar</Text>
+                <Text className="font-label text-[10px] text-muted">
+                  {language === "en" ? "Adjust" : "Ajustar"}
+                </Text>
               </Pressable>
             ) : null}
           </View>
@@ -198,10 +210,18 @@ export function MealAnalysisCard({
           {showRefineInput || analysis.confidence === "low" ? (
             <View className="mt-2.5">
               <TextInput
-                accessibilityLabel="Clarificação dos alimentos"
+                accessibilityLabel={
+                  language === "en"
+                    ? "Food clarification"
+                    : "Clarificação dos alimentos"
+                }
                 className="rounded-lg border border-border bg-surface px-3 py-2 font-body text-sm text-foreground"
                 onChangeText={setClarificationText}
-                placeholder="Ex.: é tofu com arroz integral, cerca de 300g"
+                placeholder={
+                  language === "en"
+                    ? "e.g.: it's tofu with brown rice, around 300g"
+                    : "Ex.: é tofu com arroz integral, cerca de 300g"
+                }
                 placeholderTextColor={COLORS.muted}
                 value={clarificationText}
               />
@@ -221,7 +241,11 @@ export function MealAnalysisCard({
                   <Ionicons color={COLORS.background} name="refresh-outline" size={15} />
                 )}
                 <Text className="font-headline text-xs text-background">
-                  {isAnalyzing ? "A recalcular…" : "Recalcular com estes detalhes"}
+                  {isAnalyzing
+                    ? translateText("A recalcular…", language)
+                    : language === "en"
+                    ? "Recalculate with details"
+                    : "Recalcular com estes detalhes"}
                 </Text>
               </Pressable>
             </View>
@@ -236,7 +260,6 @@ export function MealAnalysisCard({
         disabled={isSaving || isAnalyzing}
         onPress={onConfirm}
       >
-
         {isSaving ? (
           <ActivityIndicator color={COLORS.foreground} size="small" />
         ) : (
@@ -247,14 +270,19 @@ export function MealAnalysisCard({
           />
         )}
         <Text className="font-headline text-base text-foreground">
-          {isSaving ? "A guardar…" : "Confirmar e Ganhar +30 XP"}
+          {isSaving
+            ? translateText("A guardar…", language)
+            : language === "en"
+            ? "Confirm and Earn +30 XP"
+            : "Confirmar e Ganhar +30 XP"}
         </Text>
       </Pressable>
 
       <View className="mt-5 border-t border-border pt-4">
         <Text className="font-body text-xs leading-5 text-muted">
-          Valores estimados por IA para acompanhamento pessoal de hábitos.
-          Ajuste manualmente conforme necessário.
+          {language === "en"
+            ? "AI estimated values for personal habit tracking. Adjust manually as needed."
+            : "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário."}
         </Text>
       </View>
     </Card>

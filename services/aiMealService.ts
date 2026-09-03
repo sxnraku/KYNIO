@@ -139,6 +139,7 @@ function validateInput(input: AnalyzeMealInput): AnalyzeMealInput {
   return {
     description: description || undefined,
     image: input.image,
+    language: input.language,
   };
 }
 

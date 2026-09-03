@@ -61,25 +61,27 @@ export function MealCaptureCard({
   return (
     <Card>
       <Text className="font-label text-[10px] uppercase tracking-widest text-success">
-        Nova análise
+        {translateText("Nova análise", language)}
       </Text>
       <Text className="mt-2 font-headline text-lg text-foreground">
-        Mostra ou descreve a refeição
+        {translateText("Mostra ou descreve a refeição", language)}
       </Text>
       <Text className="mt-1 font-body text-sm leading-5 text-muted">
-        Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que
-        comeste.
+        {translateText(
+          "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.",
+          language,
+        )}
       </Text>
 
       <View className="mt-5 flex-row gap-3">
         <SourceButton
           icon="camera-outline"
-          label="Câmara"
+          label={translateText("Câmara", language)}
           onPress={onTakePhoto}
         />
         <SourceButton
           icon="images-outline"
-          label="Galeria"
+          label={translateText("Galeria", language)}
           onPress={onPickPhoto}
         />
       </View>
@@ -107,33 +109,46 @@ export function MealCaptureCard({
       ) : null}
 
       <Text className="mb-2 mt-5 font-label text-[10px] uppercase tracking-widest text-muted">
-        O que comeste?
+        {translateText("O que comeste?", language)}
       </Text>
       <TextInput
-        accessibilityLabel="Descrição da refeição"
+        accessibilityLabel={translateText("Descrição da refeição", language)}
         className="min-h-24 rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
         maxLength={500}
         multiline
         onChangeText={onChangeDescription}
-        placeholder="Ex.: salmão grelhado com arroz e legumes"
+        placeholder={
+          language === "en"
+            ? "e.g.: grilled salmon with rice and greens"
+            : "Ex.: salmão grelhado com arroz e legumes"
+        }
         placeholderTextColor={COLORS.muted}
         textAlignVertical="top"
         value={description}
       />
 
       <Text className="mb-2 mt-4 font-label text-[10px] uppercase tracking-widest text-muted">
-        Quantidade / Porção (opcional)
+        {language === "en"
+          ? "Quantity / Portion (optional)"
+          : "Quantidade / Porção (opcional)"}
       </Text>
       <TextInput
-        accessibilityLabel="Quantidade ou porção da refeição"
+        accessibilityLabel={
+          language === "en"
+            ? "Meal portion or quantity"
+            : "Quantidade ou porção da refeição"
+        }
         className="rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
         maxLength={100}
         onChangeText={onChangePortionQuantity}
-        placeholder="Ex.: 250g, 1 prato cheio, 2 fatias, 1 taça"
+        placeholder={
+          language === "en"
+            ? "e.g.: 250g, 1 full plate, 2 slices, 1 bowl"
+            : "Ex.: 250g, 1 prato cheio, 2 fatias, 1 taça"
+        }
         placeholderTextColor={COLORS.muted}
         value={portionQuantity}
       />
-
 
       <Pressable
         accessibilityRole="button"
@@ -152,7 +167,9 @@ export function MealCaptureCard({
           <Ionicons color={COLORS.background} name="sparkles" size={20} />
         )}
         <Text className="font-headline text-base text-background">
-          {isAnalyzing ? "A analisar…" : "Analisar refeição"}
+          {isAnalyzing
+            ? translateText("A analisar…", language)
+            : translateText("Analisar refeição", language)}
         </Text>
       </Pressable>
 
@@ -163,10 +180,10 @@ export function MealCaptureCard({
           size={15}
         />
         <Text className="flex-1 font-body text-xs leading-4 text-muted">
-          Ao tocar em Analisar, autorizas o envio desta fotografia e/ou
-          descrição, através do KYNIO, para a Google Gemini. O restante
-          histórico e o ID da conta não são enviados. A app não guarda a
-          fotografia nem a resposta remotamente.
+          {translateText(
+            "Ao tocar em Analisar, autorizas o envio desta fotografia e/ou descrição, através do KYNIO, para a Google Gemini. O restante histórico e o ID da conta não são enviados. A app não guarda a fotografia nem a resposta remotamente.",
+            language,
+          )}
         </Text>
       </View>
     </Card>

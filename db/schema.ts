@@ -72,12 +72,6 @@ export const userProfile = sqliteTable('user_profile', {
     .default('kg'),
 });
 
-export const friends = sqliteTable('friends', {
-  createdAt: integer('created_at').notNull(),
-  displayName: text('display_name').notNull(),
-  id: integer('id').primaryKey({ autoIncrement: true }),
-});
-
 export const weightEntries = sqliteTable(
   'weight_entries',
   {
@@ -89,14 +83,29 @@ export const weightEntries = sqliteTable(
   (table) => [index('weight_entries_timestamp_idx').on(table.timestamp)],
 );
 
+export const fastingSymptoms = sqliteTable(
+  'fasting_symptoms',
+  {
+    deletedAt: integer('deleted_at'),
+    fastId: integer('fast_id'),
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    intensity: integer('intensity').notNull().default(1),
+    notes: text('notes'),
+    phaseIndex: integer('phase_index').notNull().default(0),
+    symptomKey: text('symptom_key').notNull(),
+    timestamp: integer('timestamp').notNull(),
+  },
+  (table) => [index('fasting_symptoms_timestamp_idx').on(table.timestamp)],
+);
+
 export type FastRecord = typeof fasts.$inferSelect;
 export type MealRecord = typeof meals.$inferSelect;
 export type WorkoutRecord = typeof workouts.$inferSelect;
-export type FriendRecord = typeof friends.$inferSelect;
 export type WeightEntryRecord = typeof weightEntries.$inferSelect;
+export type FastingSymptomRecord = typeof fastingSymptoms.$inferSelect;
 export type NewFastRecord = typeof fasts.$inferInsert;
 export type NewMealRecord = typeof meals.$inferInsert;
 export type NewWorkoutRecord = typeof workouts.$inferInsert;
-export type NewFriendRecord = typeof friends.$inferInsert;
 export type NewWeightEntryRecord = typeof weightEntries.$inferInsert;
+export type NewFastingSymptomRecord = typeof fastingSymptoms.$inferInsert;
 export type UserProfileRecord = typeof userProfile.$inferSelect;

@@ -1,8 +1,11 @@
-import { ActivityIndicator, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { BadgeCard } from "@/components/ui/badge-card";
 import { ConsistencyLine } from "@/components/ui/consistency-line";
+import { FactualInsightsCard } from "@/components/ui/factual-insights-card";
 import { FastingStatsOverview } from "@/components/ui/fasting-stats-overview";
 import { LevelProgressCard } from "@/components/ui/level-progress-card";
 import { PageTitle } from "@/components/ui/page-title";
@@ -15,9 +18,42 @@ import { WeightTrackingCard } from "@/components/ui/weight-tracking-card";
 import { XpRewardsCard } from "@/components/ui/xp-rewards-card";
 import { COLORS } from "@/constants/colors";
 import { useGamificationProgress } from "@/hooks/use-gamification-progress";
+import { exportClinicalReportPdf } from "@/services/healthReportPdfService";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useSubscriptionStore } from "@/store/use-subscription-store";
+import { PaywallModal } from "@/components/ui/paywall-modal";
 
 export default function ProgressScreen() {
+  const language = useAppPreferencesStore((state) => state.language);
+  const isPro = useSubscriptionStore((state) => state.isPro);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const { error, isLoading, snapshot } = useGamificationProgress();
+
+  const handleExportPdf = async () => {
+    if (!isPro) {
+      setIsPaywallOpen(true);
+      return;
+    }
+
+    if (isGeneratingPdf) return;
+
+    try {
+      setIsGeneratingPdf(true);
+      await exportClinicalReportPdf(language);
+    } catch {
+      Alert.alert(
+        translateText("Erro", language),
+        translateText(
+          "Não foi possível gerar o dossiê de hábitos em PDF.",
+          language,
+        ),
+      );
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   return (
     <Screen>
@@ -48,8 +84,54 @@ export default function ProgressScreen() {
 
       {snapshot ? (
         <>
+          {/* Acesso a Relatório Clínico em PDF */}
+          <View className="mt-7 flex-row items-center justify-between rounded-2xl border border-border bg-surface p-4">
+            <View className="flex-1 pr-3">
+              <Text className="font-label text-[10px] uppercase tracking-wider text-success font-bold">
+                {language === 'en' ? 'Habits & Consistency' : 'Hábitos & Consistência'}
+              </Text>
+              <Text className="mt-0.5 font-headline text-base text-foreground">
+                {language === 'en'
+                  ? 'Habits Dossier (PDF)'
+                  : 'Dossiê de Hábitos (PDF)'}
+              </Text>
+              <Text className="mt-0.5 font-body text-xs text-muted">
+                {language === 'en'
+                  ? 'Visual report with fasting, weight and consistency logs.'
+                  : 'Documento visual com médias de jejum, peso e consistência.'}
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              className="flex-row items-center rounded-xl bg-success px-3.5 py-2.5 active:opacity-80 disabled:opacity-50"
+              disabled={isGeneratingPdf}
+              onPress={() => void handleExportPdf()}
+            >
+              {isGeneratingPdf ? (
+                <ActivityIndicator color="#3A2200" size="small" />
+              ) : (
+                <>
+                  <Ionicons
+                    color="#3A2200"
+                    name={!isPro ? "lock-closed" : "document-text"}
+                    size={15}
+                  />
+                  <Text className="ml-1.5 font-label text-xs font-bold text-[#3A2200]">
+                    {!isPro
+                      ? language === "en"
+                        ? "Export ✦"
+                        : "Exportar ✦"
+                      : language === "en"
+                      ? "Export"
+                      : "Exportar"}
+                  </Text>
+                </>
+              )}
+            </Pressable>
+          </View>
+
           {/* 4 Hero Stats: Jejuns, Jejum mais longo, Tempo total, Dias com jejum */}
-          <View className="mt-7">
+          <View className="mt-5">
             <FastingStatsOverview />
           </View>
 
@@ -80,6 +162,10 @@ export default function ProgressScreen() {
 
           <View className="mt-5">
             <WeeklyChallengesCard />
+          </View>
+
+          <View className="mt-5">
+            <FactualInsightsCard />
           </View>
 
           <View className="mt-5">
@@ -114,6 +200,12 @@ export default function ProgressScreen() {
           <PrivacyNote />
         </>
       ) : null}
+
+      <PaywallModal
+        featureTrigger="Dossiê de Hábitos em PDF"
+        onClose={() => setIsPaywallOpen(false)}
+        visible={isPaywallOpen}
+      />
     </Screen>
   );
 }

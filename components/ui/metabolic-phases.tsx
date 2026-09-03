@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { FastingSymptomModal } from "@/components/ui/fasting-symptom-modal";
 import { MetabolicPhaseDetailModal } from "@/components/ui/metabolic-phase-detail-modal";
 import { PaywallModal } from "@/components/ui/paywall-modal";
 import { Text } from "@/components/ui/text";
@@ -51,6 +52,7 @@ export function MetabolicPhases({
   const [selectedPhase, setSelectedPhase] =
     useState<EstimatedMetabolicPhase | null>(null);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number>(0);
+  const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
 
   // Pulse animation for active card
   const pulseAnim = useSharedValue(1);
@@ -89,12 +91,26 @@ export function MetabolicPhases({
   return (
     <View className="mt-8">
       <View className="mb-4">
-        <Text
-          className="font-label text-[11px] uppercase text-success"
-          style={{ letterSpacing: 2.6 }}
-        >
-          A tua jornada
-        </Text>
+        <View className="flex-row items-baseline justify-between">
+          <Text
+            className="font-label text-[11px] uppercase text-success"
+            style={{ letterSpacing: 2.6 }}
+          >
+            A tua jornada
+          </Text>
+          {isActive ? (
+            <Pressable
+              accessibilityRole="button"
+              className="flex-row items-center rounded-lg border border-success/30 bg-success/10 px-2.5 py-1 active:opacity-60"
+              onPress={() => setIsSymptomModalOpen(true)}
+            >
+              <Ionicons color={COLORS.success} name="heart-outline" size={13} />
+              <Text className="ml-1 font-label text-[10px] uppercase tracking-wider text-success font-bold">
+                {language === 'en' ? 'Feeling?' : 'Como te sentes?'}
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
         <Text className="mt-1 font-body text-sm text-muted">
           {isPro
             ? "Fases metabólicas · Toca para ver o que acontece no corpo"
@@ -198,6 +214,12 @@ export function MetabolicPhases({
       <PaywallModal
         onClose={() => setIsPaywallOpen(false)}
         visible={isPaywallOpen}
+      />
+
+      <FastingSymptomModal
+        currentPhaseIndex={currentPhaseIndex}
+        onClose={() => setIsSymptomModalOpen(false)}
+        visible={isSymptomModalOpen}
       />
     </View>
   );

@@ -13,8 +13,6 @@ import migrations from '@/drizzle/migrations';
 import { deleteCloudAccountAndData } from '@/services/cloudAuthService';
 import {
   fasts,
-  type FriendRecord,
-  friends,
   meals,
   type FastRecord,
   type MealRecord,
@@ -87,7 +85,6 @@ export interface LocalDataExport {
   app: 'KYNIO';
   exportedAt: string;
   fasts: FastRecord[];
-  friends: FriendRecord[];
   meals: MealRecord[];
   profile: UserProfileRecord | null;
   schemaVersion: number;
@@ -103,11 +100,6 @@ async function getFastsForExport(): Promise<FastRecord[]> {
 async function getMealsForExport(): Promise<MealRecord[]> {
   const database = await getInitializedDatabase();
   return database.select().from(meals).where(isNull(meals.deletedAt));
-}
-
-async function getFriendsForExport(): Promise<FriendRecord[]> {
-  const database = await getInitializedDatabase();
-  return database.select().from(friends);
 }
 
 async function getProfileForExport(): Promise<UserProfileRecord | null> {
@@ -132,14 +124,12 @@ async function getWeightEntriesForExport(): Promise<WeightEntryRecord[]> {
 export async function collectLocalData(): Promise<LocalDataExport> {
   const [
     fastRecords,
-    friendRecords,
     mealRecords,
     profile,
     weightRecords,
     workoutRecords,
   ] = await Promise.all([
     getFastsForExport(),
-    getFriendsForExport(),
     getMealsForExport(),
     getProfileForExport(),
     getWeightEntriesForExport(),
@@ -157,7 +147,6 @@ export async function collectLocalData(): Promise<LocalDataExport> {
     app: 'KYNIO',
     exportedAt: new Date().toISOString(),
     fasts: fastRecords,
-    friends: friendRecords,
     meals: mealRecords,
     profile,
     schemaVersion: LOCAL_SCHEMA_VERSION,

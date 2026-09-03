@@ -3,5 +3,20 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
+  },
+  "java.project.resourceFilters": [
+    "node_modules",
+    ".expo",
+    ".git",
+    "android/.cxx",
+    "android/app/build"
+  ],
+  "java.import.gradle.enabled": false,
+  "java.autobuild.enabled": false,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/android/app/build/**": true,
+    "**/android/.cxx/**": true,
+    "**/.expo/**": true
   }
 }

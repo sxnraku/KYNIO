@@ -3,6 +3,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 
+import { FastingEditModal } from "@/components/ui/fasting-edit-modal";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import type { FastRecord } from "@/db/schema";
@@ -51,6 +52,7 @@ export function FastingHistoryCard() {
   const historyRevision = useFastingStore((state) => state.historyRevision);
   const [fasts, setFasts] = useState<FastRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingFast, setEditingFast] = useState<FastRecord | null>(null);
 
   const loadHistory = useCallback(async () => {
     try {
@@ -221,6 +223,15 @@ export function FastingHistoryCard() {
                   ) : null}
 
                   <Pressable
+                    accessibilityLabel={language === "en" ? "Edit fast" : "Editar registo de jejum"}
+                    accessibilityRole="button"
+                    className="h-8 w-8 items-center justify-center rounded-lg bg-border/40 active:opacity-60"
+                    onPress={() => setEditingFast(fast)}
+                  >
+                    <Ionicons color={COLORS.muted} name="create-outline" size={16} />
+                  </Pressable>
+
+                  <Pressable
                     accessibilityLabel={language === "en" ? "Delete fast" : "Eliminar registo de jejum"}
                     accessibilityRole="button"
                     className="h-8 w-8 items-center justify-center rounded-lg bg-border/40 active:opacity-60"
@@ -234,6 +245,13 @@ export function FastingHistoryCard() {
           })}
         </View>
       )}
+
+      <FastingEditModal
+        fast={editingFast}
+        onClose={() => setEditingFast(null)}
+        onSaved={loadHistory}
+        visible={editingFast !== null}
+      />
     </View>
   );
 }

@@ -6,15 +6,19 @@ import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
 import type { WorkoutRecord } from "@/db/schema";
 import type { WorkoutSummary } from "@/hooks/use-workout-tracker";
+import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface WorkoutSummaryCardProps {
   records: WorkoutRecord[];
   summary: WorkoutSummary;
 }
 
-const DAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const DAY_LABELS_PT = ["D", "S", "T", "Q", "Q", "S", "S"];
+const DAY_LABELS_EN = ["S", "M", "T", "W", "T", "F", "S"];
 
-function getLastSevenDays(records: WorkoutRecord[]) {
+function getLastSevenDays(records: WorkoutRecord[], language: "en" | "pt") {
+  const dayLabels = language === "en" ? DAY_LABELS_EN : DAY_LABELS_PT;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -25,7 +29,7 @@ function getLastSevenDays(records: WorkoutRecord[]) {
 
     return {
       isToday: index === 6,
-      label: DAY_LABELS[date.getDay()],
+      label: dayLabels[date.getDay()],
       minutes: records
         .filter(
           (record) => record.timestamp >= dayStart && record.timestamp < dayEnd,
@@ -39,18 +43,26 @@ export function WorkoutSummaryCard({
   records,
   summary,
 }: WorkoutSummaryCardProps) {
-  const days = getLastSevenDays(records);
+  const language = useAppPreferencesStore((state) => state.language);
+  const days = getLastSevenDays(records, language);
   const maxMinutes = Math.max(...days.map((day) => day.minutes), 30);
+
+  const hoursEquivalent =
+    summary.weekMinutes >= 60
+      ? `${Math.floor(summary.weekMinutes / 60)}h ${
+          summary.weekMinutes % 60 > 0 ? `${summary.weekMinutes % 60}m` : ""
+        }`.trim()
+      : null;
 
   return (
     <Card>
       <View className="flex-row items-center justify-between">
         <View>
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
-            Últimos 7 dias
+            {translateText("Últimos 7 dias", language)}
           </Text>
           <Text className="mt-2 font-headline text-2xl text-foreground">
-            O teu movimento
+            {translateText("O teu movimento", language)}
           </Text>
         </View>
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-success-dark">
@@ -66,10 +78,15 @@ export function WorkoutSummaryCard({
             </Text>
             <Text className="ml-1 font-body text-sm text-muted">min</Text>
           </View>
+          {hoursEquivalent ? (
+            <Text className="font-label text-[10px] uppercase text-success">
+              ≈ {hoursEquivalent}
+            </Text>
+          ) : null}
           <Text className="mt-1 font-body text-xs text-muted">
             {summary.weekCount === 1
-              ? "1 atividade registada"
-              : `${summary.weekCount} atividades registadas`}
+              ? translateText("1 atividade registada", language)
+              : translateText(`${summary.weekCount} atividades registadas`, language)}
           </Text>
         </View>
 
@@ -113,7 +130,9 @@ export function WorkoutSummaryCard({
           <Text className="font-headline text-lg text-foreground">
             {summary.totalMinutes}
           </Text>
-          <Text className="font-body text-xs text-muted">minutos no total</Text>
+          <Text className="font-body text-xs text-muted">
+            {translateText("minutos no total", language)}
+          </Text>
         </View>
         <View className="h-9 w-px bg-border" />
         <View className="flex-1 pl-4">
@@ -121,7 +140,7 @@ export function WorkoutSummaryCard({
             +{summary.weekXp} XP
           </Text>
           <Text className="font-body text-xs text-muted">
-            ganhos esta semana
+            {translateText("ganhos esta semana", language)}
           </Text>
         </View>
       </View>

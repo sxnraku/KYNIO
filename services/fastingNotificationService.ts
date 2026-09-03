@@ -1,6 +1,16 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import {
+  ESTIMATED_METABOLIC_PHASES,
+  getEstimatedPhaseIndex,
+} from '@/services/fasting';
+import {
+  cancelNativeOngoingNotification,
+  syncOngoingNotification,
+} from '@/services/fastingWidgetService';
+import { useSubscriptionStore } from '@/store/use-subscription-store';
+
 const HOURS_TO_MS = 60 * 60 * 1000;
 
 // Identificadores estáveis das notificações agendadas: permitem cancelar só
@@ -11,11 +21,14 @@ const FASTING_PHASE_NOTIFICATION_IDS = [12, 14, 16, 24].map(
 );
 const FASTING_GOAL_NOTIFICATION_ID = 'fasting-goal';
 const FASTING_ROUTINE_REMINDER_NOTIFICATION_ID = 'fasting-routine-reminder';
+export const FASTING_ONGOING_NOTIFICATION_ID = 'fasting-ongoing-status';
+export const FASTING_ONGOING_CHANNEL_ID = 'fasting-ongoing-channel';
 
 const FASTING_NOTIFICATION_IDS = [
   ...FASTING_PHASE_NOTIFICATION_IDS,
   FASTING_GOAL_NOTIFICATION_ID,
   FASTING_ROUTINE_REMINDER_NOTIFICATION_ID,
+  FASTING_ONGOING_NOTIFICATION_ID,
 ];
 
 // Lembretes diários de hidratação: 10:00, 13:00, 16:00 e 19:00.
@@ -64,15 +77,90 @@ export async function cancelFastingNotifications(): Promise<void> {
   }
 
   try {
-    // Cancela apenas as notificações de jejum (por identificador), para não
-    // apagar os lembretes de hidratação sempre que um jejum inicia/termina.
-    await Promise.all(
-      FASTING_NOTIFICATION_IDS.map((identifier) =>
+    cancelNativeOngoingNotification();
+
+    // Cancela as notificações de jejum agendadas e dispensa a notificação persistente
+    await Promise.all([
+      ...FASTING_NOTIFICATION_IDS.map((identifier) =>
         Notifications.cancelScheduledNotificationAsync(identifier),
       ),
-    );
+      Notifications.dismissNotificationAsync(FASTING_ONGOING_NOTIFICATION_ID),
+    ]);
   } catch {
     // Silently ignore cancellation errors
+  }
+}
+
+export async function updateFastingOngoingNotification(
+  startedAt: number,
+  targetHours: number,
+): Promise<void> {
+  if (Platform.OS === 'web') {
+    return;
+  }
+
+  try {
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    const now = Date.now();
+    const elapsedMs = Math.max(0, now - startedAt);
+    const elapsedHours = Math.floor(elapsedMs / (60 * 60 * 1000));
+    const elapsedMins = Math.floor(
+      (elapsedMs % (60 * 60 * 1000)) / (60 * 1000),
+    );
+
+    const currentPhaseIndex = getEstimatedPhaseIndex(
+      elapsedHours + elapsedMins / 60,
+    );
+    const phase =
+      ESTIMATED_METABOLIC_PHASES[currentPhaseIndex] ??
+      ESTIMATED_METABOLIC_PHASES[0];
+
+    const phaseTitle = phase?.title ?? 'Jejum Ativo';
+    const phaseTip   = phase?.tip ?? phase?.description ?? 'Jejum em curso';
+
+    // Android: exclusivamente via FastingForegroundService nativo
+    // (notificação persistente com cronómetro vivo — não usar Expo aqui)
+    if (Platform.OS === 'android') {
+      syncOngoingNotification(true, startedAt, targetHours, phaseTitle, phaseTip);
+      return;
+    }
+
+    // iOS: Expo Notifications (não há Foreground Service no iOS)
+    const durationText =
+      elapsedHours > 0
+        ? `${elapsedHours}h ${elapsedMins}m`
+        : `${elapsedMins}m`;
+    const title = `A jejuar há ${durationText} · ${phaseTitle}`;
+    const body =
+      targetHours > 0
+        ? `Meta: ${targetHours}h · ${phaseTip}`
+        : phaseTip;
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        autoDismiss: false,
+        body,
+        color: '#D9922E',
+        data: {
+          phaseIndex: currentPhaseIndex,
+          phaseName: phaseTitle,
+          startedAt,
+          targetHours,
+          type: 'fasting_ongoing',
+        },
+        priority: 'low',
+        sticky: true,
+        title,
+      },
+      identifier: FASTING_ONGOING_NOTIFICATION_ID,
+      trigger: null,
+    });
+  } catch {
+    // Silently ignore ongoing notification error
   }
 }
 
@@ -93,51 +181,58 @@ export async function scheduleFastingPhaseNotifications(
       return;
     }
 
+    // Apresenta imediatamente a notificação persistente na barra de estado
+    await updateFastingOngoingNotification(startedAt, targetHours);
+
     const now = Date.now();
 
-    // Define biological milestone triggers
-    const milestones = [
-      {
-        hours: 12,
-        title: 'Queima de Gordura Ativa 🔥',
-        body: '12h de Jejum atingidas! O glicogénio hepático esgotou e o teu corpo está a queimar ácidos gordos.',
-      },
-      {
-        hours: 14,
-        title: 'Cetose Acelerada ⚡',
-        body: '14h de Jejum! Produção de corpos cetónicos em alta para energia limpa e clareza mental.',
-      },
-      {
-        hours: 16,
-        title: 'Autofagia Celular 🧬',
-        body: '16h de Jejum! Os teus processos de autofagia e renovação celular profunda estão ativos.',
-      },
-      {
-        hours: 24,
-        title: 'Pico de Renovação Celular ✨',
-        body: '24h de Jejum! Pico máximo de autofagia e reciclagem mitocondrial.',
-      },
-    ];
+    const isPro = useSubscriptionStore.getState().isPro;
 
-    // Schedule each milestone if its trigger time is in the future
-    for (const milestone of milestones) {
-      const triggerTimeMs = startedAt + milestone.hours * HOURS_TO_MS;
-      const delaySeconds = Math.floor((triggerTimeMs - now) / 1000);
+    // Define biological milestone triggers (exclusivo Sol Pro)
+    if (isPro) {
+      const milestones = [
+        {
+          hours: 12,
+          title: 'Transição Metabólica (12h) 🔥',
+          body: '12h de jejum: reservas hepáticas em transição para queima de gordura. Lembra-te de beber água.',
+        },
+        {
+          hours: 14,
+          title: 'Cetose Ativa (14h) ⚡',
+          body: '14h de jejum: produção de corpos cetónicos em ritmo acelerado para energia celular.',
+        },
+        {
+          hours: 16,
+          title: 'Autofagia Celular (16h) 🧬',
+          body: '16h de jejum: processos naturais de renovação e reciclagem celular em curso.',
+        },
+        {
+          hours: 24,
+          title: 'Renovação Profunda (24h) ✨',
+          body: '24h de jejum concluídas: pico de reciclagem mitocondrial e foco consistente.',
+        },
+      ];
 
-      if (delaySeconds > 10) {
-        await Notifications.scheduleNotificationAsync({
-          identifier: `fasting-phase-${milestone.hours}`,
-          content: {
-            title: milestone.title,
-            body: milestone.body,
-            data: { type: 'fasting_phase', hours: milestone.hours },
-            sound: true,
-          },
-          trigger: {
-            seconds: delaySeconds,
-            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-          },
-        });
+      // Schedule each milestone if its trigger time is in the future
+      for (const milestone of milestones) {
+        const triggerTimeMs = startedAt + milestone.hours * HOURS_TO_MS;
+        const delaySeconds = Math.floor((triggerTimeMs - now) / 1000);
+
+        if (delaySeconds > 10) {
+          await Notifications.scheduleNotificationAsync({
+            identifier: `fasting-phase-${milestone.hours}`,
+            content: {
+              title: milestone.title,
+              body: milestone.body,
+              data: { type: 'fasting_phase', hours: milestone.hours },
+              sound: true,
+            },
+            trigger: {
+              seconds: delaySeconds,
+              type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            },
+          });
+        }
       }
     }
 

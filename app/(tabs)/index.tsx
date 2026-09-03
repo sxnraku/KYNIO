@@ -14,6 +14,11 @@ import {
   ESTIMATED_METABOLIC_PHASES,
   getEstimatedPhaseIndex,
 } from "@/services/fasting";
+import {
+  cancelFastingNotifications,
+  updateFastingOngoingNotification,
+} from "@/services/fastingNotificationService";
+import { syncWidgetFastingState } from "@/services/fastingWidgetService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useFastingStore } from "@/store/useFastingStore";
 
@@ -37,12 +42,34 @@ export default function HomeScreen() {
   const isActive = useFastingStore((state) => state.isActive);
   const isSaving = useFastingStore((state) => state.isSaving);
   const persistenceError = useFastingStore((state) => state.persistenceError);
+  const startedAt = useFastingStore((state) => state.startedAt);
   const targetDurationMs = useFastingStore((state) => state.targetDurationMs);
   const { elapsedHours, elapsedMs, progress } = useFastingTimer();
   const currentPhaseIndex = getEstimatedPhaseIndex(elapsedHours);
   const currentPhase =
     ESTIMATED_METABOLIC_PHASES[currentPhaseIndex] ??
     ESTIMATED_METABOLIC_PHASES[0];
+
+  React.useEffect(() => {
+    // Aguardar hidratação do store — antes disso os valores podem ser undefined
+    if (!hasHydrated) return;
+
+    const safePhaseTitle = currentPhase?.title ?? 'Digestão & Absorção';
+    const safePhaseTip   = currentPhase?.tip   ?? 'Jejum em curso';
+
+    if (isActive && startedAt) {
+      void updateFastingOngoingNotification(startedAt, goal.fastingHours);
+      syncWidgetFastingState(
+        true,
+        startedAt,
+        goal.fastingHours,
+        safePhaseTitle,
+      );
+    } else {
+      void cancelFastingNotifications();
+      syncWidgetFastingState(false, 0, goal.fastingHours ?? 16, 'Pronto');
+    }
+  }, [hasHydrated, isActive, startedAt, goal.fastingHours, currentPhase?.title]);
 
   if (!hasHydrated) {
     return (
