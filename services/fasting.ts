@@ -57,6 +57,14 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
     id: 'digestion',
     physiologicalEffect:
       'Pico de insulina circulante e início do armazenamento de glicose sob a forma de glicogénio muscular e hepático.',
+    references: [
+      {
+        note: 'Estudo com 36 voluntários saudáveis: após uma refeição mista equilibrada, a glicose e a insulina séricas sobem nas primeiras horas, com amostragens até aos 180 min — confirma a fase de absorção em humanos.',
+        pmid: '35105852',
+        title: 'Absence of a sexual dimorphism in postprandial glucose metabolism after administration of a balanced mixed meal in healthy young volunteers (Nutrition & Diabetes)',
+        year: 2022,
+      },
+    ],
     startHour: 0,
     timeRange: '0h–4h',
     tip: 'Mantém-te hidratado apenas com água para facilitar o trânsito digestivo.',
@@ -73,6 +81,14 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
     id: 'glucose',
     physiologicalEffect:
       'Queda dos níveis de açúcar no sangue e desbloqueio gradual das vias de oxidação lipídica.',
+    references: [
+      {
+        note: 'Estudo randomizado com medição direta por espectroscopia de ressonância magnética (13C-MRS): quantificou a depleção do glicogénio hepático durante o jejum noturno em humanos e a sua reposição após refeição.',
+        pmid: '36797201',
+        title: 'Liver glycogen stores via 13C magnetic resonance spectroscopy in healthy children: randomized, controlled study (Am J Clin Nutr)',
+        year: 2023,
+      },
+    ],
     startHour: 4,
     timeRange: '4h–12h',
     tip: 'Se sentires fome súbita, bebe água ou chá sem açúcar; é apenas o reflexo hormonal da grelina.',
@@ -89,6 +105,14 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
     id: 'fat_burning',
     physiologicalEffect:
       'Aumento de glucagon e adrenalina, estimulando a quebra dos triglicéridos no tecido adiposo.',
+    references: [
+      {
+        note: 'Ensaio randomizado com 36 adultos magros saudáveis: jejuns de 24h isolaram os efeitos metabólicos do jejum, incluindo a mobilização de gordura, em comparação com restrição energética contínua.',
+        pmid: '34135111',
+        title: 'A randomized controlled trial to isolate the effects of fasting and energy restriction on weight loss and metabolic health in lean adults (Science Translational Medicine)',
+        year: 2021,
+      },
+    ],
     startHour: 12,
     timeRange: '12h–18h',
     tip: 'Excelente momento para caminhadas ligeiras ou trabalho focado; a clareza mental começa a aumentar.',
@@ -107,13 +131,13 @@ export const ESTIMATED_METABOLIC_PHASES: readonly EstimatedMetabolicPhase[] = [
       'Subida das cetonas no sangue e menor dependência de glicose.',
     references: [
       {
-        note: 'Review de referência sobre o "metabolic switch" do jejum intermitente: a transição para cetonas ocorre tipicamente entre 12–36h, dependendo das reservas de glicogénio e atividade física.',
-        pmid: '31881139',
-        title: 'Effects of Intermittent Fasting on Health, Aging, and Disease (de Cabo & Mattson, NEJM)',
+        note: 'Ensaio randomizado com 60 adultos saudáveis não-obesos: 4 semanas de jejum em dias alternados aumentaram o beta-hidroxibutirato (cetona) mesmo nos dias sem jejum, com melhoria de marcadores cardiovasculares.',
+        pmid: '31471173',
+        title: 'Alternate Day Fasting Improves Physiological and Molecular Markers of Aging in Healthy, Non-obese Humans (Cell Metabolism)',
         year: 2019,
       },
       {
-        note: 'Estudo-piloto com 5 adultos saudáveis num jejum de 72h: confirma a queda de insulina e glicose e remodelação metabólica; amostra pequena, resultados preliminares.',
+        note: 'Estudo-piloto com 5 adultos saudáveis num jejum de 72h: confirma a queda de insulina e glicose e a remodelação metabólica em humanos; amostra pequena, resultados preliminares.',
         pmid: '42286908',
         title: 'Systemic metabolic, hormonal, and glycomic remodeling during a 72-hour fast in healthy adults',
         year: 2026,

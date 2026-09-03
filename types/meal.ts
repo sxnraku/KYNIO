@@ -22,6 +22,7 @@ export interface MealAnalysisImage {
 export interface AnalyzeMealInput {
   description?: string;
   image?: MealAnalysisImage;
+  language?: 'en' | 'pt';
 }
 
 export interface SelectedMealImage extends MealAnalysisImage {

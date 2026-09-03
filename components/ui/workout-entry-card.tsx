@@ -1,15 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { ComponentProps } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { getLatestWeightKg } from "@/services/dbService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
   EFFORT_LABELS,
+  estimateCalories,
   type WorkoutEffort,
   WORKOUT_OPTIONS,
 } from "@/types/workout";
@@ -57,15 +60,32 @@ export function WorkoutEntryCard({
 }: WorkoutEntryCardProps) {
   const language = useAppPreferencesStore((state) => state.language);
   const xpAvailable = xpLogsRemaining > 0;
+
+  const [userWeightKg, setUserWeightKg] = useState<number | null>(null);
+  const [customWeight, setCustomWeight] = useState<string>("");
+  const [manualCalories, setManualCalories] = useState<string>("");
+  const [isPrecisionOpen, setIsPrecisionOpen] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    void getLatestWeightKg().then((weight) => {
+      if (isMounted && weight) {
+        setUserWeightKg(weight);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   return (
     <Card>
       <View className="flex-row items-center justify-between">
         <View className="flex-1 pr-4">
           <Text className="font-headline text-xl text-foreground">
-            Registar atividade
+            {translateText("Registar atividade", language)}
           </Text>
           <Text className="mt-1 font-body text-sm text-muted">
-            O que fizeste hoje?
+            {translateText("O que fizeste hoje?", language)}
           </Text>
         </View>
         <View className="rounded-full bg-xp/10 px-3 py-2">
@@ -90,7 +110,7 @@ export function WorkoutEntryCard({
           const selected = selectedType === option.id;
           return (
             <Pressable
-              accessibilityLabel={option.label}
+              accessibilityLabel={translateText(option.label, language)}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               className={
@@ -113,7 +133,7 @@ export function WorkoutEntryCard({
                     : "mt-2 font-headline text-xs text-foreground"
                 }
               >
-                {option.label}
+                {translateText(option.label, language)}
               </Text>
             </Pressable>
           );
@@ -121,7 +141,7 @@ export function WorkoutEntryCard({
       </ScrollView>
 
       <Text className="mb-3 mt-6 font-label text-[10px] uppercase tracking-widest text-muted">
-        Duração em minutos
+        {translateText("Duração em minutos", language)}
       </Text>
       <View className="flex-row gap-2">
         {DURATION_PRESETS.map((preset) => {
@@ -153,12 +173,16 @@ export function WorkoutEntryCard({
       </View>
       <View className="mt-2 flex-row items-center rounded-xl border border-border bg-surface-raised px-4">
         <TextInput
-          accessibilityLabel="Duração personalizada em minutos"
+          accessibilityLabel={
+            language === "en"
+              ? "Custom duration in minutes"
+              : "Duração personalizada em minutos"
+          }
           className="min-w-0 flex-1 py-3 font-body text-base text-foreground"
           inputMode="numeric"
-          maxLength={4}
+          maxLength={3}
           onChangeText={onChangeDuration}
-          placeholder="Outra duração"
+          placeholder={language === "en" ? "Other duration" : "Outra duração"}
           placeholderTextColor={COLORS.muted}
           value={duration}
         />
@@ -166,7 +190,7 @@ export function WorkoutEntryCard({
       </View>
 
       <Text className="mb-3 mt-6 font-label text-[10px] uppercase tracking-widest text-muted">
-        Esforço percebido
+        {translateText("Esforço percebido", language)}
       </Text>
       <View className="flex-row rounded-2xl bg-background p-1">
         {EFFORT_OPTIONS.map((option) => {
@@ -190,20 +214,211 @@ export function WorkoutEntryCard({
                     : "font-body text-xs text-muted"
                 }
               >
-                {EFFORT_LABELS[option]}
+                {translateText(EFFORT_LABELS[option], language)}
               </Text>
             </Pressable>
           );
         })}
       </View>
 
+      {/* Estimativa calórica — atualiza em tempo real com maior precisão opcional */}
+      {(() => {
+        const durationNum = parseInt(duration, 10);
+        if (!durationNum || durationNum <= 0) return null;
+
+        const parsedCustomWeight = parseFloat(customWeight.replace(",", "."));
+        const hasCustomWeight =
+          !isNaN(parsedCustomWeight) &&
+          parsedCustomWeight >= 25 &&
+          parsedCustomWeight <= 300;
+        const effectiveWeight = hasCustomWeight
+          ? parsedCustomWeight
+          : userWeightKg ?? 70;
+
+        const calculatedKcal = estimateCalories(
+          selectedType,
+          durationNum,
+          effort,
+          effectiveWeight,
+        );
+        const parsedManual = parseInt(manualCalories, 10);
+        const hasManual = !isNaN(parsedManual) && parsedManual > 0;
+        const displayKcal = hasManual ? parsedManual : calculatedKcal;
+
+        if (!displayKcal) return null;
+
+        const handleAddCaloriesToNotes = () => {
+          const calorieTag = `[${displayKcal} kcal]`;
+          if (notes.includes(calorieTag)) return;
+          const updatedNotes = notes.trim()
+            ? `${calorieTag} ${notes.trim()}`
+            : calorieTag;
+          onChangeNotes(updatedNotes);
+        };
+
+        return (
+          <View className="mt-4 rounded-2xl border border-border bg-surface-raised p-4">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1 flex-row items-center gap-2 pr-2">
+                <Ionicons color={COLORS.success} name="flame-outline" size={20} />
+                <View className="flex-1">
+                  <Text className="font-headline text-sm text-foreground">
+                    ~{displayKcal} kcal {hasManual ? (language === "en" ? "(measured)" : "(medido)") : (language === "en" ? "estimated" : "estimadas")}
+                  </Text>
+                  <Text className="font-body text-[11px] text-muted">
+                    {hasManual
+                      ? language === "en"
+                        ? "Value entered from your tracker/watch"
+                        : "Valor introduzido do teu medidor/relógio"
+                      : userWeightKg && !hasCustomWeight
+                      ? language === "en"
+                        ? `Personalised with your weight (${userWeightKg} kg)`
+                        : `Personalizado com o teu peso (${userWeightKg} kg)`
+                      : hasCustomWeight
+                      ? language === "en"
+                        ? `Calculated for ${effectiveWeight} kg`
+                        : `Calculado para ${effectiveWeight} kg`
+                      : language === "en"
+                      ? "Default average reference (70 kg)"
+                      : "Referência média padrão (70 kg)"}
+                  </Text>
+                </View>
+              </View>
+
+              <Pressable
+                accessibilityLabel={
+                  language === "en"
+                    ? "Higher calorie precision options"
+                    : "Opções de maior precisão calórica"
+                }
+                accessibilityRole="button"
+                className="flex-row items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 active:opacity-70"
+                onPress={() => setIsPrecisionOpen((prev) => !prev)}
+              >
+                <Ionicons
+                  color={COLORS.success}
+                  name={isPrecisionOpen ? "chevron-up" : "options-outline"}
+                  size={14}
+                />
+                <Text className="font-label text-[10px] uppercase tracking-wider text-success">
+                  {isPrecisionOpen
+                    ? language === "en"
+                      ? "Close"
+                      : "Fechar"
+                    : language === "en"
+                    ? "Precision"
+                    : "Precisão"}
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Painel de precisão avançada (ajuste de peso corporal ou valor exato do smartwatch) */}
+            {isPrecisionOpen ? (
+              <View className="mt-4 border-t border-border pt-4">
+                <Text className="mb-3 font-label text-[10px] uppercase tracking-widest text-muted">
+                  {language === "en" ? "Higher calculation precision" : "Mais precisão no cálculo"}
+                </Text>
+
+                {/* 1. Ajuste de peso para a fórmula METs */}
+                <View className="mb-3 flex-row items-center justify-between rounded-xl border border-border bg-background px-3 py-2">
+                  <View className="flex-1 pr-2">
+                    <Text className="font-headline text-xs text-foreground">
+                      {language === "en" ? "Body weight" : "Peso corporal"}
+                    </Text>
+                    <Text className="font-body text-[11px] text-muted">
+                      {userWeightKg
+                        ? language === "en"
+                          ? `Logged in app: ${userWeightKg} kg`
+                          : `Registado na app: ${userWeightKg} kg`
+                        : language === "en"
+                        ? "Reference used: 70 kg"
+                        : "Referência usada: 70 kg"}
+                    </Text>
+                  </View>
+                  <View className="w-24 flex-row items-center rounded-lg border border-border bg-surface-raised px-2 py-1">
+                    <TextInput
+                      accessibilityLabel={
+                        language === "en"
+                          ? "Body weight for calorie calculation"
+                          : "Peso corporal para cálculo calórico"
+                      }
+                      className="flex-1 text-right font-headline text-xs text-foreground"
+                      keyboardType="decimal-pad"
+                      maxLength={5}
+                      onChangeText={setCustomWeight}
+                      placeholder={String(userWeightKg ?? 70)}
+                      placeholderTextColor={COLORS.muted}
+                      value={customWeight}
+                    />
+                    <Text className="ml-1 font-body text-xs text-muted">kg</Text>
+                  </View>
+                </View>
+
+                {/* 2. Ou introduzir calorias exatas do smartwatch */}
+                <View className="flex-row items-center justify-between rounded-xl border border-border bg-background px-3 py-2">
+                  <View className="flex-1 pr-2">
+                    <Text className="font-headline text-xs text-foreground">
+                      {language === "en" ? "Smartwatch calories" : "Calorias do smartwatch"}
+                    </Text>
+                    <Text className="font-body text-[11px] text-muted">
+                      {language === "en"
+                        ? "Overrides formula with measured value"
+                        : "Sobrepõe a fórmula com o valor medido"}
+                    </Text>
+                  </View>
+                  <View className="w-24 flex-row items-center rounded-lg border border-border bg-surface-raised px-2 py-1">
+                    <TextInput
+                      accessibilityLabel={
+                        language === "en"
+                          ? "Calories measured on smartwatch"
+                          : "Calorias medidas no smartwatch"
+                      }
+                      className="flex-1 text-right font-headline text-xs text-foreground"
+                      keyboardType="number-pad"
+                      maxLength={5}
+                      onChangeText={setManualCalories}
+                      placeholder={language === "en" ? "E.g. 320" : "Ex: 320"}
+                      placeholderTextColor={COLORS.muted}
+                      value={manualCalories}
+                    />
+                    <Text className="ml-1 font-body text-xs text-muted">kcal</Text>
+                  </View>
+                </View>
+
+                {/* Botão rápido para adicionar às notas */}
+                <Pressable
+                  accessibilityRole="button"
+                  className="mt-3 flex-row items-center justify-center gap-1.5 rounded-xl border border-success/30 bg-success/10 py-2 active:opacity-70"
+                  onPress={handleAddCaloriesToNotes}
+                >
+                  <Ionicons color={COLORS.success} name="bookmark-outline" size={14} />
+                  <Text className="font-headline text-xs text-success">
+                    {language === "en"
+                      ? `Add [${displayKcal} kcal] to notes`
+                      : `Adicionar [${displayKcal} kcal] às notas`}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+          </View>
+        );
+      })()}
+
       <TextInput
-        accessibilityLabel="Notas opcionais sobre a atividade"
+        accessibilityLabel={
+          language === "en"
+            ? "Optional notes about the activity"
+            : "Notas opcionais sobre a atividade"
+        }
         className="mt-4 min-h-[72px] rounded-xl border border-border bg-surface-raised px-4 py-3 font-body text-sm text-foreground"
         maxLength={240}
         multiline
         onChangeText={onChangeNotes}
-        placeholder="Notas opcionais: percurso, como te sentiste…"
+        placeholder={
+          language === "en"
+            ? "Optional notes: route, how you felt…"
+            : "Notas opcionais: percurso, como te sentiste…"
+        }
         placeholderTextColor={COLORS.muted}
         textAlignVertical="top"
         value={notes}
@@ -243,8 +458,10 @@ export function WorkoutEntryCard({
           size={17}
         />
         <Text className="flex-1 font-body text-xs leading-[18px] text-muted">
-          Regista apenas atividade já realizada. A app não recomenda duração,
-          intensidade ou um plano de treino.
+          {translateText(
+            "Regista apenas atividade já realizada. A app não recomenda duração, intensidade ou um plano de treino.",
+            language,
+          )}
         </Text>
       </View>
     </Card>

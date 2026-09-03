@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KYNIO — Temas Exclusivos Sol Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #11100E;
+    color: #E8E5DD;
+    font-family: "Hanken Grotesk", -apple-system, sans-serif;
+    padding: 40px 20px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  header {
+    text-align: center;
+    max-width: 680px;
+    margin-bottom: 32px;
+  }
+
+  .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #D9922E;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #F6F3EC;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  p.subtitle {
+    font-size: 15px;
+    color: #9C978D;
+    line-height: 1.5;
+  }
+
+  /* Seletor de Temas */
+  .theme-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+    margin-bottom: 36px;
+    background: #1C1915;
+    padding: 6px;
+    border-radius: 16px;
+    border: 1px solid #2B2620;
+  }
+
+  .theme-btn {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #9C978D;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theme-btn .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .theme-btn:hover {
+    color: #F6F3EC;
+    background: #25201A;
+  }
+
+  .theme-btn.active {
+    background: #2B2620;
+    color: #F6F3EC;
+    border-color: #4A4033;
+    font-weight: 600;
+  }
+
+  /* Painel de Apresentação */
+  .showcase {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    max-width: 960px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Mockup Telemóvel */
+  .phone-frame {
+    width: 360px;
+    border-radius: 36px;
+    padding: 24px 20px;
+    box-shadow: 0 25px 60px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Detalhes do Tema */
+  .info-panel {
+    flex: 1;
+    min-width: 320px;
+    max-width: 480px;
+    background: #1C1915;
+    border: 1px solid #2B2620;
+    border-radius: 24px;
+    padding: 28px;
+  }
+
+  .info-badge {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: #D9922E;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .info-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #F6F3EC;
+    margin-bottom: 8px;
+  }
+
+  .info-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #A39D92;
+    margin-bottom: 24px;
+  }
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .palette-item {
+    background: #14120F;
+    border: 1px solid #2B2620;
+    padding: 10px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .palette-color {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+
+  .palette-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #E8E5DD;
+  }
+
+  .palette-hex {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    color: #8C867B;
+  }
+
+  /* Componentes Dentro do Telemóvel */
+  .ui-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .ui-logo {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+  }
+
+  .ui-badge {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  /* Dial Solar */
+  .dial-box {
+    border-radius: 24px;
+    padding: 24px 16px;
+    margin-bottom: 16px;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+    transition: all 0.3s ease;
+  }
+
+  .dial-arc {
+    width: 190px;
+    height: 100px;
+    margin: 0 auto 12px;
+    position: relative;
+  }
+
+  .timer-main {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .timer-sub {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Cartões Menores */
+  .card-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .mini-card {
+    border-radius: 18px;
+    padding: 14px;
+    border-width: 1px;
+    border-style: solid;
+    transition: all 0.3s ease;
+  }
+
+  .mini-card .mini-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .mini-card .mini-value {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* Botão Principal */
+  .cta-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag">✦ KYNIO Sol Pro</span>
+  <h1>Temas Premium Exclusivos</h1>
+  <p class="subtitle">
+    Clica nos botões abaixo para ver o aspeto real e a paleta de cada tema aplicado diretamente aos componentes da app.
+  </p>
+</header>
+
+<!-- Seletor de Temas -->
+<div class="theme-bar">
+  <button class="theme-btn active" onclick="setTheme('amoled')">
+    <span class="dot" style="background:#000000; border: 1px solid #FFA01C;"></span>
+    AMOLED Eclipse
+  </button>
+  <button class="theme-btn" onclick="setTheme('midnight')">
+    <span class="dot" style="background:#0D111A; border: 1px solid #F0C05A;"></span>
+    Crepúsculo & Ouro
+  </button>
+  <button class="theme-btn" onclick="setTheme('matcha')">
+    <span class="dot" style="background:#121815; border: 1px solid #94BC4A;"></span>
+    Matcha & Salva
+  </button>
+  <button class="theme-btn" onclick="setTheme('eink')">
+    <span class="dot" style="background:#141414; border: 1px solid #FFFFFF;"></span>
+    Studio Monocromo
+  </button>
+  <button class="theme-btn" onclick="setTheme('circadiano')">
+    <span class="dot" style="background:#EDE6D3; border: 1px solid #D9922E;"></span>
+    Original Claro
+  </button>
+  <button class="theme-btn" onclick="setTheme('noite')">
+    <span class="dot" style="background:#1C1915; border: 1px solid #E8A83E;"></span>
+    Original Noite
+  </button>
+</div>
+
+<div class="showcase">
+  <!-- Mockup Telemóvel Dinâmico -->
+  <div class="phone-frame" id="phone">
+    <div class="ui-header">
+      <span class="ui-logo" id="logoText">KYNIO</span>
+      <span class="ui-badge" id="badgeText">SOL PRO ✦</span>
+    </div>
+
+    <!-- Mostrador Solar -->
+    <div class="dial-box" id="dialBox">
+      <svg class="dial-arc" viewBox="0 0 190 100">
+        <path d="M 20 90 A 75 75 0 0 1 170 90" fill="none" id="arcBg" stroke-width="6" stroke-linecap="round" />
+        <path d="M 20 90 A 75 75 0 0 1 145 35" fill="none" id="arcActive" stroke-width="7" stroke-linecap="round" />
+        <circle cx="145" cy="35" r="6" id="arcSun" />
+      </svg>
+      <div class="timer-main" id="timerText">14:28:10</div>
+      <div class="timer-sub" id="phaseText">Cetose Avançada · Meta 16h</div>
+    </div>
+
+    <!-- Cartões Secundários -->
+    <div class="card-row">
+      <div class="mini-card" id="cardWater">
+        <div class="mini-label" id="labelWater">Hidratação</div>
+        <div class="mini-value" id="valWater">1.750 ml</div>
+      </div>
+      <div class="mini-card" id="cardWorkout">
+        <div class="mini-label" id="labelWorkout">Calorias</div>
+        <div class="mini-value" id="valWorkout">~380 kcal</div>
+      </div>
+    </div>
+
+    <!-- Botão de Ação -->
+    <button class="cta-btn" id="ctaBtn">
+      <span>Terminar Jejum</span>
+    </button>
+  </div>
+
+  <!-- Painel Informativo da Paleta -->
+  <div class="info-panel">
+    <div class="info-badge" id="infoTier">TEMA EXCLUSIVO SOL PRO</div>
+    <h2 class="info-title" id="infoTitle">AMOLED Eclipse</h2>
+    <p class="info-desc" id="infoDesc">
+      Preto absoluto (#000000) com os píxeis OLED 100% desligados para máxima poupança de bateria. O acento solar âmbar incandescente garante contraste cirúrgico sem ofuscar no escuro.
+    </p>
+
+    <div class="palette-grid" id="paletteGrid">
+      <!-- Injetado via JS -->
+    </div>
+
+    <div style="padding: 14px; border-radius: 14px; background: #14120F; border: 1px solid #2B2620; font-size: 12px; color: #8C867B; line-height: 1.5;">
+      💡 <strong style="color:#D9922E;">Vantagem para o utilizador:</strong> <span id="infoBenefit">Máxima poupança de autonomia de ecrã e contraste nítido em ambientes com pouca luz.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const THEMES = {
+  amoled: {
+    name: "AMOLED Eclipse",
+    tier: "TEMA EXCLUSIVO SOL PRO",
+    desc: "Preto absoluto (#000000) com os píxeis OLED 100% desligados para máxima poupança de bateria. O acento solar âmbar incandescente garante contraste cirúrgico sem ofuscar no escuro.",
+    benefit: "Máxima poupança de autonomia de ecrã e contraste nítido em ambientes com pouca luz.",
+    bg: "#000000",
+    surface: "#0C0C0B",
+    border: "#21201D",
+    fg: "#F7F5EE",
+    muted: "#78756D",
+    accent: "#FFA01C",
+    accentGlow: "#FFBD59",
+    btnText: "#1A0E00",
+    palette: [
+      { name: "Fundo Puro", hex: "#000000" },
+      { name: "Cartão / Superfície", hex: "#0C0C0B" },
+      { name: "Bordas Sutis", hex: "#21201D" },
+      { name: "Sol Âmbar Incandescente", hex: "#FFA01C" },
+      { name: "Texto Principal", hex: "#F7F5EE" },
+      { name: "Texto Secundário", hex: "#78756D" }
+    ]
+  },
+  midnight: {
+    name: "Crepúsculo & Ouro (Midnight & Gold)",
+    tier: "TEMA EXCLUSIVO SOL PRO",
+    desc: "Azul mineral profundo (#0D111A) inspirado na meia-noite ártica, contrastado com acentos em ouro imperial quente (#F0C05A). Transmite luxo sereno e reduz a fadiga visual noturna.",
+    benefit: "Ambiente luxuoso e sereno, excelente para quem usa a app à noite ou ao acordar.",
+    bg: "#0D111A",
+    surface: "#141A26",
+    border: "#242F45",
+    fg: "#EBF0F8",
+    muted: "#7E8EAA",
+    accent: "#F0C05A",
+    accentGlow: "#FBD684",
+    btnText: "#2B1E00",
+    palette: [
+      { name: "Fundo Noite", hex: "#0D111A" },
+      { name: "Superfície Ardósia", hex: "#141A26" },
+      { name: "Linhas Cerúleas", hex: "#242F45" },
+      { name: "Ouro Imperial", hex: "#F0C05A" },
+      { name: "Texto Marfim Frio", hex: "#EBF0F8" },
+      { name: "Texto Aço Suave", hex: "#7E8EAA" }
+    ]
+  },
+  matcha: {
+    name: "Matcha & Salva (Botanical Calm)",
+    tier: "TEMA EXCLUSIVO SOL PRO",
+    desc: "Tons botânicos orgânicos inspirados no chá verde matcha e folhas de salva (#121815). O acento verde-chá vivo transmite vitalidade, equilíbrio digestivo e bem-estar holístico.",
+    benefit: "Sensação orgânica e anti-stress que reforça hábitos saudáveis de nutrição e desintoxicação.",
+    bg: "#121815",
+    surface: "#1A221E",
+    border: "#293730",
+    fg: "#EBF2EC",
+    muted: "#7B8E82",
+    accent: "#94BC4A",
+    accentGlow: "#B5DF65",
+    btnText: "#142405",
+    palette: [
+      { name: "Fundo Floresta", hex: "#121815" },
+      { name: "Superfície Musgo", hex: "#1A221E" },
+      { name: "Bordas Salva", hex: "#293730" },
+      { name: "Matcha Vivo", hex: "#94BC4A" },
+      { name: "Texto Linho", hex: "#EBF2EC" },
+      { name: "Texto Folha Seca", hex: "#7B8E82" }
+    ]
+  },
+  eink: {
+    name: "Studio Monocromo (E-Ink Studio)",
+    tier: "TEMA EXCLUSIVO SOL PRO",
+    desc: "Minimalismo industrial absoluto inspirado em leitores e-ink e no design tipográfico suíço. 100% livre de cores decorativas: apenas preto titânio, cinza grafite e branco de alto impacto.",
+    benefit: "Hiperfoco sem estímulos visuais desnecessários; clareza máxima para quem adora estética brutalista.",
+    bg: "#141414",
+    surface: "#1C1C1C",
+    border: "#333333",
+    fg: "#FFFFFF",
+    muted: "#888888",
+    accent: "#FFFFFF",
+    accentGlow: "#E0E0E0",
+    btnText: "#000000",
+    palette: [
+      { name: "Preto Grafite", hex: "#141414" },
+      { name: "Superfície Asfalto", hex: "#1C1C1C" },
+      { name: "Linhas Titânio", hex: "#333333" },
+      { name: "Branco Puro", hex: "#FFFFFF" },
+      { name: "Texto Prata", hex: "#E0E0E0" },
+      { name: "Texto Cinza Médio", hex: "#888888" }
+    ]
+  },
+  circadiano: {
+    name: "Original Circadiano (Dia)",
+    tier: "TEMA BASE (GRATUITO)",
+    desc: "Papel quente (#EDE6D3), tinta carvão (#3A3A38) e o sol de mostrador em âmbar (#D9922E). Inspirado na luz natural da manhã.",
+    benefit: "Confortável para leitura durante o dia sem a agressividade do branco puro.",
+    bg: "#EDE6D3",
+    surface: "#F6F0DE",
+    border: "#D5CBAF",
+    fg: "#3A3A38",
+    muted: "#6F6E66",
+    accent: "#D9922E",
+    accentGlow: "#F4C95D",
+    btnText: "#FFFFFF",
+    palette: [
+      { name: "Papel Quente", hex: "#EDE6D3" },
+      { name: "Superfície Marfim", hex: "#F6F0DE" },
+      { name: "Linha Calma", hex: "#D5CBAF" },
+      { name: "Sol Âmbar", hex: "#D9922E" },
+      { name: "Tinta Carvão", hex: "#3A3A38" },
+      { name: "Cinza Suave", hex: "#6F6E66" }
+    ]
+  },
+  noite: {
+    name: "Original Noite (Escuro)",
+    tier: "TEMA BASE (GRATUITO)",
+    desc: "Carvão quente (#1C1915), texto marfim suave (#F1E9D6) e luz âmbar-vela (#E8A83E).",
+    benefit: "Protege o ritmo circadiano nas horas de repouso.",
+    bg: "#1C1915",
+    surface: "#24201B",
+    border: "#4A4334",
+    fg: "#F1E9D6",
+    muted: "#9E9584",
+    accent: "#E8A83E",
+    accentGlow: "#FFCD70",
+    btnText: "#261700",
+    palette: [
+      { name: "Carvão Quente", hex: "#1C1915" },
+      { name: "Superfície Café", hex: "#24201B" },
+      { name: "Linha Âmbar Mate", hex: "#4A4334" },
+      { name: "Âmbar-Vela", hex: "#E8A83E" },
+      { name: "Texto Marfim", hex: "#F1E9D6" },
+      { name: "Cinza Areia", hex: "#9E9584" }
+    ]
+  }
+};
+
+function setTheme(key) {
+  const t = THEMES[key];
+  if (!t) return;
+
+  // Atualizar botões
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  // Atualizar Mockup
+  const phone = document.getElementById('phone');
+  phone.style.backgroundColor = t.bg;
+  phone.style.borderColor = t.border;
+
+  document.getElementById('logoText').style.color = t.fg;
+  
+  const badge = document.getElementById('badgeText');
+  badge.style.backgroundColor = t.surface;
+  badge.style.color = t.accent;
+  badge.style.border = `1px solid ${t.border}`;
+
+  // Dial
+  const dial = document.getElementById('dialBox');
+  dial.style.backgroundColor = t.surface;
+  dial.style.borderColor = t.border;
+
+  document.getElementById('arcBg').setAttribute('stroke', t.border);
+  document.getElementById('arcActive').setAttribute('stroke', t.accent);
+  document.getElementById('arcSun').setAttribute('fill', t.accentGlow);
+
+  document.getElementById('timerText').style.color = t.fg;
+  const phase = document.getElementById('phaseText');
+  phase.style.color = t.muted;
+
+  // Mini cards
+  ['cardWater', 'cardWorkout'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.backgroundColor = t.surface;
+    el.style.borderColor = t.border;
+  });
+
+  document.getElementById('labelWater').style.color = t.muted;
+  document.getElementById('valWater').style.color = t.fg;
+  document.getElementById('labelWorkout').style.color = t.muted;
+  document.getElementById('valWorkout').style.color = t.accent;
+
+  // CTA
+  const cta = document.getElementById('ctaBtn');
+  cta.style.backgroundColor = t.accent;
+  cta.style.color = t.btnText;
+
+  // Painel Informativo
+  document.getElementById('infoTier').textContent = t.tier;
+  document.getElementById('infoTier').style.color = t.accent;
+  document.getElementById('infoTitle').textContent = t.name;
+  document.getElementById('infoDesc').textContent = t.desc;
+  document.getElementById('infoBenefit').textContent = t.benefit;
+
+  // Swatches da Paleta
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = t.palette.map(item => `
+    <div class="palette-item">
+      <div class="palette-color" style="background: ${item.hex};"></div>
+      <div>
+        <div class="palette-name">${item.name}</div>
+        <div class="palette-hex">${item.hex}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Inicializar com AMOLED
+window.addEventListener('DOMContentLoaded', () => {
+  setTheme('amoled');
+});
+</script>
+
+</body>
+</html>

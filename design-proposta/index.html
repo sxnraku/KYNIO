@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KYNIO — Proposta de redesign · Circadiano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    /* Paleta proposta — "luz filtrada" */
+    --paper: #EDE6D3;
+    --paper-deep: #E4DCC4;
+    --ink: #4F4F4C;
+    --ink-deep: #3A3A38;
+    --ink-soft: #6F6E66;
+    --line: #D5CBAF;
+    --amber: #D9922E;
+    --amber-glow: #F4C95D;
+    --slat-cool: #E4E9C5;
+    --slat-warm: #D5C2AD;
+    /* Paleta atual (para o "antes") */
+    --old-bg: #F3F6F4;
+    --old-surface: #FFFFFF;
+    --old-border: #DCE4DF;
+    --old-fg: #111713;
+    --old-muted: #68736C;
+    --old-success: #10B981;
+    --old-xp: #6366F1;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Hanken Grotesk", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 96px;
+  }
+
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* ── Cabeçalho ─────────────────────────────── */
+  header.page { padding: 72px 0 40px; border-bottom: 1px solid var(--line); }
+  .kicker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--amber);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .kicker::before { content: ""; width: 28px; height: 1px; background: var(--amber); }
+  h1 {
+    font-size: clamp(38px, 5.4vw, 64px);
+    font-weight: 700; letter-spacing: -0.02em; color: var(--ink-deep);
+    margin: 18px 0 14px; line-height: 1.02;
+  }
+  h1 em { font-style: normal; color: var(--amber); }
+  .lede { font-size: 17px; line-height: 1.65; color: var(--ink-soft); max-width: 640px; }
+
+  /* ── Conceito ──────────────────────────────── */
+  section { padding: 56px 0; }
+  .sec-label {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 22px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .concept-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .concept h3 { font-size: 18px; font-weight: 700; color: var(--ink-deep); margin-bottom: 8px; }
+  .concept p { font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+  .concept .num {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--amber);
+    display: block; margin-bottom: 10px;
+  }
+
+  /* ── Comparativo antes/depois ──────────────── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  @media (max-width: 900px) { .compare { grid-template-columns: 1fr; } .concept-grid { grid-template-columns: 1fr; } }
+
+  .phone-col figcaption {
+    text-align: center; margin-top: 18px;
+    font-family: "JetBrains Mono", monospace; font-size: 10px;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .phone-col figcaption b { color: var(--ink-deep); font-weight: 700; }
+
+  .phone {
+    width: 340px; margin: 0 auto;
+    border-radius: 46px; padding: 10px;
+    background: #26251f;
+    box-shadow: 0 30px 60px -24px rgba(58, 58, 56, 0.45);
+  }
+  .screen {
+    border-radius: 38px; overflow: hidden; position: relative;
+    height: 700px; display: flex; flex-direction: column;
+  }
+
+  /* ── ANTES (estado atual) ──────────────────── */
+  .screen.before { background: var(--old-bg); padding: 22px 16px 16px; }
+  .before .hdr { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+  .before .hdr h4 { font-size: 26px; font-weight: 700; color: var(--old-fg); }
+  .before .hdr small { font-size: 11px; color: var(--old-muted); display: block; margin-top: 3px; }
+  .before .xp-pill {
+    display: flex; align-items: center; gap: 5px;
+    border: 1px solid rgba(99,102,241,0.25); background: rgba(99,102,241,0.1);
+    border-radius: 999px; padding: 7px 11px;
+    font-size: 9px; font-weight: 700; color: var(--old-fg);
+  }
+  .before .xp-pill .dot { width: 11px; height: 11px; transform: rotate(45deg); border: 1.5px solid var(--old-xp); border-radius: 3px; }
+  .before .card {
+    background: var(--old-surface); border: 1px solid var(--old-border);
+    border-radius: 26px; padding: 16px; margin-bottom: 12px;
+  }
+  .before .card h5 { font-size: 16px; font-weight: 700; color: var(--old-fg); }
+  .before .card .sub { font-size: 11px; color: var(--old-muted); margin-top: 2px; }
+  .before .routine {
+    margin-top: 10px; display: flex; justify-content: space-between; align-items: center;
+    border: 1px solid rgba(220,228,223,0.8); background: rgba(243,246,244,0.6);
+    border-radius: 10px; padding: 8px 10px; font-size: 9.5px; color: var(--old-muted);
+  }
+  .before .routine b { color: var(--old-success); font-weight: 700; }
+  .before .routine .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--old-success); margin-right: 6px; }
+  .before .ring-wrap { display: flex; justify-content: center; padding: 14px 0 6px; }
+  .before .metrics {
+    display: flex; background: var(--old-bg); border-radius: 14px;
+    padding: 12px 4px; margin-top: 8px;
+  }
+  .before .metrics div { flex: 1; text-align: center; }
+  .before .metrics div + div { border-left: 1px solid var(--old-border); }
+  .before .metrics b { font-size: 12px; font-weight: 700; color: var(--old-fg); display: block; }
+  .before .metrics span { font-size: 9px; color: var(--old-muted); }
+  .before .metrics .link { color: var(--old-success); text-decoration: underline; }
+  .before .btn {
+    margin-top: 12px; background: var(--old-success); color: #fff; text-align: center;
+    border-radius: 14px; padding: 12px; font-size: 12px; font-weight: 700;
+  }
+  .before .water-title { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--old-fg); }
+  .before .water-title span { color: var(--old-muted); font-weight: 400; }
+  .before .bar { height: 8px; border-radius: 999px; background: var(--old-bg); margin-top: 10px; overflow: hidden; }
+  .before .bar i { display: block; height: 100%; width: 62%; background: var(--old-success); border-radius: 999px; }
+  .before .chips { display: flex; gap: 6px; margin-top: 10px; }
+  .before .chips span {
+    font-size: 8.5px; color: var(--old-muted); border: 1px solid var(--old-border);
+    border-radius: 999px; padding: 5px 8px; white-space: nowrap;
+  }
+  .before .chips span.on { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); color: var(--old-success); font-weight: 700; }
+
+  /* ── DEPOIS (proposta Circadiano) ──────────── */
+  .screen.after { background: var(--paper); padding: 20px 18px 16px; }
+  .after .slats { position: absolute; inset: 0; pointer-events: none; }
+  .after .slats i {
+    position: absolute; left: -20%; right: -20%; height: 120px; display: block;
+    transform: rotate(-4deg);
+  }
+  .after .slats i:nth-child(1) {
+    top: 40px;
+    background: linear-gradient(rgba(242,244,227,0) 0%, rgb(228,233,197) 100%);
+    animation: slatA 14s ease-in-out infinite alternate;
+  }
+  .after .slats i:nth-child(2) {
+    top: 150px;
+    background: linear-gradient(rgba(245,238,219,0) 0%, rgb(213,194,173) 100%);
+    animation: slatB 18s ease-in-out infinite alternate;
+  }
+  .after .slats i:nth-child(3) {
+    top: 260px;
+    background: linear-gradient(rgba(242,244,227,0) 0%, rgb(228,233,197) 100%);
+    animation: slatA 22s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes slatA { from { opacity: 0.10; } to { opacity: 0.38; } }
+  @keyframes slatB { from { opacity: 0.32; } to { opacity: 0.10; } }
+  .after > * { position: relative; z-index: 1; }
+
+  .after .status-strip { display: flex; justify-content: space-between; align-items: center; }
+  .after .status-strip .who {
+    font-family: "JetBrains Mono", monospace; font-size: 8.5px;
+    letter-spacing: 0.18em; color: var(--ink-deep); font-weight: 700;
+  }
+  .after .status-strip .xp {
+    font-family: "JetBrains Mono", monospace; font-size: 8.5px;
+    letter-spacing: 0.14em; color: var(--ink-soft);
+  }
+  .after .xp-line { height: 2px; background: var(--line); margin-top: 7px; position: relative; }
+  .after .xp-line i {
+    position: absolute; inset: 0 auto 0 0; width: 62%; background: var(--amber); display: block;
+  }
+  .after .today { margin-top: 16px; display: flex; justify-content: space-between; align-items: baseline; }
+  .after .today .d {
+    font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.26em;
+    color: var(--amber); font-weight: 700; text-transform: uppercase;
+  }
+  .after .today .date { font-size: 11px; color: var(--ink-soft); }
+
+  .after .dial { margin-top: 10px; }
+  .after .dial svg { display: block; width: 100%; height: auto; }
+  .after .dial text {
+    font-family: "JetBrains Mono", monospace; font-size: 6.5px; letter-spacing: 0.06em;
+    fill: var(--ink-soft); text-transform: uppercase;
+  }
+  .after .dial text.cur { fill: var(--ink-deep); font-weight: 700; }
+
+  .after .clock { text-align: center; margin-top: 10px; }
+  .after .clock svg { display: inline-block; }
+  .after .clock .cap {
+    font-family: "JetBrains Mono", monospace; font-size: 9px; letter-spacing: 0.18em;
+    color: var(--ink-soft); margin-top: 8px; text-transform: uppercase;
+  }
+  .after .clock .cap b { color: var(--amber); font-weight: 700; }
+
+  .after .phase-rail { display: flex; gap: 5px; margin-top: 14px; }
+  .after .phase-rail span {
+    flex: 1; height: 3px; border-radius: 2px; background: var(--line); position: relative;
+  }
+  .after .phase-rail span.done { background: var(--amber); opacity: 0.45; }
+  .after .phase-rail span.cur {
+    background: var(--amber);
+    box-shadow: 0 0 10px rgba(217, 146, 46, 0.65);
+  }
+
+  .after .btn-main {
+    margin-top: 18px; background: var(--ink-deep); color: var(--paper);
+    text-align: center; border-radius: 999px; padding: 13px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
+  }
+  .after .btn-ghost {
+    margin-top: 9px; text-align: center; font-family: "JetBrains Mono", monospace;
+    font-size: 9px; letter-spacing: 0.16em; color: var(--ink-soft); text-transform: uppercase;
+  }
+
+  .after .rule { height: 1px; background: var(--line); margin: 18px 0 14px; }
+  .after .water-h {
+    display: flex; justify-content: space-between;
+    font-family: "JetBrains Mono", monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .after .water-h b { color: var(--ink-deep); }
+  .after .segs { display: flex; gap: 4px; margin-top: 10px; }
+  .after .segs i { flex: 1; height: 16px; border-radius: 3px; background: var(--paper-deep); border: 1px solid var(--line); display: block; }
+  .after .segs i.f { background: var(--amber); border-color: var(--amber); }
+
+  .after .note {
+    margin-top: auto; font-size: 9.5px; line-height: 1.55; color: var(--ink-soft);
+    border-top: 1px solid var(--line); padding-top: 12px;
+  }
+
+  /* ── Safe area / barras de navegação ───────── */
+  .after { padding-bottom: 10px !important; }
+  .nav-zone { margin-top: 14px; display: flex; justify-content: center; }
+  .nav-zone .pill {
+    width: 108px; height: 4px; border-radius: 999px; background: var(--ink);
+    opacity: 0.55; display: block;
+  }
+
+  /* ── Secção de dispositivos ────────────────── */
+  .devices { display: flex; gap: 36px; justify-content: center; align-items: flex-end; flex-wrap: wrap; }
+  .dev figcaption {
+    text-align: center; margin-top: 14px;
+    font-family: "JetBrains Mono", monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
+    line-height: 1.7;
+  }
+  .dev figcaption b { color: var(--ink-deep); }
+  .mini-phone {
+    background: #26251f; border-radius: 36px; padding: 8px;
+    box-shadow: 0 22px 44px -20px rgba(58,58,56,0.45);
+    position: relative;
+  }
+  .mini-viewport { overflow: hidden; border-radius: 28px; position: relative; }
+  .mini-viewport .screen.after { width: 320px; transform-origin: top left; }
+  .nav-overlay {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(237, 230, 211, 0.72);
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+  }
+  .nav-overlay.gesture { height: 18px; background: transparent; backdrop-filter: none; }
+  .nav-overlay.gesture .pill {
+    width: 96px; height: 4px; border-radius: 999px; background: var(--ink);
+    opacity: 0.6; display: block;
+  }
+  .nav-overlay.buttons { height: 34px; gap: 44px; border-top: 1px solid var(--line); }
+  .nav-overlay.buttons svg { display: block; opacity: 0.7; }
+
+  .adapt { margin-top: 36px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 40px; list-style: none; }
+  @media (max-width: 900px) { .adapt { grid-template-columns: 1fr; } }
+  .adapt li {
+    font-size: 13px; line-height: 1.6; color: var(--ink-soft);
+    padding: 10px 0; border-bottom: 1px dashed var(--line);
+    display: flex; gap: 10px;
+  }
+  .adapt li::before { content: "→"; color: var(--amber); flex-shrink: 0; }
+  .adapt li b { color: var(--ink-deep); }
+  .adapt li code {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-deep);
+    background: rgba(255,255,255,0.4); border: 1px solid var(--line);
+    padding: 1px 6px; border-radius: 6px;
+  }
+
+  /* ── Controlo de simulação ─────────────────── */
+  .sim {
+    width: 340px; margin: 22px auto 0; padding: 16px 18px;
+    border: 1px dashed var(--line); border-radius: 18px; background: rgba(255,255,255,0.25);
+  }
+  .sim label {
+    font-family: "JetBrains Mono", monospace; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft);
+    display: flex; justify-content: space-between; margin-bottom: 10px;
+  }
+  .sim label b { color: var(--amber); }
+  .sim input[type="range"] { width: 100%; accent-color: var(--amber); }
+
+  /* ── Tokens ────────────────────────────────── */
+  .tokens { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; }
+  @media (max-width: 900px) { .tokens { grid-template-columns: 1fr; } }
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+  .sw .c { height: 64px; }
+  .sw .t { padding: 8px 10px; background: rgba(255,255,255,0.35); }
+  .sw .t b { display: block; font-size: 11px; font-weight: 700; color: var(--ink-deep); }
+  .sw .t span { font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--ink-soft); }
+
+  .type-row { border-top: 1px solid var(--line); padding: 16px 0; }
+  .type-row:first-child { border-top: 0; }
+  .type-row .role {
+    font-family: "JetBrains Mono", monospace; font-size: 9px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--amber); margin-bottom: 6px;
+  }
+  .type-row .sample { color: var(--ink-deep); }
+  .type-row .meta { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+
+  .code-map { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 32px; }
+  .code-map h3 { font-size: 16px; font-weight: 700; color: var(--ink-deep); margin-bottom: 14px; }
+  .code-map ul { list-style: none; }
+  .code-map li {
+    font-size: 13px; color: var(--ink-soft); padding: 9px 0; border-bottom: 1px dashed var(--line);
+    display: flex; gap: 12px; align-items: baseline; line-height: 1.5;
+  }
+  .code-map li code {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-deep);
+    background: rgba(255,255,255,0.4); border: 1px solid var(--line);
+    padding: 2px 7px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  footer {
+    margin-top: 64px; border-top: 1px solid var(--line); padding: 24px 0;
+    font-family: "JetBrains Mono", monospace; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
+    display: flex; justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="page">
+    <div class="kicker">KYNIO · Proposta de redesign</div>
+    <h1>Circadiano —<br/>o jejum como <em>luz do dia</em></h1>
+    <p class="lede">
+      O KYNIO mede tempo e ritmo metabólico, mas o visual atual é o de um dashboard fintech genérico
+      (verde esmeralda + índigo + cartões brancos). A proposta: tratar o jejum como o percurso do sol —
+      um mostrador de luz quente onde o progresso é a posição do sol e as fases metabólicas são horas
+      de um relógio solar. O ecrã inteiro respira como luz filtrada por uma persiana.
+    </p>
+  </header>
+
+  <section>
+    <div class="sec-label">01 — O conceito</div>
+    <div class="concept-grid">
+      <div class="concept">
+        <span class="num">A · MOSTRADOR SOLAR</span>
+        <h3>O anel de progresso vira um arco de sol</h3>
+        <p>O tempo decorrido deixa de ser um anel abstrato e passa a ser a posição do sol num arco
+        alvorada→crepúsculo. As seis fases metabólicas marcam as "horas" do arco; a fase ativa recebe
+        o brilho da hora dourada.</p>
+      </div>
+      <div class="concept">
+        <span class="num">B · RELÓGIO DE PONTOS</span>
+        <h3>Tipografia de matriz de pontos</h3>
+        <p>Os dígitos do temporizador são desenhados como constelações de pontos (SVG), entre o LED e o
+        grão de luz — técnicos como o JetBrains Mono da app, mas orgânicos como o sol. Reutilizável em
+        streaks e níveis.</p>
+      </div>
+      <div class="concept">
+        <span class="num">C · LUZ FILTRADA</span>
+        <h3>Papel quente + persianas de gradiente</h3>
+        <p>O fundo verde-acinzentado frio dá lugar a papel creme (#EDE6D3) com véus de gradiente que
+        mudam de opacidade como luz através de estores. Sem cartões aninhados: espaço, filetes e peso
+        tipográfico separam as secções.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">02 — Antes / Depois · ecrã "Hoje"</div>
+    <div class="compare">
+
+      <!-- ═══ ANTES ═══ -->
+      <figure class="phone-col">
+        <div class="phone">
+          <div class="screen before">
+            <div class="hdr">
+              <div>
+                <h4>Hoje</h4>
+                <small>Segunda-feira, 31 de agosto</small>
+              </div>
+              <div class="xp-pill"><span class="dot"></span>Constrói o teu ritmo</div>
+            </div>
+
+            <div class="card">
+              <h5>Resumo do jejum</h5>
+              <div class="sub">Acompanha o teu ritmo, sem pressão.</div>
+              <div class="routine"><span><span class="dot"></span>Rotina: Diário · 16h</span><b>Alterar ↗</b></div>
+              <div class="ring-wrap">
+                <svg width="150" height="150" viewBox="0 0 150 150">
+                  <circle cx="75" cy="75" r="62" fill="none" stroke="#F3F6F4" stroke-width="10"/>
+                  <circle cx="75" cy="75" r="62" fill="none" stroke="#10B981" stroke-width="10"
+                    stroke-linecap="round" stroke-dasharray="389.5" stroke-dashoffset="155.8"
+                    transform="rotate(-90 75 75)"/>
+                  <text x="75" y="72" text-anchor="middle" font-family="Hanken Grotesk" font-weight="700" font-size="24" fill="#111713">14:32</text>
+                  <text x="75" y="92" text-anchor="middle" font-family="Hanken Grotesk" font-size="9" fill="#68736C">60% · Cetose</text>
+                </svg>
+              </div>
+              <div class="metrics">
+                <div><b>14h 32m</b><span>Decorrido</span></div>
+                <div><b>1h 28m</b><span>Restante</span></div>
+                <div><b class="link">Cetose</b><span>Fase atual</span></div>
+              </div>
+              <div class="btn">Terminar jejum</div>
+            </div>
+
+            <div class="card">
+              <div class="water-title">Água <span>1.4 / 2.0 L</span></div>
+              <div class="bar"><i></i></div>
+              <div class="chips">
+                <span>+200 ml</span><span>+330 ml</span><span>+500 ml</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="water-title">Fases metabólicas</div>
+              <div class="chips">
+                <span>Digestão</span><span>Glicose</span><span>Queima</span>
+                <span class="on">Cetose</span><span>Autofagia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption><b>Antes</b> — dashboard fintech · anel verde + índigo</figcaption>
+      </figure>
+
+      <!-- ═══ DEPOIS ═══ -->
+      <figure class="phone-col">
+        <div class="phone">
+          <div class="screen after">
+            <div class="slats"><i></i><i></i><i></i></div>
+
+            <div class="status-strip">
+              <span class="who">NÍVEL 4 · PEREGRINO</span>
+              <span class="xp">1.240 / 2.000 XP</span>
+            </div>
+            <div class="xp-line"><i></i></div>
+
+            <div class="today">
+              <span class="d">Hoje</span>
+              <span class="date">Segunda, 31 de agosto</span>
+            </div>
+
+            <!-- Arco solar -->
+            <div class="dial">
+              <svg viewBox="0 0 320 150" id="dial-svg">
+                <defs>
+                  <radialGradient id="sun-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#F4C95D" stop-opacity="0.95"/>
+                    <stop offset="55%" stop-color="#F4C95D" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#F4C95D" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <!-- arco base -->
+                <path d="M 20 136 A 170 170 0 0 1 300 136" fill="none"
+                      stroke="#C9BFA4" stroke-width="1.4"/>
+                <!-- arco decorrido -->
+                <path id="arc-elapsed" d="M 20 136 A 170 170 0 0 1 300 136" fill="none"
+                      stroke="#D9922E" stroke-width="2.4" stroke-linecap="round"
+                      pathLength="100" stroke-dasharray="60 100"/>
+                <!-- marcas das fases (geradas por JS) -->
+                <g id="phase-ticks"></g>
+                <!-- sol -->
+                <g id="sun">
+                  <circle id="sun-halo" r="30" fill="url(#sun-glow)"/>
+                  <circle id="sun-core" r="8.5" fill="#E8A83E" stroke="#B87A1F" stroke-width="1.2"/>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Relógio matriz de pontos -->
+            <div class="clock">
+              <svg id="dotclock" width="212" height="52" viewBox="0 0 212 52"></svg>
+              <div class="cap" id="clock-cap">Decorridos de <b>16h</b> · faltam <b id="remain">1h 28m</b></div>
+            </div>
+
+            <div class="phase-rail" id="phase-rail">
+              <span class="done"></span><span class="done"></span><span class="done"></span>
+              <span class="cur"></span><span></span><span></span>
+            </div>
+
+            <div class="btn-main">Terminar jejum</div>
+            <div class="btn-ghost">Ajustar rotina · Diário 16h</div>
+
+            <div class="rule"></div>
+
+            <div class="water-h"><span>Água</span><b>1.4 / 2.0 L</b></div>
+            <div class="segs">
+              <i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i>
+              <i class="f"></i><i class="f"></i><i></i><i></i><i></i>
+            </div>
+
+            <div class="note">
+              Fases metabólicas estimadas com base em literatura científica de jejum.
+              Varia de pessoa para pessoa.
+            </div>
+
+            <div class="nav-zone"><span class="pill"></span></div>
+          </div>
+        </div>
+        <figcaption><b>Depois</b> — mostrador solar · matriz de pontos · luz filtrada</figcaption>
+
+        <div class="sim">
+          <label><span>Simular progresso do jejum</span><b id="sim-val">60%</b></label>
+          <input type="range" id="sim" min="0" max="1000" value="600" />
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">03 — Todos os tamanhos de ecrã e navegação</div>
+    <p style="font-size:14px;color:var(--ink-soft);max-width:640px;line-height:1.65;margin-bottom:32px">
+      O mesmo ecrã "Hoje" renderizado em três larguras — compacto, médio e grande — com as duas
+      navegações do mercado: <b style="color:var(--ink-deep)">barra de gestos</b> (iPhone / Android por gestos)
+      e <b style="color:var(--ink-deep)">3 botões</b> (Android clássico). O arco solar e o relógio de pontos
+      são SVG com <span class="mono" style="font-size:12px">viewBox</span>, por isso escalam sem distorcer;
+      as zonas de sistema ficam sempre livres.
+    </p>
+    <div class="devices" id="devices">
+      <figure class="dev">
+        <div class="mini-phone" data-nav="gesture" data-w="272"></div>
+        <figcaption><b>Compacto</b> · 320 pt · gestos<br/>(iPhone SE / mini)</figcaption>
+      </figure>
+      <figure class="dev">
+        <div class="mini-phone" data-nav="buttons" data-w="320"></div>
+        <figcaption><b>Médio</b> · 360 dp · 3 botões<br/>(Android clássico)</figcaption>
+      </figure>
+      <figure class="dev">
+        <div class="mini-phone" data-nav="gesture" data-w="368"></div>
+        <figcaption><b>Grande</b> · 430 pt · gestos<br/>(Pro Max / Ultra)</figcaption>
+      </figure>
+    </div>
+    <ul class="adapt">
+      <li><span><b>Layout fluido, sem larguras fixas</b> — arco e relógio em SVG com <code>viewBox</code>; secções em flex com espaçamentos relativos. Nada parte entre 320 e 430 pt de largura.</span></li>
+      <li><span><b>Safe areas respeitadas</b> — o componente <code>Screen</code> passa a usar <code>react-native-safe-area-context</code>: <code>padding-bottom = inset + 16</code>, para o conteúdo nunca ficar debaixo da barra de gestos ou dos 3 botões.</span></li>
+      <li><span><b>Android com 3 botões</b> — a barra de navegação do sistema é tratada como inset; a zona dos botões do sistema fica livre de qualquer elemento interativo.</span></li>
+      <li><span><b>Alvos de toque ≥ 44 pt</b> — botão principal, "Ajustar rotina", segmentos de água e fases do arco (área de toque ampliada além do ponto visível).</span></li>
+      <li><span><b>Ecrãs baixos</b> — em alturas &lt; 670 pt a nota informativa colapsa para uma linha e o arco reduz ~15%; nada fica cortado nem requer scroll forçado.</span></li>
+      <li><span><b>Modo escuro "noite"</b> — a mesma geometria com tinta profunda e âmbar-vela; a barra de gestos e os insets comportam-se igual.</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-label">04 — Tokens da proposta</div>
+    <div class="tokens">
+      <div>
+        <div class="swatches">
+          <div class="sw"><div class="c" style="background:#EDE6D3"></div><div class="t"><b>Papel</b><span>#EDE6D3</span></div></div>
+          <div class="sw"><div class="c" style="background:#4F4F4C"></div><div class="t"><b>Tinta</b><span>#4F4F4C</span></div></div>
+          <div class="sw"><div class="c" style="background:#D5CBAF"></div><div class="t"><b>Filete</b><span>#D5CBAF</span></div></div>
+          <div class="sw"><div class="c" style="background:#D9922E"></div><div class="t"><b>Âmbar sol</b><span>#D9922E</span></div></div>
+          <div class="sw"><div class="c" style="background:#F4C95D"></div><div class="t"><b>Brilho</b><span>#F4C95D</span></div></div>
+          <div class="sw"><div class="c" style="background:#E4E9C5"></div><div class="t"><b>Persiana fria</b><span>#E4E9C5</span></div></div>
+          <div class="sw"><div class="c" style="background:#D5C2AD"></div><div class="t"><b>Persiana quente</b><span>#D5C2AD</span></div></div>
+          <div class="sw"><div class="c" style="background:#3A3A38"></div><div class="t"><b>Tinta forte</b><span>#3A3A38</span></div></div>
+        </div>
+        <p style="font-size:12px;color:var(--ink-soft);margin-top:14px;line-height:1.6">
+          Um único acento (âmbar do sol) substitui o par esmeralda+índigo. XP, progresso, fase ativa e
+          ação principal vivem todos na mesma "temperatura" de luz — o dourado é a recompensa.
+        </p>
+      </div>
+      <div>
+        <div class="type-row">
+          <div class="role">Relógio · SVG</div>
+          <div class="sample" style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;letter-spacing:0.05em">14:32 <span style="font-size:12px;color:var(--ink-soft)">→ matriz de pontos</span></div>
+          <div class="meta">Dígitos desenhados como círculos SVG (react-native-svg), sem fonte nova.</div>
+        </div>
+        <div class="type-row">
+          <div class="role">Etiquetas · JetBrains Mono 500</div>
+          <div class="sample mono" style="font-size:13px;letter-spacing:0.22em">NÍVEL 4 · PEREGRINO · CETOSE</div>
+          <div class="meta">Já existe na app — passa a ser a voz da gamificação e dos dados.</div>
+        </div>
+        <div class="type-row">
+          <div class="role">Texto · Hanken Grotesk 400/700</div>
+          <div class="sample" style="font-size:16px;font-weight:700">Acompanha o teu ritmo, sem pressão.</div>
+          <div class="meta">Mantém-se — a mudança é de atmosfera, não de legibilidade.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-map">
+      <h3>O que muda no código (se aprovares)</h3>
+      <ul>
+        <li><code>constants/colors.ts</code>Nova paleta papel/tinta/âmbar em LIGHT_COLORS e DARK_COLORS (modo escuro vira "noite": tinta profunda + âmbar vela).</li>
+        <li><code>components/ui/fasting-timer.tsx</code>O anel circular é substituído pelo arco solar SVG com marcas das fases e sol com brilho (react-native-svg, sem dependências novas).</li>
+        <li><code>components/ui/dot-clock.tsx</code>Componente novo: dígitos em matriz de pontos (grelha 5×7 → círculos SVG).</li>
+        <li><code>app/(tabs)/index.tsx</code>Tira cartões aninhados; secções separadas por filetes; tira de estado Nível/XP persistente no topo.</li>
+        <li><code>components/ui/water-tracker-card.tsx</code>Barra contínua → segmentos de "copos" em âmbar, alinhados com o mostrador.</li>
+        <li><code>tailwind.config.js</code>Tokens success/xp remapeados para âmbar; sem classes novas na UI.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>KYNIO · Circadiano v1</span>
+    <span>Mockup para aprovação — nada foi alterado na app</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+
+  /* ── Matriz de pontos 5×7 ─────────────────── */
+  var FONT = {
+    "0": ["01110","10001","10011","10101","11001","10001","01110"],
+    "1": ["00100","01100","00100","00100","00100","00100","01110"],
+    "2": ["01110","10001","00001","00010","00100","01000","11111"],
+    "3": ["11111","00010","00100","00010","00001","10001","01110"],
+    "4": ["00010","00110","01010","10010","11111","00010","00010"],
+    "5": ["11111","10000","11110","00001","00001","10001","01110"],
+    "6": ["00110","01000","10000","11110","10001","10001","01110"],
+    "7": ["11111","00001","00010","00100","01000","01000","01000"],
+    "8": ["01110","10001","10001","01110","10001","10001","01110"],
+    "9": ["01110","10001","10001","01111","00001","00010","01100"],
+    ":": ["000","010","010","000","010","010","000"]
+  };
+  var CELL = 7, R = 2.5;
+
+  function drawDotClock(svg, text) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var x = 4;
+    for (var c = 0; c < text.length; c++) {
+      var glyph = FONT[text[c]];
+      if (!glyph) continue;
+      var w = glyph[0].length;
+      for (var row = 0; row < 7; row++) {
+        for (var col = 0; col < w; col++) {
+          if (glyph[row][col] !== "1") continue;
+          var dot = document.createElementNS(NS, "circle");
+          dot.setAttribute("cx", x + col * CELL);
+          dot.setAttribute("cy", 4 + row * CELL);
+          dot.setAttribute("r", R);
+          dot.setAttribute("fill", text[c] === ":" ? "#D9922E" : "#3A3A38");
+          svg.appendChild(dot);
+        }
+      }
+      x += (w + 1.6) * CELL;
+    }
+  }
+
+  /* ── Arco solar (cúpula rasa, sem sobreposição com o relógio) ── */
+  var CX = 160, RADIUS = 170, BASE_Y = 136;
+  var HALF_CHORD = 140;
+  var CENTER_Y = BASE_Y + Math.sqrt(RADIUS * RADIUS - HALF_CHORD * HALF_CHORD);
+  var PHI = Math.atan2(CENTER_Y - BASE_Y, HALF_CHORD);
+  var THETA_L = -(Math.PI - PHI);
+  var THETA_R = -PHI;
+  var PHASES = [
+    { h: 0,  label: "Digestão" },
+    { h: 4,  label: "Glicose" },
+    { h: 8,  label: "Queima" },
+    { h: 12, label: "Cetose" },
+    { h: 14, label: "Autofagia" },
+    { h: 16, label: "Renovação" }
+  ];
+  var TARGET_H = 16;
+
+  function pointAt(p) {
+    var t = THETA_L + p * (THETA_R - THETA_L);
+    return { x: CX + RADIUS * Math.cos(t), y: CENTER_Y + RADIUS * Math.sin(t) };
+  }
+
+  var ticksG = document.getElementById("phase-ticks");
+  PHASES.forEach(function (ph) {
+    var p = ph.h / TARGET_H;
+    var pt = pointAt(p);
+    var dot = document.createElementNS(NS, "circle");
+    dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y);
+    dot.setAttribute("r", 2.6);
+    dot.setAttribute("fill", "#4F4F4C");
+    dot.setAttribute("class", "tick");
+    dot.dataset.h = ph.h;
+    ticksG.appendChild(dot);
+
+    var lblPos = pointAt(p);
+    var lx = lblPos.x, ly = lblPos.y - 10;
+    var txt = document.createElementNS(NS, "text");
+    txt.setAttribute("x", lx); txt.setAttribute("y", ly);
+    txt.setAttribute("text-anchor", ph.h === 0 ? "start" : ph.h === TARGET_H ? "end" : "middle");
+    txt.textContent = ph.label;
+    txt.dataset.h = ph.h;
+    ticksG.appendChild(txt);
+  });
+
+  var sun = document.getElementById("sun");
+  var arcElapsed = document.getElementById("arc-elapsed");
+  var dotclock = document.getElementById("dotclock");
+  var capEl = document.getElementById("clock-cap");
+  var rail = document.getElementById("phase-rail");
+  var simVal = document.getElementById("sim-val");
+
+  function fmt(ms) {
+    var m = Math.max(0, Math.floor(ms / 60000));
+    var h = Math.floor(m / 60), mm = m % 60;
+    if (h === 0) return mm + " min";
+    return mm === 0 ? h + "h" : h + "h " + String(mm).padStart(2, "0") + "m";
+  }
+
+  function render(p) {
+    p = Math.min(1, Math.max(0, p));
+    var pt = pointAt(p);
+    sun.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
+    arcElapsed.setAttribute("stroke-dasharray", (p * 100).toFixed(2) + " 100");
+
+    var elapsedMs = p * TARGET_H * 3600000;
+    var m = Math.floor(elapsedMs / 60000);
+    var hh = String(Math.floor(m / 60)).padStart(2, "0");
+    var mm = String(m % 60).padStart(2, "0");
+    drawDotClock(dotclock, hh + ":" + mm);
+
+    var hours = p * TARGET_H;
+    var curIdx = 0;
+    for (var i = 0; i < PHASES.length; i++) if (hours >= PHASES[i].h) curIdx = i;
+    if (curIdx >= PHASES.length - 1) curIdx = PHASES.length - 1;
+    rail.querySelectorAll("span").forEach(function (s, i) {
+      s.className = i < curIdx ? "done" : i === curIdx ? "cur" : "";
+    });
+    ticksG.querySelectorAll("text").forEach(function (t) {
+      t.setAttribute("class", Number(t.dataset.h) === PHASES[curIdx].h ? "cur" : "");
+    });
+    capEl.innerHTML = "Decorridos de <b>" + TARGET_H + "h</b> · faltam <b id='remain'>" +
+      fmt(TARGET_H * 3600000 - elapsedMs) + "</b>";
+    simVal.textContent = Math.round(p * 100) + "%";
+  }
+
+  document.getElementById("sim").addEventListener("input", function (e) {
+    render(Number(e.target.value) / 1000);
+  });
+
+  render(0.6);
+
+  /* ── Variantes de dispositivo (clones estáticos do ecrã "Depois") ── */
+  var DEVICE_H = 700;
+  document.querySelectorAll(".mini-phone").forEach(function (frame) {
+    var w = Number(frame.dataset.w);
+    var nav = frame.dataset.nav;
+    var innerW = w - 16;
+    var k = innerW / 320;
+    var vp = document.createElement("div");
+    vp.className = "mini-viewport";
+    vp.style.width = innerW + "px";
+    vp.style.height = Math.round(DEVICE_H * k) + "px";
+    var clone = document.querySelector(".screen.after").cloneNode(true);
+    clone.style.transform = "scale(" + k + ")";
+    clone.style.height = DEVICE_H + "px";
+    vp.appendChild(clone);
+    var ov = document.createElement("div");
+    if (nav === "gesture") {
+      ov.className = "nav-overlay gesture";
+      ov.innerHTML = '<span class="pill"></span>';
+    } else {
+      ov.className = "nav-overlay buttons";
+      ov.innerHTML =
+        '<svg width="14" height="12" viewBox="0 0 14 12"><path d="M7 1 L13 11 L1 11 Z" fill="none" stroke="#4F4F4C" stroke-width="1.3"/></svg>' +
+        '<svg width="12" height="12" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.6" fill="none" stroke="#4F4F4C" stroke-width="1.3"/></svg>' +
+        '<svg width="12" height="12" viewBox="0 0 12 12"><rect x="1.4" y="1.4" width="9.2" height="9.2" rx="2" fill="none" stroke="#4F4F4C" stroke-width="1.3"/></svg>';
+    }
+    vp.appendChild(ov);
+    frame.appendChild(vp);
+  });
+})();
+</script>
+</body>
+</html>

@@ -21,6 +21,8 @@ import {
   requestNotificationPermission,
   scheduleHydrationReminders,
 } from "@/services/fastingNotificationService";
+import { openHealthConnectSettings } from "@/services/healthConnectService";
+import { exportClinicalReportPdf } from "@/services/healthReportPdfService";
 import { translateText } from "@/services/i18n";
 import {
   IAP_SKUS,
@@ -44,6 +46,12 @@ export default function SettingsScreen() {
   const hydrationRemindersEnabled = useAppPreferencesStore(
     (state) => state.hydrationRemindersEnabled,
   );
+  const healthConnectEnabled = useAppPreferencesStore(
+    (state) => state.healthConnectEnabled,
+  );
+  const setHealthConnectEnabled = useAppPreferencesStore(
+    (state) => state.setHealthConnectEnabled,
+  );
   const language = useAppPreferencesStore((state) => state.language);
   const setHydrationRemindersEnabled = useAppPreferencesStore(
     (state) => state.setHydrationRemindersEnabled,
@@ -54,6 +62,7 @@ export default function SettingsScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -158,10 +167,19 @@ export default function SettingsScreen() {
 
     try {
       const fileName = await exportAllLocalData();
-      setSuccessMessage(`Exportação preparada: ${fileName}`);
+      setSuccessMessage(
+        language === "en"
+          ? `Export ready: ${fileName}`
+          : `Exportação preparada: ${fileName}`,
+      );
     } catch (error) {
       setErrorMessage(
-        getErrorMessage(error, "Não foi possível exportar os dados locais."),
+        getErrorMessage(
+          error,
+          language === "en"
+            ? "Could not export local data."
+            : "Não foi possível exportar os dados locais.",
+        ),
       );
     } finally {
       setIsExporting(false);
@@ -188,7 +206,9 @@ export default function SettingsScreen() {
       setErrorMessage(
         getErrorMessage(
           error,
-          "Não foi possível eliminar todos os dados locais.",
+          language === "en"
+            ? "Could not delete all local data."
+            : "Não foi possível eliminar todos os dados locais.",
         ),
       );
       setIsDeleting(false);
@@ -239,6 +259,27 @@ export default function SettingsScreen() {
     await scheduleHydrationReminders();
   };
 
+  const handleExportPdf = async () => {
+    if (isGeneratingPdf || isDeleting || isExporting) {
+      return;
+    }
+
+    try {
+      setIsGeneratingPdf(true);
+      await exportClinicalReportPdf(language);
+    } catch {
+      Alert.alert(
+        translateText("Erro", language),
+        translateText(
+          "Não foi possível gerar o relatório clínico em PDF.",
+          language,
+        ),
+      );
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <View className="flex-row items-center border-b border-border px-5 pb-4 pt-3">
@@ -251,7 +292,7 @@ export default function SettingsScreen() {
           <Ionicons color={COLORS.foreground} name="arrow-back" size={20} />
         </Pressable>
         <Text className="ml-3 font-headline text-xl text-foreground">
-          Definições
+          {translateText("Definições", language)}
         </Text>
       </View>
 
@@ -291,7 +332,11 @@ export default function SettingsScreen() {
                 </View>
                 <Text className="font-body text-xs text-muted">
                   {isPro
-                    ? `Plano ativo (${tier}) · Acesso total`
+                    ? language === "en"
+                      ? `Active plan (${tier}) · Full access`
+                      : `Plano ativo (${tier}) · Acesso total`
+                    : language === "en"
+                    ? "Unlimited AI, all fasts and exclusive themes"
                     : "IA ilimitada, todos os jejuns e temas exclusivos"}
                 </Text>
               </View>
@@ -302,7 +347,13 @@ export default function SettingsScreen() {
               className="rounded-xl bg-success px-3.5 py-2 active:opacity-80"
             >
               <Text className="font-label text-xs font-bold" style={{ color: "#3A2200" }}>
-                {isPro ? "Gerir" : "Desbloquear"}
+                {isPro
+                  ? language === "en"
+                    ? "Manage"
+                    : "Gerir"
+                  : language === "en"
+                  ? "Unlock"
+                  : "Desbloquear"}
               </Text>
             </Pressable>
           </View>
@@ -310,11 +361,11 @@ export default function SettingsScreen() {
 
         <View className="mb-5">
           <SettingsActionCard
-            description="Recupera a subscrição ou compra Pro ativa na tua conta Google Play."
+            description={translateText("Recupera a subscrição ou compra Pro ativa na tua conta Google Play.", language)}
             disabled={isDeleting || isExporting}
             icon="refresh-outline"
             isLoading={isRestoring}
-            label="Restaurar compras"
+            label={translateText("Restaurar compras", language)}
             onPress={() => void handleRestorePurchases()}
             testID="restore-purchases-button"
           />
@@ -357,12 +408,45 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Google Health Connect */}
+        <View className="mt-5 rounded-2xl border border-border bg-surface p-5">
+          <View className="flex-row items-center gap-3">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/10">
+              <Ionicons color={COLORS.success} name="fitness-outline" size={21} />
+            </View>
+            <View className="flex-1 pr-3">
+              <Text className="font-headline text-base text-foreground">
+                Google Health Connect
+              </Text>
+              <Text className="mt-1 font-body text-xs leading-4 text-muted">
+                {language === 'en'
+                  ? 'Import weight from smart scales and workouts from smartwatches.'
+                  : 'Importa peso de balanças inteligentes e treinos de smartwatches.'}
+              </Text>
+            </View>
+            <Switch
+              accessibilityLabel="Google Health Connect"
+              onValueChange={(value) => {
+                setHealthConnectEnabled(value);
+                if (value) {
+                  void openHealthConnectSettings();
+                }
+              }}
+              thumbColor={
+                healthConnectEnabled ? COLORS.surfaceRaised : COLORS.muted
+              }
+              trackColor={{ false: COLORS.border, true: COLORS.success }}
+              value={healthConnectEnabled}
+            />
+          </View>
+        </View>
+
         <View className="mt-5">
           <SettingsActionCard
-            description="Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade."
+            description={translateText("Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade.", language)}
             icon="compass-outline"
             isLoading={false}
-            label="Rever tutorial guiado"
+            label={translateText("Rever tutorial guiado", language)}
             onPress={() =>
               useGuidedTutorialStore.getState().restartTutorial()
             }
@@ -385,32 +469,26 @@ export default function SettingsScreen() {
             </View>
             <View className="flex-1">
               <Text className="font-headline text-lg text-foreground">
-                Privacidade e controlo
+                {translateText("Privacidade e controlo", language)}
               </Text>
               <Text className="mt-1 font-body text-sm text-muted">
-                Local por defeito · cloud opcional
+                {translateText("Local por defeito · cloud opcional", language)}
               </Text>
             </View>
           </View>
 
           <View className="mt-5 gap-3">
             <Text className="font-body text-sm leading-5 text-muted">
-              • Jejuns, refeições, peso, progresso e fotografias confirmadas
-              ficam sempre disponíveis neste dispositivo.
+              {translateText("• Jejuns, refeições, peso, progresso e fotografias confirmadas ficam sempre disponíveis neste dispositivo.", language)}
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • Ao ligares uma conta Google, perfil, amigos, peso e registos são
-              também sincronizados para permitir utilização em vários
-              dispositivos.
+              {translateText("• Ao ligares uma conta Google, perfil, peso e registos são também sincronizados para permitir utilização em vários dispositivos.", language)}
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • A análise de refeição envia apenas a fotografia e/ou descrição
-              escolhida, através do KYNIO, para a Google Gemini; o restante
-              histórico e o ID da conta não acompanham esse pedido.
+              {translateText("• A análise de refeição envia apenas a fotografia e/ou descrição escolhida, através do KYNIO, para a Google Gemini; o restante histórico e o ID da conta não acompanham esse pedido.", language)}
             </Text>
             <Text className="font-body text-sm leading-5 text-muted">
-              • A exportação abre o seletor do sistema; só sai do dispositivo
-              quando escolhes um destino.
+              {translateText("• A exportação abre o seletor do sistema; só sai do dispositivo quando escolhes um destino.", language)}
             </Text>
           </View>
         </View>
@@ -440,11 +518,23 @@ export default function SettingsScreen() {
 
         <View className="mt-5">
           <SettingsActionCard
-            description="Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar."
-            disabled={isDeleting}
+            description={translateText("Gera um documento visual em PDF com médias de jejum, evolução do peso e macronutrientes para partilha com médicos ou nutricionistas.", language)}
+            disabled={isDeleting || isExporting}
+            icon="document-text-outline"
+            isLoading={isGeneratingPdf}
+            label={translateText("Relatório Clínico (PDF)", language)}
+            onPress={() => void handleExportPdf()}
+            testID="export-clinical-pdf-button"
+          />
+        </View>
+
+        <View className="mt-4">
+          <SettingsActionCard
+            description={translateText("Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.", language)}
+            disabled={isDeleting || isGeneratingPdf}
             icon="download-outline"
             isLoading={isExporting}
-            label="Exportar os meus Dados"
+            label={translateText("Exportar os meus Dados (JSON)", language)}
             onPress={() => void handleExport()}
             testID="export-data-button"
           />
@@ -452,30 +542,28 @@ export default function SettingsScreen() {
 
         <View className="mt-4">
           <SettingsActionCard
-            description="Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados."
+            description={translateText("Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.", language)}
             destructive
             disabled={isExporting}
             icon="trash-outline"
             isLoading={isDeleting}
-            label="Eliminar Todos os Dados"
+            label={translateText("Eliminar Todos os Dados", language)}
             onPress={confirmDelete}
           />
         </View>
 
         <View className="mt-6 rounded-2xl border border-border bg-surface p-5">
           <Text className="font-label text-[10px] uppercase tracking-widest text-xp">
-            Aviso legal
+            {translateText("Aviso legal", language)}
           </Text>
           <Text className="mt-3 font-body text-sm leading-6 text-muted">
-            Esta app é uma ferramenta de acompanhamento pessoal de estilo de
-            vida e gamificação. Não presta aconselhamento médico, nutricional ou
-            de treino.
+            {translateText("Esta app é uma ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico, nutricional ou de treino.", language)}
           </Text>
         </View>
 
         <View className="mt-5 rounded-2xl border border-border bg-surface p-5">
           <Text className="font-label text-[10px] uppercase tracking-widest text-success">
-            Documentos e suporte
+            {translateText("Documentos e suporte", language)}
           </Text>
           <View className="mt-3">
             {(
@@ -504,7 +592,7 @@ export default function SettingsScreen() {
               >
                 <Ionicons color={COLORS.success} name={icon} size={21} />
                 <Text className="ml-3 flex-1 font-headline text-sm text-foreground">
-                  {label}
+                  {translateText(label, language)}
                 </Text>
                 <Ionicons color={COLORS.muted} name="open-outline" size={18} />
               </Pressable>

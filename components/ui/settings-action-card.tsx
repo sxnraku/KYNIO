@@ -10,6 +10,7 @@ interface SettingsActionCardProps {
   disabled?: boolean;
   icon:
     | "compass-outline"
+    | "document-text-outline"
     | "download-outline"
     | "refresh-outline"
     | "trash-outline";

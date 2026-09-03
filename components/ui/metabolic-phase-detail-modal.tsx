@@ -76,10 +76,10 @@ export function MetabolicPhaseDetailModal({
                 </View>
                 <View>
                   <Text className="font-headline text-2xl text-foreground">
-                    {phase.title}
+                    {translateText(phase.title, language)}
                   </Text>
                   <Text className="mt-0.5 font-label text-xs text-muted">
-                    {phase.timeRange} de jejum
+                    {phase.timeRange} {language === "en" ? "of fasting" : "de jejum"}
                   </Text>
                 </View>
               </View>
@@ -97,7 +97,10 @@ export function MetabolicPhaseDetailModal({
               <View className="mb-4 flex-row items-center rounded-xl bg-success/10 px-3 py-2 border border-success/30">
                 <View className="mr-2 h-2 w-2 rounded-full bg-success animate-pulse" />
                 <Text className="font-headline text-xs text-success">
-                  Esta é a fase estimada em que o teu organismo se encontra agora.
+                  {translateText(
+                    "Esta é a fase estimada em que o teu organismo se encontra agora.",
+                    language,
+                  )}
                 </Text>
               </View>
             ) : null}
@@ -112,11 +115,11 @@ export function MetabolicPhaseDetailModal({
                 <View className="mb-2 flex-row items-center">
                   <Ionicons color={COLORS.success} name="analytics-outline" size={18} />
                   <Text className="ml-2 font-headline text-sm text-foreground">
-                    O que está a acontecer no organismo
+                    {translateText("O que está a acontecer no organismo", language)}
                   </Text>
                 </View>
                 <Text className="font-body text-sm leading-6 text-muted">
-                  {phase.description}
+                  {translateText(phase.description, language)}
                 </Text>
               </View>
 
@@ -125,11 +128,11 @@ export function MetabolicPhaseDetailModal({
                 <View className="mb-1.5 flex-row items-center">
                   <Ionicons color={COLORS.success} name="hardware-chip-outline" size={17} />
                   <Text className="ml-2 font-headline text-xs text-success">
-                    BIOLOGIA & HORMONAS
+                    {translateText("BIOLOGIA & HORMONAS", language)}
                   </Text>
                 </View>
                 <Text className="font-body text-xs leading-5 text-muted">
-                  {phase.physiologicalEffect}
+                  {translateText(phase.physiologicalEffect, language)}
                 </Text>
               </View>
 
@@ -138,7 +141,7 @@ export function MetabolicPhaseDetailModal({
                 <View className="mb-3 flex-row items-center">
                   <Ionicons color={COLORS.success} name="shield-checkmark-outline" size={18} />
                   <Text className="ml-2 font-headline text-sm text-foreground">
-                    O que a investigação observou
+                    {language === "en" ? "Key Benefits" : "Benefícios Principais"}
                   </Text>
                 </View>
                 <View className="gap-2.5">
@@ -148,7 +151,7 @@ export function MetabolicPhaseDetailModal({
                         <Ionicons color={COLORS.success} name="checkmark" size={11} />
                       </View>
                       <Text className="flex-1 font-body text-xs leading-5 text-muted">
-                        {benefit}
+                        {translateText(benefit, language)}
                       </Text>
                     </View>
                   ))}
@@ -160,11 +163,11 @@ export function MetabolicPhaseDetailModal({
                 <View className="mb-1.5 flex-row items-center">
                   <Ionicons color={COLORS.warning} name="bulb-outline" size={17} />
                   <Text className="ml-2 font-headline text-xs text-warning">
-                    DICA PRÁTICA
+                    {translateText("DICA PRÁTICA", language)}
                   </Text>
                 </View>
                 <Text className="font-body text-xs leading-5 text-muted">
-                  {phase.tip}
+                  {translateText(phase.tip, language)}
                 </Text>
               </View>
 
@@ -174,7 +177,7 @@ export function MetabolicPhaseDetailModal({
                   <View className="mb-3 flex-row items-center">
                     <Ionicons color={COLORS.muted} name="library-outline" size={18} />
                     <Text className="ml-2 font-headline text-sm text-foreground">
-                      Fontes científicas
+                      {translateText("Fontes científicas", language)}
                     </Text>
                   </View>
                   <View className="gap-3">
@@ -194,7 +197,7 @@ export function MetabolicPhaseDetailModal({
                           {reference.title} ({reference.year})
                         </Text>
                         <Text className="mt-1 font-body text-[11px] leading-4 text-muted">
-                          {reference.note}
+                          {translateText(reference.note, language)}
                         </Text>
                         <Text className="mt-1 font-body text-[10px] leading-3 text-success">
                           PubMed PMID: {reference.pmid} ↗
@@ -203,7 +206,10 @@ export function MetabolicPhaseDetailModal({
                     ))}
                   </View>
                   <Text className="mt-3 font-body text-[10px] leading-4 text-muted">
-                    Leitura de contexto científico — não é uma promessa de resultados individuais.
+                    {translateText(
+                      "Leitura de contexto científico — não é uma promessa de resultados individuais.",
+                      language,
+                    )}
                   </Text>
                 </View>
               ) : null}
@@ -213,15 +219,17 @@ export function MetabolicPhaseDetailModal({
                 <View className="flex-row items-center">
                   <Ionicons color={COLORS.muted} name="shield-checkmark-outline" size={15} />
                   <Text className="ml-1.5 font-headline text-[11px] text-muted">
-                    AVISO DE SAÚDE & PRIVACIDADE RGPD
+                    {translateText("AVISO DE SAÚDE & PRIVACIDADE RGPD", language)}
                   </Text>
                 </View>
                 <Text className="mt-1 font-body text-[11px] leading-4 text-muted">
-                  As fases são estimativas biológicas de referência e não substituem avaliação médica. Em caso de tonturas ou mal-estar, interrompe o jejum. Todos os dados permanecem na tua base SQLite local privada.
+                  {translateText(
+                    "As fases são estimativas biológicas de referência e não substituem avaliação médica. Em caso de tonturas ou mal-estar, interrompe o jejum. Todos os dados permanecem na tua base SQLite local privada.",
+                    language,
+                  )}
                 </Text>
               </View>
             </ScrollView>
-
 
             <Pressable
               accessibilityLabel={translateText("Entendido", language)}
@@ -230,7 +238,7 @@ export function MetabolicPhaseDetailModal({
               onPress={onClose}
             >
               <Text className="font-headline text-sm text-background">
-                Entendido
+                {translateText("Entendido", language)}
               </Text>
             </Pressable>
           </View>

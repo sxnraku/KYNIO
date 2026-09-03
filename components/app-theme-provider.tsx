@@ -16,9 +16,11 @@ export function AppThemeProvider({ children }: PropsWithChildren) {
         "--color-danger": palette.dangerRgb,
         "--color-foreground": palette.foregroundRgb,
         "--color-muted": palette.mutedRgb,
+        "--color-success": palette.successRgb,
         "--color-success-dark": palette.successDarkRgb,
         "--color-surface": palette.surfaceRgb,
         "--color-surface-raised": palette.surfaceRaisedRgb,
+        "--color-xp": palette.successRgb,
       }),
     [palette],
   );

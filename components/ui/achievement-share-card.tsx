@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/text";
 
 import { COLORS } from "@/constants/colors";
 import { getShareUrlLabel } from "@/services/achievementShareContent";
+import { translateText } from "@/services/i18n";
 import type { AchievementSharePayload } from "@/types/achievement-share";
 
 interface AchievementShareCardProps {
@@ -14,6 +15,7 @@ interface AchievementShareCardProps {
 export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
   function AchievementShareCard({ payload }, ref) {
     const visibleBadges = payload.badgeTitles.slice(0, 3);
+    const isEn = payload.language === "en";
 
     return (
       <View
@@ -36,25 +38,25 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                   KYNIO
                 </Text>
                 <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]/80">
-                  A minha jornada
+                  {isEn ? "My journey" : "A minha jornada"}
                 </Text>
               </View>
             </View>
             <View className="rounded-full bg-[#3A2200]/15 px-3 py-2">
               <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]">
-                Conquista
+                {isEn ? "Achievement" : "Conquista"}
               </Text>
             </View>
           </View>
 
           <Text className="mt-7 font-label text-[9px] uppercase tracking-widest text-[#3A2200]/75">
-            Nível atual
+            {isEn ? "Current level" : "Nível atual"}
           </Text>
           <Text className="mt-1 font-headline text-[32px] leading-9 text-[#3A2200]">
-            Nível {payload.level}
+            {isEn ? `Level ${payload.level}` : `Nível ${payload.level}`}
           </Text>
           <Text className="mt-1 font-body text-base text-[#3A2200]/90">
-            {payload.levelTitle}
+            {translateText(payload.levelTitle, payload.language)}
           </Text>
         </View>
 
@@ -65,7 +67,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                 {payload.totalXp}
               </Text>
               <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                XP total
+                {isEn ? "Total XP" : "XP total"}
               </Text>
             </View>
             <View className="flex-1 rounded-xl bg-[#EDE6D3] p-3">
@@ -73,7 +75,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                 {payload.streakDays}
               </Text>
               <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                Dias seguidos
+                {isEn ? "Streak days" : "Dias seguidos"}
               </Text>
             </View>
             <View className="flex-1 rounded-xl bg-[#F0DFC0] p-3">
@@ -81,7 +83,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                 {payload.badgeTitles.length}
               </Text>
               <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                Insígnias
+                {isEn ? "Badges" : "Insígnias"}
               </Text>
             </View>
           </View>
@@ -93,13 +95,15 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
                   className="rounded-full bg-[#F0DFC0] px-3 py-2"
                   key={badge}
                 >
-                  <Text className="font-label text-[8px] text-xp">{badge}</Text>
+                  <Text className="font-label text-[8px] text-xp">
+                    {translateText(badge, payload.language)}
+                  </Text>
                 </View>
               ))
             ) : (
               <View className="rounded-full bg-success-dark px-3 py-2">
                 <Text className="font-label text-[8px] text-success">
-                  Jornada iniciada
+                  {isEn ? "Journey started" : "Jornada iniciada"}
                 </Text>
               </View>
             )}
@@ -107,7 +111,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
 
           <View className="mt-5 flex-row items-center justify-between border-t border-[#D5CBAF] pt-4">
             <Text className="font-body text-[11px] text-[#6F6E66]">
-              Hábitos ao meu ritmo.
+              {isEn ? "Habits at my own pace." : "Hábitos ao meu ritmo."}
             </Text>
             <Text className="font-label text-[8px] text-success">
               {getShareUrlLabel()}

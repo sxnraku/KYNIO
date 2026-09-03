@@ -16,9 +16,9 @@ module.exports = {
         danger: "rgb(var(--color-danger) / <alpha-value>)",
         foreground: "rgb(var(--color-foreground) / <alpha-value>)",
         muted: "rgb(var(--color-muted) / <alpha-value>)",
-        success: "#D9922E",
+        success: "rgb(var(--color-success, 217 146 46) / <alpha-value>)",
         "success-dark": "rgb(var(--color-success-dark) / <alpha-value>)",
-        xp: "#D9922E",
+        xp: "rgb(var(--color-xp, 217 146 46) / <alpha-value>)",
       },
       fontFamily: {
         body: ["HankenGrotesk_400Regular"],

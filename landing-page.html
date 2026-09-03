@@ -1,1102 +1,299 @@
-<!doctype html>
-<html lang="pt" data-active-language="pt">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="KYNIO · Rastreador de jejum intermitente com fases biológicas, análise de refeições e foco em privacidade local." />
-    <meta name="google-site-verification" content="googlee0efefad07438cd0" />
-    <title>KYNIO · Jejum Intermitente & Nutrição</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css" />
-
-    <style>
-      :root {
-        --accent: #10B981;
-        --accent-strong: #059669;
-        --accent-subtle: rgba(16, 185, 129, 0.1);
-        --bg-dark: #09090B;
-        --surface-dark: #121215;
-        --surface-card: #18181B;
-        --surface-raised: #27272A;
-        --border-dark: #27272A;
-        --border-light: #3F3F46;
-        --text-primary: #F4F4F5;
-        --text-muted: #A1A1AA;
-        --cyan: #38BDF8;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Hanken Grotesk', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      }
-
-      body {
-        background-color: var(--bg-dark);
-        color: var(--text-primary);
-        line-height: 1.6;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-      }
-
-      /* Navbar */
-      header {
-        position: sticky;
-        top: 0;
-        background: rgba(9, 9, 11, 0.94);
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid var(--border-dark);
-        z-index: 100;
-        padding: 14px 24px;
-      }
-
-      .nav-inner {
-        max-width: 1140px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .brand-wrap {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-decoration: none;
-        color: #fff;
-      }
-
-      .brand-logo {
-        width: 36px;
-        height: 36px;
-        border-radius: 12px;
-        object-fit: cover;
-      }
-
-      .brand-title {
-        font-size: 19px;
-        font-weight: 800;
-        letter-spacing: -0.4px;
-      }
-
-      .nav-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .btn-beta-nav {
-        background: var(--accent);
-        color: #000;
-        font-weight: 800;
-        font-size: 13px;
-        padding: 9px 18px;
-        border-radius: 12px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        cursor: pointer;
-        border: none;
-        transition: opacity 0.2s;
-      }
-
-      .btn-beta-nav:hover {
-        opacity: 0.9;
-      }
-
-      .lang-switch {
-        display: flex;
-        background: var(--surface-card);
-        border: 1px solid var(--border-dark);
-        border-radius: 10px;
-        padding: 2px;
-      }
-
-      .lang-switch button {
-        background: transparent;
-        border: none;
-        color: var(--text-muted);
-        font-weight: 700;
-        font-size: 11px;
-        padding: 5px 10px;
-        border-radius: 8px;
-        cursor: pointer;
-        min-height: auto;
-      }
-
-      .lang-switch button.active {
-        background: var(--surface-raised);
-        color: #fff;
-      }
-
-      /* Hero Section */
-      .hero-section {
-        max-width: 1140px;
-        margin: 0 auto;
-        padding: 70px 24px 80px;
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 48px;
-        align-items: center;
-      }
-
-      .hero-badge-pill {
-        display: inline-flex;
-        align-items: center;
-        background: var(--accent-subtle);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: #34D399;
-        font-size: 11px;
-        font-weight: 800;
-        padding: 5px 14px;
-        border-radius: 20px;
-        margin-bottom: 22px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-      }
-
-      .hero-h1 {
-        font-size: clamp(38px, 5.2vw, 56px);
-        font-weight: 900;
-        line-height: 1.06;
-        letter-spacing: -1.5px;
-        margin-bottom: 20px;
-        color: #fff;
-      }
-
-      .hero-h1 em {
-        font-style: normal;
-        color: #10B981;
-      }
-
-      .hero-sub {
-        font-size: 17px;
-        color: var(--text-muted);
-        line-height: 1.6;
-        margin-bottom: 34px;
-        max-width: 520px;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        max-width: 420px;
-      }
-
-      .btn-hero-main {
-        background: var(--accent);
-        color: #000;
-        font-size: 15px;
-        font-weight: 800;
-        padding: 16px 24px;
-        border-radius: 14px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        cursor: pointer;
-        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
-        transition: transform 0.15s;
-      }
-
-      .btn-hero-main:hover {
-        transform: translateY(-1px);
-      }
-
-      .hero-trust-bar {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 600;
-      }
-
-      /* 1:1 REAL APP CARD PREVIEW */
-      .app-preview-card {
-        background: var(--surface-card);
-        border: 1px solid var(--border-light);
-        border-radius: 32px;
-        padding: 24px;
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .card-header-app {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-
-      .app-title-text {
-        font-size: 18px;
-        font-weight: 800;
-        color: #fff;
-      }
-
-      .app-sub-text {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
-
-      .icon-box-svg {
-        width: 40px;
-        height: 40px;
-        background: rgba(16, 185, 129, 0.12);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #10B981;
-      }
-
-      .svg-icon {
-        width: 20px;
-        height: 20px;
-        stroke: currentColor;
-        stroke-width: 2;
-        fill: none;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-      }
-
-      /* Live Timer Ring */
-      .timer-ring-box {
-        width: 190px;
-        height: 190px;
-        margin: 12px auto 16px;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .timer-ring-box svg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        transform: rotate(-90deg);
-      }
-
-      .t-track {
-        fill: none;
-        stroke: #27272A;
-        stroke-width: 10;
-      }
-
-      .t-bar {
-        fill: none;
-        stroke: #10B981;
-        stroke-width: 10;
-        stroke-linecap: round;
-        stroke-dasharray: 534;
-        stroke-dashoffset: 133;
-        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
-      }
-
-      .t-time-h1 {
-        font-size: 32px;
-        font-weight: 900;
-        letter-spacing: -0.5px;
-        color: #fff;
-      }
-
-      .t-phase-badge {
-        background: rgba(16, 185, 129, 0.15);
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        color: #10B981;
-        font-size: 10px;
-        font-weight: 800;
-        padding: 3px 10px;
-        border-radius: 10px;
-        margin-top: 4px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .pulse-dot {
-        width: 6px;
-        height: 6px;
-        background: #10B981;
-        border-radius: 50%;
-        animation: pDot 1.4s infinite;
-      }
-
-      @keyframes pDot {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.3; transform: scale(0.8); }
-      }
-
-      .metric-triplet {
-        display: flex;
-        justify-content: space-between;
-        border-top: 1px solid var(--border-dark);
-        padding-top: 14px;
-        margin-bottom: 16px;
-      }
-
-      .m-col {
-        flex: 1;
-        text-align: center;
-      }
-
-      .m-num {
-        font-size: 14px;
-        font-weight: 800;
-        color: #fff;
-      }
-
-      .m-lbl {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
-
-      .btn-app-preview {
-        width: 100%;
-        background: #10B981;
-        color: #000;
-        font-weight: 800;
-        font-size: 14px;
-        padding: 13px;
-        border-radius: 14px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        cursor: pointer;
-      }
-
-      /* Pillars Section */
-      .pillars-section {
-        background: #0E0E11;
-        border-top: 1px solid var(--border-dark);
-        border-bottom: 1px solid var(--border-dark);
-        padding: 80px 24px;
-      }
-
-      .container-max {
-        max-width: 1140px;
-        margin: 0 auto;
-      }
-
-      .section-heading-center {
-        text-align: center;
-        max-width: 640px;
-        margin: 0 auto 50px;
-      }
-
-      .section-tag {
-        color: var(--accent);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-      }
-
-      .section-h2 {
-        font-size: clamp(28px, 4vw, 38px);
-        font-weight: 900;
-        letter-spacing: -0.8px;
-        margin-bottom: 12px;
-        color: #fff;
-      }
-
-      .section-desc {
-        font-size: 15px;
-        color: var(--text-muted);
-      }
-
-      .pillars-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-      }
-
-      .pillar-card {
-        background: var(--surface-card);
-        border: 1px solid var(--border-dark);
-        border-radius: 24px;
-        padding: 28px 24px;
-        transition: border-color 0.2s;
-      }
-
-      .pillar-card:hover {
-        border-color: var(--border-light);
-      }
-
-      .pillar-icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: rgba(16, 185, 129, 0.12);
-        border: 1px solid rgba(16, 185, 129, 0.25);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--accent);
-        margin-bottom: 20px;
-      }
-
-      .pillar-title {
-        font-size: 18px;
-        font-weight: 800;
-        margin-bottom: 8px;
-        color: #fff;
-      }
-
-      .pillar-body {
-        font-size: 13.5px;
-        color: var(--text-muted);
-        line-height: 1.55;
-      }
-
-      /* Real Screenshots Showcase */
-      .showcase-section {
-        padding: 80px 24px;
-        max-width: 1140px;
-        margin: 0 auto;
-      }
-
-      .showcase-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 18px;
-        margin-top: 36px;
-      }
-
-      .shot-card {
-        background: var(--surface-card);
-        border: 1px solid var(--border-dark);
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-      }
-
-      .shot-card img {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-
-      .shot-info {
-        padding: 16px;
-      }
-
-      .shot-title {
-        font-size: 14px;
-        font-weight: 800;
-        color: #fff;
-        margin-bottom: 2px;
-      }
-
-      .shot-sub {
-        font-size: 11.5px;
-        color: var(--text-muted);
-      }
-
-      /* Final CTA Card */
-      .cta-card-wrap {
-        max-width: 1140px;
-        margin: 0 auto 80px;
-        padding: 0 24px;
-      }
-
-      .cta-card-box {
-        background: var(--surface-card);
-        border: 1px solid var(--border-light);
-        border-radius: 32px;
-        padding: 56px 32px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .cta-title {
-        font-size: clamp(28px, 4vw, 40px);
-        font-weight: 900;
-        letter-spacing: -0.8px;
-        margin-bottom: 12px;
-        color: #fff;
-      }
-
-      .cta-desc {
-        font-size: 15px;
-        color: var(--text-muted);
-        max-width: 540px;
-        line-height: 1.6;
-        margin-bottom: 30px;
-      }
-
-      /* Beta Modal */
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.88);
-        backdrop-filter: blur(14px);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 200;
-        padding: 20px;
-      }
-
-      .modal-overlay.open {
-        display: flex;
-      }
-
-      .modal-card {
-        background: #141417;
-        border: 1px solid var(--border-light);
-        border-radius: 28px;
-        width: 100%;
-        max-width: 480px;
-        padding: 32px;
-        position: relative;
-        box-shadow: 0 25px 80px rgba(0,0,0,0.95);
-      }
-
-      .modal-close-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: var(--surface-raised);
-        border: 1px solid var(--border-dark);
-        color: #fff;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      .step-item {
-        display: flex;
-        gap: 14px;
-        margin-bottom: 20px;
-        align-items: flex-start;
-      }
-
-      .step-badge {
-        width: 28px;
-        height: 28px;
-        background: var(--accent);
-        color: #000;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 900;
-        font-size: 13px;
-        flex-shrink: 0;
-      }
-
-      .step-h4 {
-        font-size: 14px;
-        font-weight: 800;
-        color: #fff;
-        margin-bottom: 3px;
-      }
-
-      .step-p {
-        font-size: 12px;
-        color: var(--text-muted);
-        line-height: 1.4;
-      }
-
-      .btn-play-action {
-        width: 100%;
-        background: var(--accent);
-        color: #000;
-        font-size: 15px;
-        font-weight: 800;
-        padding: 16px;
-        border-radius: 14px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none;
-        cursor: pointer;
-        margin-top: 10px;
-      }
-
-      /* Footer */
-      footer {
-        border-top: 1px solid var(--border-dark);
-        padding: 40px 24px;
-        text-align: center;
-        background: #070709;
-      }
-
-      .footer-inner {
-        max-width: 1140px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-      }
-
-      .footer-nav {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
-      }
-
-      .footer-nav a {
-        color: var(--text-muted);
-        font-size: 13px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: color 0.2s;
-      }
-
-      .footer-nav a:hover {
-        color: var(--accent);
-      }
-
-      .footer-disclaimer {
-        font-size: 12px;
-        color: #71717A;
-        max-width: 620px;
-        line-height: 1.5;
-      }
-
-      /* Language visibility */
-      [data-language] {
-        display: none;
-      }
-
-      html[data-active-language="pt"] [data-language="pt"],
-      html[data-active-language="en"] [data-language="en"] {
-        display: inline;
-      }
-
-      div[data-language],
-      p[data-language],
-      section[data-language],
-      h1[data-language],
-      h2[data-language],
-      h3[data-language] {
-        display: none;
-      }
-
-      html[data-active-language="pt"] div[data-language="pt"],
-      html[data-active-language="pt"] p[data-language="pt"],
-      html[data-active-language="pt"] section[data-language="pt"],
-      html[data-active-language="pt"] h1[data-language="pt"],
-      html[data-active-language="pt"] h2[data-language="pt"],
-      html[data-active-language="pt"] h3[data-language="pt"],
-      html[data-active-language="en"] div[data-language="en"],
-      html[data-active-language="en"] p[data-language="en"],
-      html[data-active-language="en"] section[data-language="en"],
-      html[data-active-language="en"] h1[data-language="en"],
-      html[data-active-language="en"] h2[data-language="en"],
-      html[data-active-language="en"] h3[data-language="en"] {
-        display: block;
-      }
-
-      @media (max-width: 860px) {
-        .hero-section {
-          grid-template-columns: 1fr;
-          text-align: center;
-          padding-top: 40px;
-        }
-
-        .hero-sub {
-          margin: 0 auto 28px;
-        }
-
-        .hero-actions {
-          margin: 0 auto;
-        }
-
-        .hero-trust-bar {
-          justify-content: center;
-        }
-      }
-    </style>
-  </head>
-  <body>
-
-    <!-- Top Navigation -->
-    <header>
-      <div class="nav-inner">
-        <a class="brand-wrap" href="index.html">
-          <img class="brand-logo" src="assets/app-icon-512x512.png" alt="KYNIO">
-          <span class="brand-title">KYNIO</span>
-        </a>
-
-        <div class="nav-right">
-          <div class="lang-switch">
-            <button data-language-button="pt">PT</button>
-            <button data-language-button="en">EN</button>
-          </div>
-          <button class="btn-beta-nav" onclick="openBetaModal()">
-            <span data-language="pt">Aderir à Beta</span>
-            <span data-language="en">Join Beta</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <div>
-        <div class="hero-badge-pill">
-          <span data-language="pt">Versão de Teste Fechado no Google Play</span>
-          <span data-language="en">Closed Beta on Google Play</span>
-        </div>
-
-        <h1 class="hero-h1">
-          <span data-language="pt">Constrói o teu ritmo. <em>Sem pressão.</em></span>
-          <span data-language="en">Build your rhythm. <em>Without pressure.</em></span>
-        </h1>
-
-        <p class="hero-sub">
-          <span data-language="pt">Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado na tua SQLite local.</span>
-          <span data-language="en">Track when your body transitions to fat burning, ketosis, and cellular autophagy. Snap a meal photo to calculate calories and macros. 100% private in local SQLite.</span>
-        </p>
-
-        <div class="hero-actions">
-          <button class="btn-hero-main" onclick="openBetaModal()">
-            <span data-language="pt">Entrar na Beta do Android</span>
-            <span data-language="en">Join the Android Beta</span>
-          </button>
-
-          <div class="hero-trust-bar">
-            <span><span data-language="pt">Privacidade Local</span><span data-language="en">Local Privacy</span></span>
-            <span>•</span>
-            <span><span data-language="pt">Sem Anúncios</span><span data-language="en">Ad-Free</span></span>
-            <span>•</span>
-            <span><span data-language="pt">Google Play Store</span><span data-language="en">Google Play Store</span></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Fasting Card Replica -->
-      <div>
-        <div class="app-preview-card">
-          <div class="card-header-app">
-            <div>
-              <div class="app-title-text">
-                <span data-language="pt">Resumo do jejum</span>
-                <span data-language="en">Fasting summary</span>
-              </div>
-              <div class="app-sub-text">
-                <span data-language="pt">Acompanha o teu ritmo, sem pressão.</span>
-                <span data-language="en">Track your rhythm, without pressure.</span>
-              </div>
-            </div>
-            <div class="icon-box-svg">
-              <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-          </div>
-
-          <div class="timer-ring-box">
-            <svg viewBox="0 0 190 190">
-              <circle class="t-track" cx="95" cy="95" r="85"></circle>
-              <circle class="t-bar" cx="95" cy="95" r="85"></circle>
-            </svg>
-            <div class="t-time-h1">16:00:00</div>
-            <div class="t-phase-badge">
-              <div class="pulse-dot"></div>
-              <span data-language="pt">Queima de Gordura</span>
-              <span data-language="en">Fat Burning</span>
-            </div>
-          </div>
-
-          <div class="metric-triplet">
-            <div class="m-col">
-              <div class="m-num">16h 00m</div>
-              <div class="m-lbl"><span data-language="pt">Decorrido</span><span data-language="en">Elapsed</span></div>
-            </div>
-            <div class="m-col">
-              <div class="m-num">0 min</div>
-              <div class="m-lbl"><span data-language="pt">Restante</span><span data-language="en">Remaining</span></div>
-            </div>
-            <div class="m-col">
-              <div class="m-num" style="color: #10B981;">Cetose</div>
-              <div class="m-lbl"><span data-language="pt">Fase</span><span data-language="en">Phase</span></div>
-            </div>
-          </div>
-
-          <button class="btn-app-preview" onclick="openBetaModal()">
-            <span data-language="pt">Iniciar Jejum</span>
-            <span data-language="en">Start Fast</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Key App Pillars -->
-    <section class="pillars-section">
-      <div class="container-max">
-        <div class="section-heading-center">
-          <div class="section-tag">
-            <span data-language="pt">Funcionalidades</span>
-            <span data-language="en">Features</span>
-          </div>
-          <h2 class="section-h2">
-            <span data-language="pt">Foco em hábitos e saúde. Sem complicações.</span>
-            <span data-language="en">Focused on habits and health. No friction.</span>
-          </h2>
-          <p class="section-desc">
-            <span data-language="pt">Uma ferramenta pessoal desenvolvida para manter a tua consistência diária de forma simples e intuitiva.</span>
-            <span data-language="en">A personal tool built to keep your daily consistency simple, clean, and intuitive.</span>
-          </p>
-        </div>
-
-        <div class="pillars-grid">
-          <div class="pillar-card">
-            <div class="pillar-icon-box">
-              <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <h3 class="pillar-title">
-              <span data-language="pt">Fases Metabólicas Reais</span>
-              <span data-language="en">Real Metabolic Phases</span>
-            </h3>
-            <p class="pillar-body">
-              <span data-language="pt">Acompanha a transição entre Digestão, Queima de Gordura, Cetose e Autofagia Celular com base em literatura biológica.</span>
-              <span data-language="en">Track your progress through Digestion, Fat Burning, Ketosis, and Cellular Autophagy grounded in biological literature.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card">
-            <div class="pillar-icon-box">
-              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-            </div>
-            <h3 class="pillar-title">
-              <span data-language="pt">Scanner de Refeições</span>
-              <span data-language="en">Meal Scanner</span>
-            </h3>
-            <p class="pillar-body">
-              <span data-language="pt">Tira uma foto ao teu prato para estimar instantaneamente calorias e macronutrientes (proteína, hidratos e gorduras).</span>
-              <span data-language="en">Snap a photo of your plate to estimate calories and macronutrients (protein, carbs, and fat) in seconds.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card">
-            <div class="pillar-icon-box">
-              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-            </div>
-            <h3 class="pillar-title">
-              <span data-language="pt">Água & Eletrólitos</span>
-              <span data-language="en">Water & Electrolytes</span>
-            </h3>
-            <p class="pillar-body">
-              <span data-language="pt">Controlo prático de hidratação diária com atalhos de copos e orientações saudáveis para o jejum.</span>
-              <span data-language="en">Effortless daily hydration tracking with quick cup shortcuts and healthy fasting guidance.</span>
-            </p>
-          </div>
-
-          <div class="pillar-card">
-            <div class="pillar-icon-box">
-              <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            </div>
-            <h3 class="pillar-title">
-              <span data-language="pt">Privacidade Local</span>
-              <span data-language="en">Local Privacy</span>
-            </h3>
-            <p class="pillar-body">
-              <span data-language="pt">Os teus registos começam guardados no teu dispositivo na SQLite privada. Sem anúncios e sem rastreio invasivo.</span>
-              <span data-language="en">Your records are stored right on your device in private SQLite. Zero intrusive ads and zero tracking.</span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Real App Screenshots Gallery -->
-    <section class="showcase-section">
-      <div class="section-heading-center">
-        <div class="section-tag">
-          <span data-language="pt">Ecrãs da App</span>
-          <span data-language="en">App Screenshots</span>
-        </div>
-        <h2 class="section-h2">
-          <span data-language="pt">Capturas autênticas da interface</span>
-          <span data-language="en">Authentic UI Screenshots</span>
-        </h2>
-      </div>
-
-      <div class="showcase-grid">
-        <div class="shot-card">
-          <img src="assets/screenshots/00_jejum_tracker.png" alt="Temporizador de Jejum">
-          <div class="shot-info">
-            <div class="shot-title">16:8 Fasting</div>
-            <div class="shot-sub"><span data-language="pt">Temporizador & Alvos</span><span data-language="en">Timer & Protocols</span></div>
-          </div>
-        </div>
-
-        <div class="shot-card">
-          <img src="assets/screenshots/01_refeicoes_nutricao_ia.png" alt="Nutrição">
-          <div class="shot-info">
-            <div class="shot-title">Nutrition</div>
-            <div class="shot-sub"><span data-language="pt">Scanner de Prato</span><span data-language="en">Meal Scanner</span></div>
-          </div>
-        </div>
-
-        <div class="shot-card">
-          <img src="assets/screenshots/02_treinos_movimento.png" alt="Treinos">
-          <div class="shot-info">
-            <div class="shot-title">Workouts</div>
-            <div class="shot-sub"><span data-language="pt">Registo de Atividade</span><span data-language="en">Activity Logging</span></div>
-          </div>
-        </div>
-
-        <div class="shot-card">
-          <img src="assets/screenshots/03_progresso_gamificado.png" alt="Progresso & Níveis">
-          <div class="shot-info">
-            <div class="shot-title">Consistency</div>
-            <div class="shot-sub"><span data-language="pt">Níveis de XP & Metas</span><span data-language="en">XP Levels & Goals</span></div>
-          </div>
-        </div>
-
-        <div class="shot-card">
-          <img src="assets/screenshots/04_conquistas_partilha.png" alt="Conquistas">
-          <div class="shot-info">
-            <div class="shot-title">Achievements</div>
-            <div class="shot-sub"><span data-language="pt">Badges & Partilha</span><span data-language="en">Badges & Sharing</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Bottom CTA Card -->
-    <div class="cta-card-wrap">
-      <div class="cta-card-box">
-        <h2 class="cta-title">
-          <span data-language="pt">Pronto para começar o teu primeiro jejum?</span>
-          <span data-language="en">Ready to start your first fast?</span>
-        </h2>
-        <p class="cta-desc">
-          <span data-language="pt">Acede à versão oficial de teste fechado na Google Play Store.</span>
-          <span data-language="en">Get access to the closed beta on the Google Play Store.</span>
-        </p>
-        <button class="btn-hero-main" onclick="openBetaModal()" style="max-width: 320px; width: 100%;">
-          <span data-language="pt">Aderir à Beta no Google Play</span>
-          <span data-language="en">Join Beta on Google Play</span>
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KYNIO · Jejum Intermitente & Nutrição</title>
+<meta name="description" content="KYNIO — acompanha fases metabólicas do jejum, fotografa refeições para estimar macros, 100% privado no teu dispositivo.">
+<link rel="icon" href="legal-site/assets/app-icon-512x512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="legal-site/styles.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <a class="nav-brand" href="#top">
+    <img src="legal-site/assets/app-icon-512x512.png" alt="KYNIO" class="nav-icon">
+    <span class="nav-word">KYNIO</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#fases" data-i18n="nav.phases">Fases</a>
+    <a href="#funcionalidades" data-i18n="nav.features">Funcionalidades</a>
+    <a href="#ecras" data-i18n="nav.screens">Ecrãs</a>
+  </nav>
+  <div class="nav-right">
+    <button class="lang-toggle" id="langToggle" aria-label="Idioma">
+      <span data-lang="pt" data-language="pt" class="lang-opt active">PT</span><span class="lang-sep">/</span><span data-lang="en" data-language="en" class="lang-opt">EN</span>
+    </button>
+    <button class="btn btn-ink btn-sm" data-open-beta data-i18n="nav.cta">Aderir à Beta</button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span><span data-i18n="hero.badge">Beta fechada · Google Play</span></p>
+      <h1 class="hero-title">
+        <span data-i18n="hero.t1">Constrói o teu ritmo.</span><br>
+        <em data-i18n="hero.t2">Sem pressão.</em>
+      </h1>
+      <p class="hero-sub" data-i18n="hero.sub">Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-ink" data-open-beta>
+          <span data-i18n="hero.cta1">Entrar na Beta do Android</span>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
+        <a class="link-quiet" href="#fases" data-i18n="hero.cta2">Ver como funciona</a>
+      </div>
+      <p class="hero-meta" data-i18n="hero.meta">Privacidade local&nbsp;&nbsp;·&nbsp;&nbsp;Sem anúncios&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store</p>
+    </div>
+
+    <div class="hero-showcase">
+      <div class="showcase-plate">
+        <!-- floating decorations -->
+        <div class="float-chip chip-tl" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M6 2h12M6 22h12M7 2c0 6 5 6 5 10s-5 4-5 10M17 2c0 6-5 6-5 10s5 4 5 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span>16:8</span>
+        </div>
+        <div class="float-chip chip-tr" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 3c3.5 4.2 6 7.3 6 10.2A6 6 0 0 1 6 13.2C6 10.3 8.5 7.2 12 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <span data-i18n="chip.water">2000 ml</span>
+        </div>
+        <div class="float-chip chip-bl" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="m12 2 2.4 6.2L21 9.3l-5 4.4 1.5 6.5L12 16.7l-5.5 3.5L8 13.7 3 9.3l6.6-1.1L12 2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span data-i18n="chip.level">Nível 4 · Consistente</span>
+        </div>
+        <div class="float-chip chip-br mono" aria-hidden="true">+50 XP</div>
+
+        <!-- phone -->
+        <div class="phone" id="phone">
+          <div class="phone-notch" aria-hidden="true"></div>
+          <div class="phone-screen" id="phoneScreen" tabindex="0" aria-label="Ecrãs da aplicação KYNIO — rola para ver">
+            <img src="legal-site/assets/screenshots/00_jejum_tracker.png" alt="Temporizador de jejum 16:8">
+            <img src="legal-site/assets/screenshots/01_refeicoes_nutricao_ia.png" alt="Scanner de refeições com IA">
+            <img src="legal-site/assets/screenshots/02_treinos_movimento.png" alt="Registo de treinos">
+            <img src="legal-site/assets/screenshots/03_progresso_gamificado.png" alt="Progresso e níveis de XP">
+            <img src="legal-site/assets/screenshots/04_conquistas_partilha.png" alt="Conquistas e partilha">
+          </div>
+        </div>
+        <div class="phone-dots" id="phoneDots" aria-hidden="true">
+          <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FASES METABÓLICAS (dark, live) ============ -->
+<section class="phases" id="fases">
+  <div class="section-head">
+    <p class="eyebrow eyebrow-amber" data-i18n="phases.eyebrow">O teu corpo, em tempo real</p>
+    <h2 class="section-title" data-i18n="phases.title">Cinco fases. Um arco.</h2>
+    <p class="section-sub" data-i18n="phases.sub">O KYNIO traduz literatura biológica num temporizador vivo — sabe exatamente onde estás no jejum, sem adivinhar.</p>
+  </div>
+
+  <div class="arc-stage">
+    <svg class="arc-svg" viewBox="0 0 900 420" aria-hidden="true">
+      <defs>
+        <radialGradient id="dotGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#f5b544" stop-opacity=".9"/>
+          <stop offset="45%" stop-color="#f5b544" stop-opacity=".28"/>
+          <stop offset="100%" stop-color="#f5b544" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- track -->
+      <path id="arcTrack" d="M 70 380 A 380 380 0 0 1 830 380" fill="none" stroke="#3a3226" stroke-width="3" stroke-linecap="round"/>
+      <path id="arcFill" d="M 70 380 A 380 380 0 0 1 830 380" fill="none" stroke="#f5b544" stroke-width="3" stroke-linecap="round"/>
+      <!-- nodes injected by JS -->
+      <g id="arcNodes"></g>
+      <!-- glow + dot -->
+      <circle id="arcGlow" r="46" fill="url(#dotGlow)"/>
+      <circle id="arcDot" r="11" fill="#f5b544" stroke="#1a140d" stroke-width="3"/>
+    </svg>
+
+    <div class="arc-readout">
+      <p class="arc-timer mono" id="arcTimer">08:23:41</p>
+      <p class="arc-phase"><span class="pulse-dot pulse-dot-sm" aria-hidden="true"></span><span id="arcPhaseName">Queima de Gordura</span></p>
+      <p class="arc-sub mono"><span id="arcElapsed">8h 23m</span> <span data-i18n="arc.elapsed">decorridos</span> · <span id="arcRemain">7h 36m</span> <span data-i18n="arc.remain">restantes</span></p>
+    </div>
+  </div>
+
+  <div class="phase-grid" id="phaseGrid">
+    <article class="phase-item" data-phase="0">
+      <p class="phase-hour mono">0h</p>
+      <h3 data-i18n="ph.0.t">Digestão</h3>
+      <p data-i18n="ph.0.d">A glicose da última refeição ainda está em circulação. O corpo usa-a primeiro.</p>
+    </article>
+    <article class="phase-item" data-phase="1">
+      <p class="phase-hour mono">4h</p>
+      <h3 data-i18n="ph.1.t">Queima de Glicose</h3>
+      <p data-i18n="ph.1.d">Os níveis de insulina descem. O glicogénio do fígado torna-se a fonte principal.</p>
+    </article>
+    <article class="phase-item" data-phase="2">
+      <p class="phase-hour mono">12h</p>
+      <h3 data-i18n="ph.2.t">Queima de Gordura</h3>
+      <p data-i18n="ph.2.d">O interruptor metabólico: a gordura armazenada passa a ser o combustível.</p>
+    </article>
+    <article class="phase-item" data-phase="3">
+      <p class="phase-hour mono">16h</p>
+      <h3 data-i18n="ph.3.t">Cetose</h3>
+      <p data-i18n="ph.3.d">Os corpos cetónicos alimentam o cérebro. Clareza mental e energia estável.</p>
+    </article>
+    <article class="phase-item" data-phase="4">
+      <p class="phase-hour mono">24h</p>
+      <h3 data-i18n="ph.4.t">Autofagia Celular</h3>
+      <p data-i18n="ph.4.d">A limpeza celular profunda: reciclagem de componentes danificados.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ FUNCIONALIDADES ============ -->
+<section class="features" id="funcionalidades">
+  <div class="section-head">
+    <p class="eyebrow" data-i18n="feat.eyebrow">Funcionalidades</p>
+    <h2 class="section-title" data-i18n="feat.title">Foco em hábitos e saúde.<br>Sem complicações.</h2>
+    <p class="section-sub" data-i18n="feat.sub">Uma ferramenta pessoal desenvolvida para manter a tua consistência diária de forma simples e intuitiva.</p>
+  </div>
+
+  <div class="feature-list">
+    <a class="feature-row" href="#ecras">
+      <span class="feature-num mono">01</span>
+      <span class="feature-body">
+        <h3 data-i18n="f.0.t">Fases Metabólicas Reais</h3>
+        <p data-i18n="f.0.d">Acompanha a transição entre Digestão, Queima de Gordura, Cetose e Autofagia Celular com base em literatura biológica.</p>
+      </span>
+      <span class="feature-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="18" height="18"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <a class="feature-row" href="#ecras">
+      <span class="feature-num mono">02</span>
+      <span class="feature-body">
+        <h3 data-i18n="f.1.t">Scanner de Refeições</h3>
+        <p data-i18n="f.1.d">Tira uma foto ao teu prato para estimar instantaneamente calorias e macronutrientes — proteína, hidratos e gorduras.</p>
+      </span>
+      <span class="feature-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="18" height="18"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <a class="feature-row" href="#ecras">
+      <span class="feature-num mono">03</span>
+      <span class="feature-body">
+        <h3 data-i18n="f.2.t">Água & Eletrólitos</h3>
+        <p data-i18n="f.2.d">Controlo prático de hidratação diária com atalhos de copos e orientações saudáveis para o jejum.</p>
+      </span>
+      <span class="feature-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="18" height="18"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+    <a class="feature-row" href="#ecras">
+      <span class="feature-num mono">04</span>
+      <span class="feature-body">
+        <h3 data-i18n="f.3.t">Privacidade Local</h3>
+        <p data-i18n="f.3.d">Os teus registos ficam guardados no teu dispositivo, numa SQLite privada. Sem anúncios e sem rastreio invasivo.</p>
+      </span>
+      <span class="feature-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="18" height="18"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<!-- ============ ECRÃS (drag carousel) ============ -->
+<section class="screens" id="ecras">
+  <div class="section-head section-head-split">
+    <div>
+      <p class="eyebrow" data-i18n="scr.eyebrow">Ecrãs da app</p>
+      <h2 class="section-title" data-i18n="scr.title">Capturas autênticas.<br>Sem maquilhagem.</h2>
+    </div>
+    <p class="drag-hint mono" data-i18n="scr.hint">arrasta para explorar →</p>
+  </div>
+
+  <div class="drag-strip" id="dragStrip">
+    <figure class="shot">
+      <div class="shot-frame"><img src="legal-site/assets/screenshots/00_jejum_tracker.png" alt="16:8 Fasting" draggable="false"></div>
+      <figcaption class="mono">16:8 Fasting — <span data-i18n="cap.0">Temporizador & Alvos</span></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="shot-frame"><img src="legal-site/assets/screenshots/01_refeicoes_nutricao_ia.png" alt="Nutrition" draggable="false"></div>
+      <figcaption class="mono">Nutrition — <span data-i18n="cap.1">Scanner de Prato</span></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="shot-frame"><img src="legal-site/assets/screenshots/02_treinos_movimento.png" alt="Workouts" draggable="false"></div>
+      <figcaption class="mono">Workouts — <span data-i18n="cap.2">Registo de Atividade</span></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="shot-frame"><img src="legal-site/assets/screenshots/03_progresso_gamificado.png" alt="Consistency" draggable="false"></div>
+      <figcaption class="mono">Consistency — <span data-i18n="cap.3">Níveis de XP & Metas</span></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="shot-frame"><img src="legal-site/assets/screenshots/04_conquistas_partilha.png" alt="Achievements" draggable="false"></div>
+      <figcaption class="mono">Achievements — <span data-i18n="cap.4">Badges & Partilha</span></figcaption>
+    </figure>
+  </div>
+  <div class="drag-progress" aria-hidden="true"><span class="drag-track"><span id="dragBar"></span></span></div>
+</section>
+
+<!-- ============ CTA FINAL ============ -->
+<section class="final">
+  <div class="final-inner">
+    <p class="eyebrow eyebrow-amber" data-i18n="fin.eyebrow">Beta fechada no Google Play</p>
+    <h2 class="final-title" data-i18n="fin.title">Pronto para o teu<br>primeiro jejum?</h2>
+    <p class="final-sub" data-i18n="fin.sub">Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.</p>
+    <button class="btn btn-amber btn-lg" data-open-beta>
+      <span data-i18n="fin.cta">Aderir à Beta no Google Play</span>
+      <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img src="legal-site/assets/app-icon-512x512.png" alt="" class="nav-icon">
+      <span class="nav-word">KYNIO</span>
+    </div>
+    <nav class="footer-links">
+      <a href="legal-site/privacy.html" data-i18n="ft.privacy">Política de Privacidade</a>
+      <a href="legal-site/terms.html" data-i18n="ft.terms">Termos de Utilização</a>
+      <a href="legal-site/account-deletion.html" data-i18n="ft.delete">Eliminar Conta</a>
+      <a href="legal-site/support.html" data-i18n="ft.support">Suporte & Contacto</a>
+    </nav>
+  </div>
+  <p class="footer-note" data-i18n="ft.note">KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.</p>
+</footer>
+
+<!-- ============ MODAL BETA ============ -->
+<div class="modal" id="betaModal" role="dialog" aria-modal="true" aria-labelledby="betaTitle" hidden>
+  <div class="modal-backdrop" data-close-beta></div>
+  <div class="modal-card">
+    <button class="modal-close" data-close-beta aria-label="Fechar">
+      <svg viewBox="0 0 16 16" width="16" height="16"><path d="m3 3 10 10M13 3 3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <p class="eyebrow" data-i18n="md.eyebrow">Acesso à Beta do Android</p>
+    <h3 class="modal-title" id="betaTitle" data-i18n="md.title">Dois passos e estás dentro.</h3>
+
+    <div class="modal-step">
+      <span class="step-num mono">1</span>
+      <div>
+        <h4 data-i18n="md.s1t">Entrar no Grupo de Testers</h4>
+        <p data-i18n="md.s1d">Autoriza a tua conta Google para ter acesso à versão de teste na Play Store.</p>
+        <a class="btn btn-ink btn-sm" href="https://groups.google.com/g/kynio-testers" target="_blank" rel="noopener"><span data-i18n="md.s1b">Entrar no Grupo Google</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 13 13 3M6 3h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
     </div>
 
-    <!-- Beta Instructions Modal -->
-    <div class="modal-overlay" id="betaModal" onclick="closeBetaModal(event)">
-      <div class="modal-card" onclick="event.stopPropagation()">
-        <button class="modal-close-btn" onclick="closeBetaModal()">✕</button>
-
-        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #fff;">
-          <span data-language="pt">Acesso à Beta do Android</span>
-          <span data-language="en">Join Android Closed Beta</span>
-        </h3>
-        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
-          <span data-language="pt">Segue os 2 passos rápidos para instalar a versão oficial no teu telemóvel:</span>
-          <span data-language="en">Follow these 2 quick steps to install the official app on your device:</span>
-        </p>
-
-        <div class="step-item">
-          <div class="step-badge">1</div>
-          <div>
-            <div class="step-h4">
-              <span data-language="pt">Entrar no Grupo de Testers</span>
-              <span data-language="en">Join the Testers Group</span>
-            </div>
-            <div class="step-p">
-              <span data-language="pt">Autoriza a tua conta Google para ter acesso à versão de teste na Play Store.</span>
-              <span data-language="en">Authorise your Google account to get access on the Google Play Store.</span>
-            </div>
-            <a class="btn-group-link" href="https://groups.google.com/g/kynio-testers" target="_blank" rel="noopener" style="display: inline-block; margin-top: 6px; font-size: 12px; color: var(--accent); font-weight: 700; text-decoration: underline;">
-              <span data-language="pt">Entrar no Grupo Google →</span>
-              <span data-language="en">Join Google Group →</span>
-            </a>
-          </div>
-        </div>
-
-        <div class="step-item">
-          <div class="step-badge">2</div>
-          <div>
-            <div class="step-h4">
-              <span data-language="pt">Descarregar na Google Play</span>
-              <span data-language="en">Download on Google Play</span>
-            </div>
-            <div class="step-p">
-              <span data-language="pt">Abre o link oficial e instala o KYNIO no teu Android.</span>
-              <span data-language="en">Open the official link and install KYNIO on your Android device.</span>
-            </div>
-          </div>
-        </div>
-
-        <a class="btn-play-action" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener">
-          <span data-language="pt">Abrir na Google Play Store</span>
-          <span data-language="en">Open on Google Play Store</span>
-        </a>
+    <div class="modal-step">
+      <span class="step-num mono">2</span>
+      <div>
+        <h4 data-i18n="md.s2t">Descarregar na Google Play</h4>
+        <p data-i18n="md.s2d">Abre o link oficial e instala o KYNIO no teu Android.</p>
+        <a class="btn btn-amber btn-sm" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener"><span data-i18n="md.s2b">Abrir na Google Play Store</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 13 13 3M6 3h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Footer -->
-    <footer>
-      <div class="footer-inner">
-        <div class="footer-nav">
-          <a href="privacy.html">
-            <span data-language="pt">Política de Privacidade</span>
-            <span data-language="en">Privacy Policy</span>
-          </a>
-          <a href="terms.html">
-            <span data-language="pt">Termos de Utilização</span>
-            <span data-language="en">Terms of Use</span>
-          </a>
-          <a href="account-deletion.html">
-            <span data-language="pt">Eliminar Conta</span>
-            <span data-language="en">Delete Account</span>
-          </a>
-          <a href="support.html">
-            <span data-language="pt">Suporte & Contacto</span>
-            <span data-language="en">Support & Contact</span>
-          </a>
-        </div>
-        <div class="footer-disclaimer">
-          <span data-language="pt">KYNIO · Ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.</span>
-          <span data-language="en">KYNIO · Personal lifestyle and gamification tracking tool. Does not provide medical or nutritional advice.</span>
-        </div>
-      </div>
-    </footer>
-
-    <script src="site.js"></script>
-    <script>
-      function openBetaModal() {
-        document.getElementById('betaModal').classList.add('open');
-      }
-
-      function closeBetaModal(e) {
-        if (!e || e.target.id === 'betaModal' || e.target.classList.contains('modal-close-btn')) {
-          document.getElementById('betaModal').classList.remove('open');
-        }
-      }
-    </script>
-  </body>
+<script src="legal-site/site.js"></script>
+</body>
 </html>

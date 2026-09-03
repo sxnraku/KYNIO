@@ -2,6 +2,190 @@
 
 export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "1 refeição confirmada": "1 confirmed meal",
+  "Já comecei antes": "Started earlier",
+  "Já comecei o jejum antes": "I started fasting earlier",
+  "Ajustar rotina": "Adjust routine",
+  "Configurar rotina de jejum": "Configure fasting routine",
+  "Quando começaste?": "When did you start?",
+  "Editar início": "Edit start time",
+  "Indica a hora real para recuperar o tempo já decorrido.": "Enter the actual time to recover elapsed fasting hours.",
+  "Atalhos": "Presets",
+  "Data": "Date",
+  "Hora": "Time",
+  "Data de início do jejum": "Fasting start date",
+  "Hora de início do jejum": "Fasting start time",
+  "A hora de início não pode estar no futuro.": "Start time cannot be in the future.",
+  "Introduz uma data válida no formato DD/MM/AAAA.": "Enter a valid date in DD/MM/YYYY format.",
+  "Introduz uma hora válida no formato HH:MM.": "Enter a valid time in HH:MM format.",
+  "Não foi possível guardar esta hora de início.": "Could not save this start time.",
+  "O relógio usa esta data guardada no dispositivo e continua a contar mesmo com a app fechada.": "The timer uses this saved time and keeps tracking even when the app is closed.",
+  "Iniciar deste momento": "Start from this time",
+  "Guardar alteração": "Save changes",
+  "Relatório Clínico (PDF)": "Clinical Report (PDF)",
+  "Gera um documento visual em PDF com médias de jejum, evolução do peso e macronutrientes para partilha com médicos ou nutricionistas.": "Generate a visual PDF report with fasting averages, weight trends, and macronutrients for healthcare professionals.",
+  "Exportar os meus Dados (JSON)": "Export My Data (JSON)",
+  "Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.": "Creates a JSON file with your full local SQLite history and opens system share options.",
+  "Eliminar Todos os Dados": "Delete All Data",
+  "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.": "Removes the SQLite database, private photos and, when connected, the account and synced data.",
+  "Restaurar compras": "Restore Purchases",
+  "Recupera a subscrição ou compra Pro ativa na tua conta Google Play.": "Recovers active Pro subscription or purchase from your Google Play account.",
+  "Rever tutorial guiado": "Replay Guided Tutorial",
+  "Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade.": "Replays the tour of Fasting, Meals, Workouts, Progress, and Privacy.",
+  "Privacidade e controlo": "Privacy and Control",
+  "Local por defeito · cloud opcional": "Local by default · Optional cloud",
+  "• Jejuns, refeições, peso, progresso e fotografias confirmadas ficam sempre disponíveis neste dispositivo.": "• Fasts, meals, weight, progress, and confirmed photos always stay available on this device.",
+  "• Ao ligares uma conta Google, perfil, peso e registos são também sincronizados para permitir utilização em vários dispositivos.": "• When connecting a Google account, profile, weight, and logs also sync across devices.",
+  "• A análise de refeição envia apenas a fotografia e/ou descrição escolhida, através do KYNIO, para a Google Gemini; o restante histórico e o ID da conta não acompanham esse pedido.": "• Meal analysis only sends the chosen photo/description through KYNIO to Google Gemini; other history and account ID are never sent.",
+  "• A exportação abre o seletor do sistema; só sai do dispositivo quando escolhes um destino.": "• Exporting opens the system picker; data only leaves your device when you choose a destination.",
+  "Aviso legal": "Legal Notice",
+  "Esta app é uma ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico, nutricional ou de treino.": "This app is a personal lifestyle and gamification tracker. It does not provide medical, nutritional, or fitness advice.",
+  "Documentos e suporte": "Documents & Support",
+  "Política de Privacidade": "Privacy Policy",
+  "Termos de Utilização": "Terms of Use",
+  "Eliminar conta pela web": "Delete account via web",
+  "Ajuda e suporte": "Help & Support",
+  "Definições": "Settings",
+  "Registar atividade": "Log activity",
+  "O que fizeste hoje?": "What did you do today?",
+  "Duração em minutos": "Duration in minutes",
+  "Esforço percebido": "Perceived effort",
+  "Últimos 7 dias": "Last 7 days",
+  "O teu movimento": "Your movement",
+  "minutos no total": "total minutes",
+  "ganhos esta semana": "earned this week",
+  "Regista apenas atividade já realizada. A app não recomenda duração, intensidade ou um plano de treino.":
+    "Only log activity already completed. The app does not recommend duration, intensity, or workout plans.",
+  "Uma atividade não pode ultrapassar 3 horas (180 min).":
+    "A single workout activity cannot exceed 3 hours (180 min).",
+  "Uma atividade não pode ultrapassar 4 horas.":
+    "A single workout activity cannot exceed 4 hours.",
+  "Nova análise": "New analysis",
+  "Mostra ou descreve a refeição": "Show or describe your meal",
+  "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.":
+    "Open live camera, pick an image from gallery, or describe what you ate.",
+  "Câmara": "Camera",
+  "Galeria": "Gallery",
+  "O que comeste?": "What did you eat?",
+  "Analisar refeição": "Analyze meal",
+  "Ao tocar em Analisar, autorizas o envio desta fotografia e/ou descrição, através do KYNIO, para a Google Gemini. O restante histórico e o ID da conta não são enviados. A app não guarda a fotografia nem a resposta remotamente.":
+    "By tapping Analyze, you authorize sending this photo and/or description through KYNIO to Google Gemini. Other history and account ID are never sent. The app stores neither the photo nor response remotely.",
+  "Resultado estruturado": "Structured result",
+  "Calorias estimadas": "Estimated calories",
+  "Toca no valor para ajustar": "Tap value to adjust",
+  "A imagem não ficou clara? Clarifica aqui:": "Image unclear? Clarify here:",
+  "Queres ajustar ingredientes ou porção?": "Want to adjust ingredients or portion?",
+  "Ajustar": "Adjust",
+  "A recalcular…": "Recalculating…",
+  "Recalcular com estes detalhes": "Recalculate with these details",
+  "Confirmar e Ganhar +30 XP": "Confirm and Earn +30 XP",
+  "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário.":
+    "AI estimated values for personal habit tracking. Adjust manually as needed.",
+  "Fontes científicas": "Scientific sources",
+  "O que está a acontecer no organismo": "What is happening in your body",
+  "BIOLOGIA & HORMONAS": "BIOLOGY & HORMONES",
+  "Benefícios Principais": "Key Benefits",
+  "DICA PRÁTICA": "PRACTICAL TIP",
+  "AVISO DE SAÚDE & PRIVACIDADE RGPD": "HEALTH & GDPR PRIVACY NOTICE",
+  "Leitura de contexto científico — não é uma promessa de resultados individuais.":
+    "Scientific context reading — not a guarantee of individual outcomes.",
+  "As fases são estimativas biológicas de referência e não substituem avaliação médica. Em caso de tonturas ou mal-estar, interrompe o jejum. Todos os dados permanecem na tua base SQLite local privada.":
+    "Phases are biological reference estimates and do not replace medical advice. If you experience dizziness or feel unwell, stop fasting. All data remains in your local private SQLite database.",
+  "Esta é a fase estimada em que o teu organismo se encontra agora.":
+    "This is the estimated phase your body is currently in.",
+  "Digestão & Absorção": "Digestion & Absorption",
+  "Queima de Glicose": "Glycogen Depletion",
+  "Queima de Gordura": "Fat Burning",
+  "Cetose Ativa": "Active Ketosis",
+  "Autofagia Celular": "Cellular Autophagy",
+  "Regeneração & Reset": "Renewal & Reset",
+  "Absorção dos macro e micronutrientes da última refeição":
+    "Absorption of macro and micronutrients from the last meal",
+  "Manutenção temporária dos níveis energéticos":
+    "Temporary maintenance of energy levels",
+  "Digestão mecânica e enzimática no trato digestivo":
+    "Mechanical and enzymatic digestion in the gastrointestinal tract",
+  "O organismo está focado na digestão da última refeição. A glicose e os níveis de insulina sobem, permitindo às células utilizar o açúcar no sangue como fonte primária de energia.":
+    "The body is focused on digesting the last meal. Glucose and insulin rise, allowing cells to utilize blood sugar as primary fuel.",
+  "Pico de insulina circulante e início do armazenamento de glicose sob a forma de glicogénio muscular e hepático.":
+    "Peak circulating insulin and onset of glucose storage as liver and muscle glycogen.",
+  "Mantém-te hidratado apenas com água para facilitar o trânsito digestivo.":
+    "Stay hydrated with water to support smooth digestion.",
+  "Redução progressiva da insulina plasmática":
+    "Progressive reduction of circulating insulin",
+  "Estabilização da glicemia sanguínea":
+    "Stabilization of blood glucose levels",
+  "Uso eficiente das reservas energéticas imediatas":
+    "Efficient utilization of immediate energy stores",
+  "Queda dos níveis de açúcar no sangue e desbloqueio gradual das vias de oxidação lipídica.":
+    "Decline in blood sugar levels and progressive unlock of lipid oxidation pathways.",
+  "Se sentires fome súbita, bebe água ou chá sem açúcar; é apenas o reflexo hormonal da grelina.":
+    "If you feel sudden hunger waves, drink water or unsweetened tea; it is often just a ghrelin pulse.",
+  "Início ativo da queima de gordura corporal (lipólise)":
+    "Active onset of body fat mobilization (lipolysis)",
+  "Aumento da flexibilidade metabólica":
+    "Enhanced metabolic flexibility",
+  "Sensibilidade melhorada dos recetores de insulina":
+    "Improved insulin receptor sensitivity",
+  "As reservas de glicogénio do fígado ficam significativamente reduzidas. O corpo faz a transição para oxidar ácidos gordos, convertendo lípidos em energia.":
+    "Liver glycogen stores become substantially depleted. The body transitions to oxidizing fatty acids, converting stored fat into fuel.",
+  "Aumento de glucagon e adrenalina, estimulando a quebra dos triglicéridos no tecido adiposo.":
+    "Increase in glucagon and epinephrine, stimulating breakdown of triglycerides in adipose tissue.",
+  "Excelente momento para caminhadas ligeiras ou trabalho focado; a clareza mental começa a aumentar.":
+    "Great time for light walks or deep focused work; mental clarity begins to rise.",
+  "Produção de corpos cetónicos (beta-hidroxibutirato) pelo fígado":
+    "Hepatic production of ketone bodies (beta-hydroxybutyrate)",
+  "Muitas pessoas reportam clareza mental e menos picos de fome":
+    "Many people report steady mental focus and subdued appetite spikes",
+  "Estudos associam a cetose a marcadores inflamatórios mais baixos":
+    "Studies link nutritional ketosis to reduced systemic inflammatory markers",
+  "Com as reservas de glicogénio esgotadas, o fígado converte gordura em corpos cetónicos. O cérebro passa a usar cetonas como fonte alternativa de energia — o momento exato varia de pessoa para pessoa.":
+    "With glycogen exhausted, the liver converts fat into ketone bodies. The brain begins utilizing ketones as an alternative energy substrate.",
+  "Subida das cetonas no sangue e menor dependência de glicose.":
+    "Rise in blood ketone concentrations and decreased dependence on dietary glucose.",
+  "Adiciona uma pitada de sal marinho na água para manter o equilíbrio eletrolítico.":
+    "Add a pinch of sea salt or electrolytes to water to support fluid balance.",
+  "Processo natural de reciclagem de componentes celulares danificados":
+    "Natural recycling process for damaged cellular components",
+  "Inclui a mitofagia: reciclagem de mitocôndrias disfuncionais":
+    "Encompasses mitophagy: targeted recycling of dysfunctional mitochondria",
+  "Está a ser estudada por possível relação com longevidade celular":
+    "Actively researched for potential connections to cellular resilience",
+  "A autofagia está sempre ativa a nível basal, mas o jejum tende a intensificá-la: as células passam a reciclar mais organelos e proteínas danificadas. Em humanos, o ponto exato de intensificação ainda não foi medido diretamente — a estimativa de 24h+ é baseada sobretudo em estudos animais.":
+    "Autophagy operates continuously at basal rates, but fasting tends to upregulate it: cells clear out damaged organelles and proteins. In humans, precise timing varies.",
+  "O jejum reduz a sinalização de mTOR e ativa a AMPK, duas vias associadas ao aumento da atividade autofágica.":
+    "Fasting downregulates mTOR signaling and activates AMPK, two master pathways driving cellular recycling.",
+  "Repouso e hidratação com eletrólitos (sódio, potássio, magnésio) são essenciais em jejuns de dia completo.":
+    "Rest and hydration with electrolytes (sodium, potassium, magnesium) are essential during full-day fasts.",
+  "Redução de IGF-1, pressão arterial e gordura corporal observada em ensaios clínicos":
+    "Reductions in IGF-1, blood pressure, and visceral fat documented in clinical trials",
+  "Melhoria de marcadores de idade biológica em dois estudos independentes":
+    "Improvements in biological age markers reported across independent studies",
+  "Melhoria da sensibilidade à insulina em participantes de risco":
+    "Enhanced insulin sensitivity noted in at-risk participants",
+  "Jejuns prolongados ou dietas que os mimetizam foram testados em ensaios clínicos com humanos: ciclos de 5 dias reduziram IGF-1, pressão arterial e marcadores inflamatórios, e dois estudos independentes observaram uma redução de ~2,5 anos na idade biológica medida. São resultados promissores, mas a investigação continua.":
+    "Prolonged fasting and fasting-mimicking diets evaluated in clinical trials showed reductions in IGF-1 and blood pressure, with preliminary indications of biological rejuvenation.",
+  "Redução sustentada de IGF-1 e resistência à insulina, com aumento do rácio linfoide/mieloide (indicador de rejuvenescimento imunitário).":
+    "Sustained decrease in IGF-1 alongside favorable lymphoid/myeloid shifts in immune markers.",
+  "Quebra o jejum prolongado com caldos nutritivos e porções pequenas de fácil digestão.":
+    "Break extended fasts gently with broths and small, easily digestible portions.",
+  "Estudo com 36 voluntários saudáveis: após uma refeição mista equilibrada, a glicose e a insulina séricas sobem nas primeiras horas, com amostragens até aos 180 min — confirma a fase de absorção em humanos.":
+    "Study with 36 healthy volunteers: following a balanced mixed meal, serum glucose and insulin rise during the initial hours, sampled up to 180 min — confirming the human absorption phase.",
+  "Estudo randomizado com medição direta por espectroscopia de ressonância magnética (13C-MRS): quantificou a depleção do glicogénio hepático durante o jejum noturno em humanos e a sua reposição após refeição.":
+    "Randomized trial using direct 13C magnetic resonance spectroscopy (13C-MRS): quantified liver glycogen depletion during overnight fasting in humans and replenishment post-meal.",
+  "Ensaio randomizado com 36 adultos magros saudáveis: jejuns de 24h isolaram os efeitos metabólicos do jejum, incluindo a mobilização de gordura, em comparação com restrição energética contínua.":
+    "Randomized trial in 36 healthy lean adults: 24h fasts isolated fasting metabolic effects, including fat mobilization, compared to continuous energy restriction.",
+  "Ensaio randomizado com 60 adultos saudáveis não-obesos: 4 semanas de jejum em dias alternados aumentaram o beta-hidroxibutirato (cetona) mesmo nos dias sem jejum, com melhoria de marcadores cardiovasculares.":
+    "Randomized trial in 60 healthy non-obese adults: 4 weeks of alternate-day fasting increased beta-hydroxybutyrate (ketone) even on non-fasting days, improving cardiovascular markers.",
+  "Estudo-piloto com 5 adultos saudáveis num jejum de 72h: confirma a queda de insulina e glicose e a remodelação metabólica em humanos; amostra pequena, resultados preliminares.":
+    "Pilot study with 5 healthy adults during a 72h fast: confirms drop in insulin and glucose alongside systemic metabolic remodeling in humans; small sample, preliminary results.",
+  "Trial clínico piloto (30 participantes) que mediu fluxo autofágico em células sanguíneas humanas durante uma dieta que mimetiza o jejum — dos poucos estudos com medição direta em humanos; amostra pequena.":
+    "Pilot clinical trial (30 participants) quantifying autophagic flux in human blood cells during a fasting-mimicking diet — among few human direct-measurement studies.",
+  "Jejum de 72h em 5 adultos criou um ambiente metabólico \"conducente à autofagia\" — mas os autores sublinham que a autofagia não foi medida diretamente.":
+    "72h fast in 5 adults established a metabolic milieu conducive to autophagy — though authors emphasize autophagy was not directly assayed.",
+  "Ensaio randomizado com 100 participantes: 3 ciclos mensais de 5 dias de dieta que mimetiza o jejum reduziram peso, pressão arterial e IGF-1, sem efeitos adversos graves.":
+    "Randomized trial with 100 participants: 3 monthly 5-day cycles of a fasting-mimicking diet reduced body weight, blood pressure, and IGF-1 without serious adverse events.",
+  "Análise de dois ensaios clínicos em humanos: 3 ciclos de FMD associaram-se a ~2,5 anos de redução na mediana da idade biológica e a melhoria do rácio linfoide/mieloide (indicador de idade imunitária).":
+    "Analysis of two human clinical trials: 3 cycles of FMD were associated with ~2.5 years median biological age reduction and improved lymphoid/myeloid ratio (immune aging marker).",
   "36h Monge": "36h Monk Fast",
   "48h Reset": "48h Reset",
   "A análise de refeição envia apenas a fotografia e/ou descrição escolhida, através do KYNIO, para a Google Gemini; o restante histórico e o ID da conta não acompanham esse pedido.":
@@ -25,7 +209,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A fotografia e os dados do perfil ficam no dispositivo, exceto quando ligas a sincronização opcional.":
     "Your photo and profile data stay on the device unless you enable optional sync.",
   "A guardar…": "Saving…",
-  "A imagem não ficou clara? Clarifica aqui:": "Image unclear? Clarify here:",
   "A ingestão regular de água mineral apoia o equilíbrio natural de eletrólitos durante o jejum. Em caso de condições de saúde, consulta o teu médico.":
     "Regular mineral water intake supports natural electrolyte balance during fasting. For medical conditions, consult your doctor.",
   "A intensidade suaviza quando há uma pausa; o histórico permanece.":
@@ -38,7 +221,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A preparar o armazenamento local…": "Preparing local storage…",
   "A preparar o perfil…": "Preparing your profile…",
   "A processar…": "Processing…",
-  "A recalcular…": "Recalculating…",
   "A resposta não é armazenada remotamente pela app.":
     "The response is not stored remotely by the app.",
   "A recuperar o jejum em curso…": "Restoring your active fast…",
@@ -52,13 +234,9 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "A tua jornada": "Your journey",
   "A tua subscrição Pro foi restaurada neste dispositivo.":
     "Your Pro subscription has been restored on this device.",
-  "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.":
-    "Open the live camera, choose a gallery image or describe what you ate.",
   "Abrir definições": "Open settings",
   "Abrir definições de privacidade": "Open privacy settings",
   "Abrir estudo no PubMed": "Open study on PubMed",
-  "Absorção dos macro e micronutrientes da última refeição":
-    "Absorption of macro and micronutrients from the last meal",
   "Acesso a 36h Monge, 48h Reset, OMAD e Jejum Livre prolongado.":
     "Access to 36h Monk, 48h Reset, OMAD and extended Open Fasting.",
   "Acesso a análises aprofundadas de macronutrientes e tendências de cetose.":
@@ -76,44 +254,73 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Only add entries if you want to track this measurement over time.",
   "Adiciona EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ao ficheiro .env.local para ativar o login Google.":
     "Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY to .env.local to enable Google sign-in.",
-  "Adiciona o primeiro nome ao teu círculo.":
-    "Add the first person to your circle.",
-  "Adiciona uma pitada de sal marinho na água para manter o equilíbrio eletrolítico.":
-    "Stay well hydrated with mineral water to support natural electrolyte balance.",
   "Adicionar 250ml de água": "Add 250ml of water",
   "Adicionar 500ml de água": "Add 500ml of water",
-  "Adicionar amigo": "Add friend",
   "Adicionar registo de peso": "Add weight entry",
+  "Ainda não registaste refeições hoje": "No meals logged today yet",
   "Ainda sem atividades": "No activities yet",
   "Ainda sem jejuns registados": "No completed fasts yet",
-  "Ajuda e suporte": "Help and support",
-  "Ajustar": "Adjust",
-  Amigos: "Friends",
   "Análises de IA Ilimitadas": "Unlimited AI Analyses",
   "análises de refeição ilimitadas com IA": "unlimited AI meal analyses",
-  "Analisar refeição": "Analyse meal",
   "Antes de começar": "Before you begin",
-  "Ao ligar a conta, nome, email, perfil, amigos, peso e registos de hábitos são guardados remotamente para sincronização. A ligação é opcional e pode ser removida.":
-    "When you connect an account, your name, email, profile, friends, weight and habit logs are stored remotely for syncing. The connection is optional and can be removed.",
-  "Ao ligares uma conta Google, perfil, amigos e registos são também sincronizados para permitir utilização em vários dispositivos.":
-    "When you connect a Google account, profile, friends and logs are also synced for use across multiple devices.",
-  "Ao ligares uma conta Google, perfil, amigos, peso e registos são também sincronizados para permitir utilização em vários dispositivos.":
-    "When you connect a Google account, profile, friends, weight and logs are also synced for use across multiple devices.",
-  "Ao tocar em Analisar, autorizas o envio desta fotografia e/ou descrição, através do KYNIO, para a Google Gemini. O restante histórico e o ID da conta não são enviados. A app não guarda a fotografia nem a resposta remotamente.":
-    "By tapping Analyse, you authorise KYNIO to send this photo and/or description to Google Gemini. Your other history and account ID are not sent. The app does not remotely store the photo or response.",
+  "Ao ligar a conta, nome, email, perfil, peso e registos de hábitos são guardados remotamente para sincronização. A ligação é opcional e pode ser removida.":
+    "When you connect an account, your name, email, profile, weight and habit logs are stored remotely for syncing. The connection is optional and can be removed.",
+  "Ao ligares uma conta Google, perfil, peso e registos são também sincronizados para permitir utilização em vários dispositivos.":
+    "When you connect a Google account, profile, weight and logs are also synced for use across multiple devices.",
   Aparência: "Appearance",
   "Aparência e idioma": "Appearance and language",
+  "Temas Visuais": "Visual Themes",
+  "4 temas Sol Pro ✦": "4 Sol Pro themes ✦",
+  "Original Claro": "Original Light",
+  "Original Noite": "Original Night",
+  "AMOLED Eclipse": "AMOLED Eclipse",
+  "Crepúsculo & Ouro": "Midnight & Gold",
+  "Matcha & Salva": "Matcha & Sage",
+  Monocromo: "Monochrome",
+  "Exclusivo Pro": "Exclusive Pro",
+  "Sol Pro ✦": "Sol Pro ✦",
+  "Temas Exclusivos Sol Pro": "Exclusive Sol Pro Themes",
+  "AMOLED Preto Puro, Crepúsculo & Ouro, Matcha Botânico e Studio Monocromo.":
+    "Pure AMOLED Black, Midnight & Gold, Botanical Matcha and Studio Monochrome.",
+  "Escudo de Sol (Proteção de Sequência)": "Streak Shield (Streak Protection)",
+  "2 proteções mensais para nunca perderes a tua sequência de dias e XP.":
+    "2 monthly shields to protect your daily streak and XP from resetting.",
+  "Dossiê de Hábitos em PDF": "Habits Dossier PDF",
+  "Exportação gráfica do histórico factual de jejum, peso e consistência.":
+    "Visual export of factual fasting, weight and consistency logs.",
+  "Sequência salva pelo Escudo de Sol 🛡️": "Streak saved by Streak Shield 🛡️",
+  "Escudo de Sol em ação (Streak protegido)": "Streak Shield active (Streak protected)",
+  "Escudo de Sol ativo (2 proteções/mês)": "Streak Shield active (2 shields/month)",
+  "Protege os teus dias com o Escudo de Sol": "Protect your days with Streak Shield",
+  "Desbloquear ✦": "Unlock ✦",
+  "Não foi possível gerar o dossiê de hábitos em PDF.":
+    "Could not generate habits dossier PDF.",
+  "Cartões Stories para Instagram": "Instagram Stories Cards",
+  "Story 9:16 ✦": "Story 9:16 ✦",
+  "Partilhar Story no Instagram": "Share Story to Instagram",
+  Padrão: "Standard",
+  "Padrões Pessoais": "Personal Patterns",
+  "Insights Factuais": "Factual Insights",
+  "Evolução Semanal": "Weekly Trend",
+  "Dia de Maior Consistência": "Most Consistent Day",
+  "Dia em que concluis mais metas de jejum":
+    "Day you complete the most fasting goals",
+  "Janela Habitual de Refeição": "Typical Eating Window",
+  "Hora em que quebras o jejum com mais frequência":
+    "Hour you break fast most frequently",
+  "Cálculos puramente descritivos derivados dos teus registos locais no dispositivo.":
+    "Purely descriptive calculations derived from your local device records.",
   Aprendiz: "Apprentice",
   "As categorias e o esforço percebido são descritivos. Não constituem aconselhamento médico ou de treino e não substituem orientação profissional adequada ao teu caso.":
     "Categories and perceived effort are descriptive. They are not medical or training advice and do not replace professional guidance suited to your situation.",
-  "As fases são estimativas biológicas de referência e não substituem avaliação médica. Em caso de tonturas ou mal-estar, interrompe o jejum. Todos os dados permanecem na tua base SQLite local privada.":
-    "Phases are reference biological estimates and do not replace medical evaluation. If you feel dizzy or unwell, stop fasting. All data stays in your private local SQLite database.",
+  "As tuas refeições confirmadas aparecerão aqui com fotografia, calorias e macros.":
+    "Your confirmed meals will appear here with photo, calories and macros.",
+  "A hora de fim deve ser posterior à hora de início.":
+    "End time must be after start time.",
   "As insígnias desbloqueadas aparecerão aqui.":
     "Unlocked badges will appear here.",
   "As preferências ficam guardadas apenas neste dispositivo.":
     "Preferences are stored only on this device.",
-  "As reservas de glicogénio do fígado ficam significativamente reduzidas. O corpo faz a transição para oxidar ácidos gordos, convertendo lípidos em energia.":
-    "Liver glycogen stores become significantly reduced. The body transitions to oxidising fatty acids, converting lipids into fuel.",
   "Rotina de Jejum": "Fasting Routine",
   "Agendamento automático e lembretes ADF": "Automated schedules & ADF reminders",
   "Ativar Rotina Automática": "Enable Automatic Schedule",
@@ -135,6 +342,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Alterar ↗": "Change ↗",
   "Hora do Jejum ADF": "ADF Fasting Time",
   "Hora do teu Jejum": "Time to Fast",
+  "Duração:": "Duration:",
+  "Duração ajustada": "Adjusted duration",
   "Hidratação": "Hydration",
   "Lembretes de hidratação": "Hydration reminders",
   "Pausa para um copo de água. O teu jejum agradece.":
@@ -155,37 +364,25 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Sol Essencial": "Essential Sun",
   "Sol Pro Ativo ✦": "Sol Pro Active ✦",
   Autofagia: "Autophagy",
-  "Autofagia Celular": "Cellular Autophagy",
   "Autofagia Estimada": "Estimated autophagy",
-  "Aumento de glucagon e adrenalina, estimulando a quebra dos triglicéridos no tecido adiposo.":
-    "Rise in glucagon and adrenaline, stimulating the breakdown of triglycerides in adipose tissue.",
-  "Aumento da flexibilidade metabólica": "Increase in metabolic flexibility",
-  "Aviso legal": "Legal notice",
-  "AVISO DE SAÚDE & PRIVACIDADE RGPD": "HEALTH ADVISORY & GDPR PRIVACY",
   "BASE": "BASE",
   "Benefícios comprovados": "Proven benefits",
   "Bicicleta": "Cycling",
   Bio: "Bio",
   "Biografia do perfil": "Profile bio",
-  "BIOLOGIA & HORMONAS": "BIOLOGY & HORMONES",
   Bloqueada: "Locked",
   Bloqueado: "Locked",
-  "Calorias estimadas": "Estimated calories",
   "Calorias estimadas, editável": "Estimated calories, editable",
   "Calorias registadas hoje": "Calories logged today",
   "Calorias, macros, tags e confiança aparecerão aqui para revisão manual.":
     "Calories, macros, tags and confidence will appear here for manual review.",
-  Câmara: "Camera",
   Caminhada: "Walk",
   Cancelar: "Cancel",
   "Captar fotografia": "Take photo",
   Cetose: "Ketosis",
   "Clarificação dos alimentos": "Food clarification",
-  "Cetose Ativa": "Active Ketosis",
   "Cetose Estimada": "Estimated ketosis",
   Claro: "Light",
-  "Muitas pessoas reportam clareza mental e menos picos de fome":
-    "Many people report mental clarity and fewer hunger spikes",
   "Cobrado mensalmente · Cancela quando quiseres":
     "Billed monthly · Cancel anytime",
   "Como queres aparecer?": "How would you like to appear?",
@@ -201,7 +398,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Confirma a primeira análise de refeição.":
     "Confirm your first meal analysis.",
   "Configurar Rotina de Jejum": "Configure Fasting Routine",
-  "Confirmar e Ganhar +30 XP": "Confirm and Earn +30 XP",
   Consistente: "Consistent",
   "Constrói o teu ritmo": "Build your rhythm",
   "Conta e sincronização": "Account and sync",
@@ -214,12 +410,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "(Copo)": "(Glass)",
   Copo: "Glass",
   Corrida: "Run",
-  "Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.":
-    "Creates a JSON file with your full local SQLite history and opens the system options to save it.",
   "Dá identidade à tua jornada": "Give your journey an identity",
-  "Data de início do jejum": "Fasting start date",
   Decorrido: "Elapsed",
-  Definições: "Settings",
   "Descrição da refeição": "Meal description",
   Desbloqueada: "Unlocked",
   Desbloqueado: "Unlocked",
@@ -231,36 +423,34 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Desbloqueia vantagens Sol e passes premium com o teu progresso.":
     "Unlock Sol perks and premium passes with your progress.",
   "Desligar conta Google": "Disconnect Google account",
-  "DICA PRÁTICA": "PRACTICAL TIP",
   "Dica de Hidratação Saudável": "Healthy Hydration Tip",
   Digestão: "Digestion",
   "Dias com jejum": "Days with fasting",
   "Dias seguidos": "Days in a row",
-  "Digestão & Absorção": "Digestion & Absorption",
-  "Redução sustentada de IGF-1 e resistência à insulina, com aumento do rácio linfoide/mieloide (indicador de rejuvenescimento imunitário).":
-    "Sustained reduction of IGF-1 and insulin resistance, with an increased lymphoid-to-myeloid ratio (an immune rejuvenation indicator).",
   Disciplinado: "Disciplined",
-  "Documentos e suporte": "Documents and support",
-  "Duração em minutos": "Duration in minutes",
   "Duração personalizada em minutos": "Custom duration in minutes",
   "Editar hora de início do jejum": "Edit fasting start time",
-  "Editar início": "Edit start",
-  "Ajustar rotina": "Adjust routine",
-  "Configurar rotina de jejum": "Set up fasting routine",
+  "Editar": "Edit",
+  "Editar hora de início": "Edit start time",
+  "Editar Jejum": "Edit Fast",
+  "Editar perfil": "Edit profile",
   "Editar objetivo": "Edit target",
+  "Eliminar": "Delete",
+  "Eliminar conta e dados na cloud": "Delete account and cloud data",
+  "Eliminar conta permanentemente?": "Delete account permanently?",
+  "Eliminar dados locais": "Delete local data",
+  "Eliminar Jejum": "Delete Fast",
+  "Eliminar peso": "Delete weight",
+  "Eliminar refeição": "Delete meal",
+  "Tens a certeza que queres eliminar esta refeição do teu histórico?":
+    "Are you sure you want to delete this meal from your history?",
   Elevado: "High",
   "Eliminar definitivamente": "Delete permanently",
-  "Eliminar conta pela web": "Delete account on the web",
   "Eliminar registo": "Delete entry",
   "Eliminar este registo?": "Delete this entry?",
-  "Eliminar Todos os Dados": "Delete All Data",
   "Eliminar todos os dados?": "Delete all data?",
   "Em Movimento": "On the Move",
   "EM BREVE": "COMING SOON",
-  "Jejuns prolongados ou dietas que os mimetizam foram testados em ensaios clínicos com humanos: ciclos de 5 dias reduziram IGF-1, pressão arterial e marcadores inflamatórios, e dois estudos independentes observaram uma redução de ~2,5 anos na idade biológica medida. São resultados promissores, mas a investigação continua.":
-    "Prolonged fasts or fasting-mimicking diets have been tested in human clinical trials: 5-day cycles lowered IGF-1, blood pressure and inflammatory markers, and two independent studies observed a ~2.5-year reduction in measured biological age. Promising results, but research is ongoing.",
-  "Subida das cetonas no sangue e menor dependência de glicose.":
-    "Rising blood ketones and reduced dependence on glucose.",
   "Enquadra a refeição": "Frame the meal",
   Entendido: "Understood",
   Entrar: "Enter",
@@ -277,21 +467,13 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "You choose the destination. Nothing is posted automatically.",
   "ESCOLHE O TEU PLANO": "CHOOSE YOUR PLAN",
   Escuro: "Dark",
-  "Esforço percebido": "Perceived effort",
   "Esta ação elimina permanentemente jejuns, refeições, peso, XP, perfil, consentimento, fotografias privadas e, se existir, a conta sincronizada. Não elimina ficheiros que já tenhas exportado e não pode ser anulada.":
     "This permanently deletes fasts, meals, weight, XP, profile, consent, private photos and any synced account. It does not delete files you already exported and cannot be undone.",
-  "Esta app é uma ferramenta de acompanhamento pessoal de estilo de vida e gamificação. Não presta aconselhamento médico, nutricional ou de treino.":
-    "This app is a personal lifestyle tracking and gamification tool. It does not provide medical, nutritional or training advice.",
-  "Esta é a fase estimada em que o teu organismo se encontra agora.":
-    "This is the estimated phase your body is currently in.",
   "Esta janela fecha automaticamente quando a conta Google estiver ligada.":
     "This window closes automatically when the Google account is connected.",
   Evolução: "Progress",
   "É necessário atualizar para continuar a utilizar o KYNIO.":
     "You need to update to continue using KYNIO.",
-  "Estabilização da glicemia sanguínea": "Stabilisation of blood glucose",
-  "Excelente momento para caminhadas ligeiras ou trabalho focado; a clareza mental começa a aumentar.":
-    "Great time for light walks or deep focused work; mental clarity begins to sharpen.",
   "Ex.: 250g, 1 prato cheio, 2 fatias, 1 taça":
     "E.g. 250g, 1 full plate, 2 slices, 1 bowl",
   "Ex.: é tofu com arroz integral, cerca de 300g":
@@ -318,7 +500,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Metabolic phases estimated from fasting science literature. They vary from person to person. Tap the phases to see all biological details.",
   "Fechar": "Close",
   "Fechar câmara": "Close camera",
-  "Fontes científicas": "Scientific sources",
   "Fechar detalhes da fase": "Close phase details",
   "Fechar seleção da hora de início": "Close start time selection",
   "Fechar seleção de objetivo": "Close goal selection",
@@ -334,24 +515,22 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Fotografa e analisa refeições sem limites diários de tokens.":
     "Photograph and analyse meals without daily token limits.",
   "Fotografar refeição": "Photograph meal",
-  Galeria: "Gallery",
   "(Garrafa)": "(Bottle)",
   Garrafa: "Bottle",
-  "ganhos esta semana": "earned this week",
   "Gerir": "Manage",
   Glicose: "Glucose",
+  Gratuito: "Free",
+  "Guardar": "Save",
+  "Guardar alterações": "Save changes",
   Gordura: "Fat",
   "Gordura, editável": "Fat, editable",
   "Guardada apenas neste dispositivo.": "Stored only on this device.",
   "Histórico": "History",
   "Histórico de Peso": "Weight History",
-  "Hora de início do jejum": "Fasting start time",
   "Horas de Jejum (7 Dias)": "Fasting Hours (7 Days)",
   "Guardar atividade · +50 XP": "Save activity · +50 XP",
   "Guardar atividade · sem XP": "Save activity · no XP",
   "Limite XP diário": "Daily XP limit",
-  "Uma atividade não pode ultrapassar 4 horas.":
-    "An activity cannot exceed 4 hours.",
   "Atividade guardada. Limite diário de XP de atividades atingido (3 por dia).":
     "Activity saved. Daily activity XP limit reached (3 per day).",
   "Atividade guardada no dispositivo. +50 XP": "Activity saved on device. +50 XP",
@@ -376,17 +555,9 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Imagem e link enviados para a app escolhida.":
     "Image and link sent to the selected app.",
   "Imagem e link partilhados.": "Image and link shared.",
-  "Indica a hora real para recuperar o tempo já decorrido.":
-    "Enter the real time to recover the elapsed time.",
   Iniciado: "Initiated",
   "Iniciar Jejum": "Start Fast",
-  "A autofagia está sempre ativa a nível basal, mas o jejum tende a intensificá-la: as células passam a reciclar mais organelos e proteínas danificadas. Em humanos, o ponto exato de intensificação ainda não foi medido diretamente — a estimativa de 24h+ é baseada sobretudo em estudos animais.":
-    "Autophagy is always active at a basal level, but fasting tends to intensify it: cells recycle more damaged organelles and proteins. In humans, the exact intensification point has not been measured directly — the 24h+ estimate is mostly based on animal studies.",
   "Início de Queima de Glicose": "Early glucose use",
-  "Início ativo da queima de gordura corporal (lipólise)":
-    "Active onset of body fat burning (lipolysis)",
-  "O jejum reduz a sinalização de mTOR e ativa a AMPK, duas vias associadas ao aumento da atividade autofágica.":
-    "Fasting reduces mTOR signaling and activates AMPK, two pathways associated with increased autophagic activity.",
   "Insígnia de Prestígio Mestre e estatuto honorário permanente de pioneiro Kynio.":
     "Master Prestige badge and permanent honorary Kynio pioneer status.",
   Insígnias: "Badges",
@@ -398,8 +569,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Enter a valid weight greater than zero.",
   "Introduz um peso válido ou deixa o campo vazio.":
     "Enter a valid weight or leave the field empty.",
-  "Já comecei antes": "Started earlier",
-  "Já comecei o jejum antes": "I started fasting earlier",
   Jejum: "Fasting",
   "JEJUM ATIVO": "FAST ACTIVE",
   "JEJUM INATIVO": "FAST INACTIVE",
@@ -413,29 +582,20 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Jornada iniciada": "Journey started",
   "Kynio Sol Pass Pro": "Kynio Sol Pass Pro",
   Leve: "Light",
-  "Leitura de contexto científico — não é uma promessa de resultados individuais.":
-    "Scientific background reading — not a promise of individual results.",
   "Leva o teu jejum e nutrição ao próximo nível com IA ilimitada.":
     "Take your fasting and nutrition to the next level with unlimited AI.",
   "Lembrar mais tarde": "Remind me later",
   "Ligar Google agora · opcional": "Connect Google now · optional",
   "Limpeza de mitocôndrias disfuncionais (mitofagia)":
     "Clearance of dysfunctional mitochondria (mitophagy)",
-  "Inclui a mitofagia: reciclagem de mitocôndrias disfuncionais":
-    "Includes mitophagy: recycling of dysfunctional mitochondria",
   "Linha de 7 Dias": "7-Day Line",
   "Linha de Consistência": "Consistency Line",
   "Lista vazia": "Empty list",
-  "Local por defeito · cloud opcional": "Local by default · optional cloud",
   "Local por defeito · sincronização opcional":
     "Local by default · optional sync",
   "Macros estimados · editáveis": "Estimated macros · editable",
-  "Manutenção temporária dos níveis energéticos":
-    "Temporary maintenance of energy levels",
   "Mantém atividade durante 7 dias seguidos.":
     "Stay active for 7 consecutive days.",
-  "Mantém-te hidratado apenas com água para facilitar o trânsito digestivo.":
-    "Stay hydrated with water to support digestive transit.",
   "Mantém uma cópia local e sincroniza entre os teus dispositivos quando tens internet.":
     "Keep a local copy and sync between your devices when you are online.",
   "Mestre da Consistência": "Master of Consistency",
@@ -443,11 +603,9 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Métricas & Tendências Avançadas": "Advanced Metrics & Trends",
   "Métricas Avançadas": "Advanced Metrics",
   "Mês": "Month",
-  "minutos no total": "total minutes",
   Mobilidade: "Mobility",
   Moderado: "Moderate",
   "Modo IA Pro Turbo": "AI Pro Turbo Mode",
-  "Mostra ou descreve a refeição": "Show or describe the meal",
   "Na tua lista privada": "In your private list",
   "Não foram encontradas compras ou subscrições ativas para esta conta Google.":
     "No active purchases or subscriptions were found for this Google account.",
@@ -486,33 +644,23 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Níveis, consistência e conquistas calculados apenas com os teus registos locais.":
     "Levels, consistency and achievements calculated only from your local logs.",
   Nome: "Name",
-  "Nome do amigo": "Friend's name",
   "Nome do perfil": "Profile name",
   "Notas opcionais sobre a atividade": "Optional notes about the activity",
   "NOVA VERSÃO DISPONÍVEL": "NEW VERSION AVAILABLE",
   "Nova versão:": "New version:",
   "Notas opcionais: percurso, como te sentiste…":
     "Optional notes: route, how you felt…",
-  "Nova análise": "New analysis",
   "Novo registo": "New entry",
   "O acesso é usado apenas para enquadrar e fotografar esta refeição. A captura só acontece quando tocares no botão.":
     "Access is only used to frame and photograph this meal. A photo is only taken when you tap the button.",
-  "Com as reservas de glicogénio esgotadas, o fígado converte gordura em corpos cetónicos. O cérebro passa a usar cetonas como fonte alternativa de energia — o momento exato varia de pessoa para pessoa.":
-    "With glycogen stores depleted, the liver converts fat into ketone bodies. The brain starts using ketones as an alternative energy source — the exact timing varies from person to person.",
-  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, amigos, peso e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
-    "History starts on your device. If you connect a Google account, profile, friends, weight and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
-  "O organismo está focado na digestão da última refeição. A glicose e os níveis de insulina sobem, permitindo às células utilizar o açúcar no sangue como fonte primária de energia.":
-    "The body is focused on digesting the last meal. Glucose and insulin levels rise, allowing cells to use blood sugar as their primary energy source.",
-  "O que comeste?": "What did you eat?",
-  "O que está a acontecer no organismo": "What is happening in your body",
+  "O histórico começa guardado no dispositivo. Se ligares uma conta Google, perfil, peso e registos serão também sincronizados remotamente entre os teus dispositivos. Uma fotografia de refeição só é enviada, através do KYNIO, para a Google Gemini quando pedes uma análise.":
+    "History starts on your device. If you connect a Google account, profile, weight and logs are also synced remotely across your devices. A meal photo is only sent through KYNIO to Google Gemini when you request an analysis.",
   "O que a investigação observou": "What research has observed",
-  "O que fizeste hoje?": "What did you do today?",
   "O registo de peso serve apenas para acompanhamento pessoal. Não avalia a tua saúde, não define um peso ideal e não substitui orientação profissional.":
     "Weight logging is only for personal tracking. It does not assess your health, define an ideal weight or replace professional guidance.",
   "O teu círculo": "Your circle",
   "O teu histórico aparecerá aqui depois do primeiro registo.":
     "Your history will appear here after the first entry.",
-  "O teu movimento": "Your movement",
   "O teu progresso, à tua maneira": "Your progress, your way",
   "Objetivo de jejum": "Fasting target",
   "Objetivo de jejum diário": "Daily fasting target",
@@ -520,10 +668,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "Choose the target you want to start with. You can change it anytime.",
   "Opcional, descritivo e sem metas obrigatórias.":
     "Optional, descriptive and without mandatory targets.",
-  "Melhoria da sensibilidade à insulina em participantes de risco":
-    "Improved insulin sensitivity in at-risk participants",
-  "Melhoria de marcadores de idade biológica em dois estudos independentes":
-    "Improved biological-age markers in two independent studies",
   "Outra duração": "Other duration",
   Outro: "Other",
   "Ouve sempre os sinais do teu corpo. Jejuns prolongados (superiores a 24h) não são indicados para menores, grávidas ou sem acompanhamento médico. Todos os teus registos são 100% locais e confidenciais.":
@@ -539,14 +683,9 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   Peso: "Weight",
   "Peso atual (opcional)": "Current weight (optional)",
   "Peso inicial opcional": "Optional starting weight",
-  "Pico de insulina circulante e início do armazenamento de glicose sob a forma de glicogénio muscular e hepático.":
-    "Peak circulating insulin and onset of glucose storage as muscle and liver glycogen.",
   "Plano Anual": "Annual Plan",
   "Plano Mensal": "Monthly Plan",
-  "Política de Privacidade": "Privacy Policy",
   "POUPA 42% · MAIS POPULAR": "SAVE 42% · MOST POPULAR",
-  "Está a ser estudada por possível relação com longevidade celular":
-    "Being studied for a possible link to cellular longevity",
   "Pré-visualização em direto": "Live preview",
   Preferências: "Preferences",
   "PREMIUM PASS": "PREMIUM PASS",
@@ -557,10 +696,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Prioridade e precisão aumentada no modelo Gemini de análise de refeições.":
     "Priority and enhanced precision in the Gemini meal analysis model.",
   Privacidade: "Privacy",
-  "Privacidade e controlo": "Privacy and control",
   "Privacidade e dados": "Privacy and data",
-  "Produção de corpos cetónicos (beta-hidroxibutirato) pelo fígado":
-    "Production of ketone bodies (beta-hydroxybutyrate) by the liver",
   Progresso: "Progress",
   "Progresso indisponível": "Progress unavailable",
   "Pronto para iniciar jejum livre": "Ready to start open fasting",
@@ -571,59 +707,32 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
     "When you finish your first fast, it will appear here with duration, goal details, and XP earned.",
   "Quantidade / Porção (opcional)": "Quantity / Portion (optional)",
   "Quantidade ou porção da refeição": "Meal quantity or portion",
-  "Quebra o jejum prolongado com caldos nutritivos e porções pequenas de fácil digestão.":
-    "Break extended fasts with nourishing broths and small, easily digestible portions.",
-  "Queda dos níveis de açúcar no sangue e desbloqueio gradual das vias de oxidação lipídica.":
-    "Drop in blood sugar levels and gradual unlocking of lipid oxidation pathways.",
-  "Queima de Glicose": "Glucose Burn",
-  "Queima de Gordura": "Fat Burning",
   "Quero acompanhar o meu peso": "I want to track my weight",
-  "Queres ajustar ingredientes ou porção?":
-    "Want to adjust ingredients or portion?",
   "Quota diária de IA atingida": "Daily AI quota reached",
-  "Recalcular com estes detalhes": "Recalculate with these details",
   "Recompensas de XP": "XP Rewards",
-  "Recupera a subscrição ou compra Pro ativa na tua conta Google Play.":
-    "Recovers the Pro subscription or purchase active on your Google Play account.",
-  "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.":
-    "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Renovação": "Renewal",
   "Queima": "Burning",
-  "Processo natural de reciclagem de componentes celulares danificados":
-    "Natural recycling of damaged cellular components",
-  "Estudos associam a cetose a marcadores inflamatórios mais baixos":
-    "Studies link ketosis to lower inflammatory markers",
   "Possível redução de marcadores de stress oxidativo e inflamação":
     "Possible reduction of oxidative stress and inflammation markers",
-  "Redução progressiva da insulina plasmática":
-    "Progressive reduction of plasma insulin",
-  Refeições: "Meals",
+  "Refeição": "Meal",
+  "Refeições": "Meals",
+  "Refeições Registadas": "Logged Meals",
   Referência: "Reference",
-  "Regeneração & Reset": "Renewal & Reset",
   "Regista a primeira atividade realizada.":
     "Log your first completed activity.",
-  "Regista apenas atividade já realizada. A app não recomenda duração, intensidade ou um plano de treino.":
-    "Only log activity you have already completed. The app does not recommend duration, intensity or a training plan.",
   "Regista o movimento que escolheste fazer, ao teu ritmo e sem metas obrigatórias.":
     "Log the movement you chose to do, at your own pace and without mandatory targets.",
-  "Registar atividade": "Log activity",
   "Registo opcional": "Optional log",
   Remover: "Remove",
   "Remover 250ml de água": "Remove 250ml of water",
-  "Remover amigo?": "Remove friend?",
+  "Registar peso": "Log weight",
+  "Registar treino": "Log workout",
   "Remover fotografia": "Remove photo",
   Repetir: "Retake",
-  "Repouso e hidratação com eletrólitos (sódio, potássio, magnésio) são essenciais em jejuns de dia completo.":
-    "Rest and hydration with mineral water and electrolytes are key during full-day fasts.",
   Restante: "Remaining",
   "Restaurar": "Restore",
-  "Restaurar compras": "Restore purchases",
-  "Resultado estruturado": "Structured result",
   "Resumo de hoje": "Today's summary",
   "Resumo do jejum": "Fasting summary",
-  "Rever tutorial guiado": "Replay guided tour",
-  "Se sentires fome súbita, bebe água ou chá sem açúcar; é apenas o reflexo hormonal da grelina.":
-    "If you feel sudden hunger, drink water or unsweetened tea; it is simply ghrelin's hormonal wave.",
   "Segurança de Saúde & Privacidade RGPD": "Health Safety & GDPR Privacy",
   "Sem atividade registada": "No activity logged",
   "Sem compras ativas": "No active purchases",
@@ -633,8 +742,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Sem meta pré-fixada · Conta até decidires terminar":
     "No preset target · Counts until you choose to end",
   "Sem registos": "No entries",
-  "Sensibilidade melhorada dos recetores de insulina":
-    "Enhanced sensitivity of insulin receptors",
   "Sincronização em Nuvem": "Cloud Sync",
   "Sincronização em nuvem · Sol Pro": "Cloud sync · Sol Pro",
   "Sincronizar agora": "Sync now",
@@ -652,8 +759,6 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Tentar novamente": "Try again",
   "Terminar Jejum": "End Fast",
   "Termos": "Terms",
-  "Termos de Utilização": "Terms of Use",
-  "Toca no valor para ajustar": "Tap the value to adjust",
   "Todos os Protocolos de Jejum": "All Fasting Protocols",
   "Planeador de Jejum": "Fasting Planner",
   "Protocolo Sol Pro": "Sol Pro protocol",
@@ -673,17 +778,38 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Utilizador KYNIO": "KYNIO User",
   "Última análise grátis — desbloqueia ilimitado":
     "Last free analysis — unlock unlimited",
-  "Últimos 7 dias": "Last 7 days",
-  "Valores estimados por IA para acompanhamento pessoal de hábitos. Ajuste manualmente conforme necessário.":
-    "AI-estimated values for personal habit tracking. Adjust manually as needed.",
   "Ver biologia & dicas →": "View biology & tips →",
   "Ver biologia & dicas": "View biology & tips",
   "Ver todos os registos": "View all entries",
   "Versão instalada:": "Installed version:",
   "VISUAL": "VISUAL",
-  "Volta a apresentar o guia de Jejum, Refeições, Treinos, Progresso e Privacidade.":
-    "Shows the Fasting, Meals, Workouts, Progress and Privacy guide again.",
   "Voltar": "Back",
   "Voltar ao perfil": "Return to profile",
   "XP total": "Total XP",
+  "DIAS": "DAYS",
+  "Mais precisão no cálculo": "Higher calculation precision",
+  "Precisão": "Precision",
+  "Valor introduzido do teu medidor/relógio": "Value entered from your tracker/watch",
+  "Referência média padrão (70 kg)": "Default average reference (70 kg)",
+  "Peso corporal": "Body weight",
+  "Referência usada: 70 kg": "Reference used: 70 kg",
+  "Calorias do smartwatch": "Smartwatch calories",
+  "Sobrepõe a fórmula com o valor medido": "Overrides formula with measured value",
+  "Popular & Equilibrado": "Popular & Balanced",
+  "Queima Acelerada": "Accelerated Burn",
+  "Jejum Guerreiro": "Warrior Fast",
+  "Uma Refeição por Dia (OMAD)": "One Meal A Day (OMAD)",
+  "Jejum Monge": "Monk Fast",
+  "Reset Metabólico": "Metabolic Reset",
+  "Dossiê de Hábitos (PDF)": "Habits Dossier (PDF)",
+  "Hábitos & Consistência": "Habits & Consistency",
+  "Documento visual com médias de jejum, peso e consistência.":
+    "Visual report with fasting, weight and consistency logs.",
+  "Exportar ✦": "Export ✦",
+  "Partilhar conquista": "Share achievement",
+  "Escudo de Sol (Proteção de Streak)": "Streak Shield (Streak Protection)",
+  "Temas Visuais Exclusivos": "Exclusive Visual Themes",
+  "Cópia de segurança encriptada e sincronização multi-dispositivo.":
+    "Encrypted backup and multi-device sync.",
+  "Reset Metabólico Prolongado": "Extended Metabolic Reset",
 };

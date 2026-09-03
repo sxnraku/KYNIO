@@ -4,6 +4,7 @@ import { FastingControls } from "@/components/ui/fasting-controls";
 import { FastingScheduleModal } from "@/components/ui/fasting-schedule-modal";
 import { FastingTimer } from "@/components/ui/fasting-timer";
 import { PaywallModal } from "@/components/ui/paywall-modal";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useFastingScheduleStore } from "@/store/use-fasting-schedule-store";
 import { useSubscriptionStore } from "@/store/use-subscription-store";
 import type { FastingGoal } from "@/store/useFastingStore";
@@ -32,14 +33,15 @@ export function FastingSummaryCard({
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const isPro = useSubscriptionStore((state) => state.isPro);
   const scheduleStore = useFastingScheduleStore();
+  const language = useAppPreferencesStore((state) => state.language);
 
   const scheduleLabel =
     scheduleStore.enabled && scheduleStore.mode !== "none"
       ? scheduleStore.mode === "adf"
         ? `ADF · ${scheduleStore.targetHours}h`
         : scheduleStore.mode === "daily"
-          ? `Diário · ${scheduleStore.targetHours}h`
-          : `Personalizado · ${scheduleStore.targetHours}h`
+          ? `${language === "en" ? "Daily" : "Diário"} · ${scheduleStore.targetHours}h`
+          : `${language === "en" ? "Custom" : "Personalizado"} · ${scheduleStore.targetHours}h`
       : null;
 
   return (

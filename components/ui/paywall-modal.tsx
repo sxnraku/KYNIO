@@ -23,6 +23,7 @@ import {
   type FormattedPlanInfo,
 } from "@/services/inAppPurchaseService";
 import { verifyPurchaseWithServer } from "@/services/purchaseVerificationService";
+import { translateText } from "@/services/i18n";
 
 interface PaywallModalProps {
   visible: boolean;
@@ -244,7 +245,11 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             <AppText style={styles.title}>KYNIO SOL PRO</AppText>
             <AppText style={styles.subtitle}>
               {featureTrigger
-                ? `Desbloqueia ${featureTrigger} e todas as ferramentas premium.`
+                ? language === "en"
+                  ? `Unlock ${translateText(featureTrigger, language)} and all premium tools.`
+                  : `Desbloqueia ${featureTrigger} e todas as ferramentas premium.`
+                : language === "en"
+                ? "Elevate your fasting and nutrition to the next level with unlimited AI."
                 : "Leva o teu jejum e nutrição ao próximo nível com IA ilimitada."}
             </AppText>
             <Pressable onPress={onClose} style={styles.closeButton}>
@@ -265,15 +270,21 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                     {item.icon}
                   </AppText>
                   <View style={styles.featureTextContainer}>
-                    <AppText style={styles.featureTitle}>{item.title}</AppText>
-                    <AppText style={styles.featureDesc}>{item.desc}</AppText>
+                    <AppText style={styles.featureTitle}>
+                      {translateText(item.title, language)}
+                    </AppText>
+                    <AppText style={styles.featureDesc}>
+                      {translateText(item.desc, language)}
+                    </AppText>
                   </View>
                 </View>
               ))}
             </View>
 
             {/* Plan Selector */}
-            <AppText style={styles.sectionLabel}>ESCOLHE O TEU PLANO</AppText>
+            <AppText style={styles.sectionLabel}>
+              {language === "en" ? "CHOOSE YOUR PLAN" : "ESCOLHE O TEU PLANO"}
+            </AppText>
 
             {/* Annual Plan (Featured) */}
             <Pressable
@@ -379,29 +390,43 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             >
               <AppText style={styles.ctaButtonText}>
                 {selectedPlan === "annual" && hasTrialAvailable
-                  ? "Experimentar 7 Dias Grátis"
+                  ? language === "en"
+                    ? "Try 7 Days Free"
+                    : "Experimentar 7 Dias Grátis"
                   : isProcessing
-                  ? "A processar…"
+                  ? language === "en"
+                    ? "Processing…"
+                    : "A processar…"
+                  : language === "en"
+                  ? "Unlock Sol Pro"
                   : "Desbloquear Sol Pro"}
               </AppText>
             </Pressable>
 
             {/* Disclaimer & Legal Links */}
             <AppText style={styles.disclaimerText}>
-              Subscrição com renovação automática através da tua conta Google Play. Cancela a qualquer momento nas definições da Play Store com pelo menos 24h de antecedência.
+              {language === "en"
+                ? "Auto-renewing subscription via your Google Play account. Cancel anytime in Play Store settings at least 24h in advance."
+                : "Subscrição com renovação automática através da tua conta Google Play. Cancela a qualquer momento nas definições da Play Store com pelo menos 24h de antecedência."}
             </AppText>
 
             <View style={styles.legalLinksRow}>
               <Pressable onPress={() => Linking.openURL("https://sxnraku.github.io/KYNIO/privacy.html")}>
-                <AppText style={styles.legalLink}>Privacidade</AppText>
+                <AppText style={styles.legalLink}>
+                  {language === "en" ? "Privacy" : "Privacidade"}
+                </AppText>
               </Pressable>
               <AppText style={styles.legalDot}>•</AppText>
               <Pressable onPress={() => Linking.openURL("https://sxnraku.github.io/KYNIO/terms.html")}>
-                <AppText style={styles.legalLink}>Termos</AppText>
+                <AppText style={styles.legalLink}>
+                  {language === "en" ? "Terms" : "Termos"}
+                </AppText>
               </Pressable>
               <AppText style={styles.legalDot}>•</AppText>
               <Pressable onPress={handleRestore}>
-                <AppText style={styles.legalLink}>Restaurar</AppText>
+                <AppText style={styles.legalLink}>
+                  {language === "en" ? "Restore" : "Restaurar"}
+                </AppText>
               </Pressable>
             </View>
           </ScrollView>

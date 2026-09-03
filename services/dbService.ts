@@ -3,8 +3,8 @@ import { desc, eq, isNull } from 'drizzle-orm';
 import { getInitializedDatabase } from '@/db/client';
 import {
   fasts,
-  type FriendRecord,
-  friends,
+  fastingSymptoms,
+  type FastingSymptomRecord,
   meals,
   type FastRecord,
   type MealRecord,
@@ -174,6 +174,52 @@ export async function deleteFastRecord(id: number): Promise<void> {
   requestCloudSync();
 }
 
+export interface UpdateFastRecordInput {
+  completed?: boolean;
+  endTime: number;
+  id: number;
+  startTime: number;
+  targetHours?: number;
+}
+
+export async function updateFastRecord(
+  input: UpdateFastRecordInput,
+): Promise<FastRecord> {
+  if (input.endTime <= input.startTime) {
+    throw new Error('A hora de fim deve ser posterior à hora de início.');
+  }
+
+  const database = await getInitializedDatabase();
+  const [existing] = await database
+    .select()
+    .from(fasts)
+    .where(eq(fasts.id, input.id))
+    .limit(1);
+
+  if (!existing || existing.deletedAt !== null) {
+    throw new Error('Registo de jejum não encontrado.');
+  }
+
+  const targetHours = input.targetHours ?? existing.targetHours;
+  const durationHours = (input.endTime - input.startTime) / (1000 * 60 * 60);
+  const completed =
+    input.completed ?? (targetHours > 0 ? durationHours >= targetHours : true);
+
+  const [updatedRecord] = await database
+    .update(fasts)
+    .set({
+      completed,
+      endTime: input.endTime,
+      startTime: input.startTime,
+      targetHours,
+    })
+    .where(eq(fasts.id, input.id))
+    .returning();
+
+  requestCloudSync();
+  return requireInsertedRecord(updatedRecord, 'jejum');
+}
+
 
 export async function saveMealRecord(
   input: SaveMealRecordInput,
@@ -321,6 +367,17 @@ export async function getWeightEntries(): Promise<WeightEntryRecord[]> {
     .orderBy(desc(weightEntries.timestamp));
 }
 
+export async function getLatestWeightKg(): Promise<number | null> {
+  const database = await getInitializedDatabase();
+  const [record] = await database
+    .select({ weightGrams: weightEntries.weightGrams })
+    .from(weightEntries)
+    .where(isNull(weightEntries.deletedAt))
+    .orderBy(desc(weightEntries.timestamp))
+    .limit(1);
+  return record ? Number((record.weightGrams / 1000).toFixed(1)) : null;
+}
+
 export async function saveWeightEntry(
   input: SaveWeightEntryInput,
 ): Promise<WeightEntryRecord> {
@@ -345,37 +402,6 @@ export async function saveWeightEntry(
 export async function deleteWeightEntry(id: number): Promise<void> {
   const database = await getInitializedDatabase();
   await database.delete(weightEntries).where(eq(weightEntries.id, id));
-  requestCloudSync();
-}
-
-export async function getFriendRecords(): Promise<FriendRecord[]> {
-  const database = await getInitializedDatabase();
-  return database.select().from(friends).orderBy(desc(friends.createdAt));
-}
-
-export async function saveFriendRecord(
-  displayName: string,
-): Promise<FriendRecord> {
-  const normalizedName = displayName.trim().slice(0, 40);
-
-  if (!normalizedName) {
-    throw new Error('Escreve o nome do amigo.');
-  }
-
-  const database = await getInitializedDatabase();
-  const [friend] = await database
-    .insert(friends)
-    .values({ createdAt: Date.now(), displayName: normalizedName })
-    .returning();
-
-  const record = requireInsertedRecord(friend, 'amigo');
-  requestCloudSync();
-  return record;
-}
-
-export async function deleteFriendRecord(id: number): Promise<void> {
-  const database = await getInitializedDatabase();
-  await database.delete(friends).where(eq(friends.id, id));
   requestCloudSync();
 }
 
@@ -582,4 +608,61 @@ export async function acceptLegalTerms(): Promise<UserProfileRecord> {
   }
 
   return profile;
+}
+
+export interface SaveFastingSymptomInput {
+  fastId?: number | null;
+  intensity?: number;
+  notes?: string | null;
+  phaseIndex: number;
+  symptomKey: string;
+  timestamp?: number;
+}
+
+export async function saveFastingSymptomRecord(
+  input: SaveFastingSymptomInput,
+): Promise<FastingSymptomRecord> {
+  const database = await getInitializedDatabase();
+  const [record] = await database
+    .insert(fastingSymptoms)
+    .values({
+      fastId: input.fastId ?? null,
+      intensity: input.intensity ?? 1,
+      notes: input.notes ?? null,
+      phaseIndex: input.phaseIndex,
+      symptomKey: input.symptomKey,
+      timestamp: input.timestamp ?? Date.now(),
+    })
+    .returning();
+
+  if (!record) {
+    throw new Error('Não foi possível registar o sintoma.');
+  }
+
+  return record;
+}
+
+export async function getFastingSymptomRecords(
+  fastId?: number,
+): Promise<FastingSymptomRecord[]> {
+  const database = await getInitializedDatabase();
+  const records = await database
+    .select()
+    .from(fastingSymptoms)
+    .where(isNull(fastingSymptoms.deletedAt))
+    .orderBy(desc(fastingSymptoms.timestamp));
+
+  if (typeof fastId === 'number') {
+    return records.filter((r) => r.fastId === fastId);
+  }
+
+  return records;
+}
+
+export async function deleteFastingSymptomRecord(id: number): Promise<void> {
+  const database = await getInitializedDatabase();
+  await database
+    .update(fastingSymptoms)
+    .set({ deletedAt: Date.now() })
+    .where(eq(fastingSymptoms.id, id));
 }

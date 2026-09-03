@@ -48,14 +48,6 @@ export interface RemoteWorkoutRow {
   xp_earned: number;
 }
 
-export interface RemoteFriendRow {
-  created_at: number | string;
-  display_name: string;
-  record_key: string;
-  updated_at: number | string;
-  user_id: string;
-}
-
 export interface RemoteWeightRow {
   record_key: string;
   timestamp: number | string;

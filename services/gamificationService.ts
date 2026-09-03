@@ -7,8 +7,9 @@ export const XP_REWARDS = {
 } as const;
 
 // Limites anti-abuso: sessões realistas e XP de atividade limitado por dia.
-export const MAX_WORKOUT_DURATION_MINUTES = 4 * 60;
-export const MAX_DAILY_WORKOUT_MINUTES = 6 * 60;
+export const MAX_WORKOUT_DURATION_MINUTES = 3 * 60; // 3h max por sessão
+export const MAX_DAILY_WORKOUT_MINUTES = 6 * 60; // 6h max por dia
+export const MAX_WEEKLY_WORKOUT_MINUTES = 20 * 60; // 20h max por semana (teto de segurança)
 export const WORKOUT_XP_ACTIVITIES_PER_DAY = 3;
 
 export function getWorkoutXpForLog(activitiesLoggedToday: number): number {
@@ -31,6 +32,8 @@ export interface LocalGamificationStats {
   activeDays: number;
   completedFasts: number;
   daysSinceLastActivity: number | null;
+  hasStreakShield: boolean;
+  isShieldActive: boolean;
   mealScans: number;
   missedDaysInLine: number;
   streakDays: number;
@@ -177,19 +180,30 @@ function getLocalDayOrdinal(timestamp: number): number {
   return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_IN_MILLISECONDS);
 }
 
-function calculateStreak(dayOrdinals: number[]): {
+function calculateStreak(
+  dayOrdinals: number[],
+  hasStreakShield = false,
+): {
   daysSinceLastActivity: number | null;
   intensity: number;
   missedDaysInLine: number;
+  shieldApplied: boolean;
   streakDays: number;
 } {
   if (dayOrdinals.length === 0) {
-    return { daysSinceLastActivity: null, intensity: 0, missedDaysInLine: 0, streakDays: 0 };
+    return {
+      daysSinceLastActivity: null,
+      intensity: 0,
+      missedDaysInLine: 0,
+      shieldApplied: false,
+      streakDays: 0,
+    };
   }
 
   const uniqueDays = [...new Set(dayOrdinals)].sort((a, b) => b - a);
   let streakDays = 1;
   let missedDaysInLine = 0;
+  let shieldApplied = false;
 
   for (let index = 1; index < uniqueDays.length; index += 1) {
     const gap = uniqueDays[index - 1] - uniqueDays[index];
@@ -205,20 +219,43 @@ function calculateStreak(dayOrdinals: number[]): {
       continue;
     }
 
+    // Escudo de Sol (Pro): protege um salto adicional de até 2 dias perdidos
+    if (hasStreakShield && !shieldApplied && gap <= 3) {
+      shieldApplied = true;
+      streakDays += gap;
+      continue;
+    }
+
     break;
   }
 
   const today = getLocalDayOrdinal(Date.now());
   const daysSinceLastActivity = Math.max(0, today - uniqueDays[0]);
-  const intensity = Math.max(0.25, 1 - daysSinceLastActivity * 0.25 - missedDaysInLine * 0.2);
 
-  return { daysSinceLastActivity, intensity, missedDaysInLine, streakDays };
+  // Se o utilizador não jejuou nos últimos dias mas tem Escudo de Sol ativo
+  if (hasStreakShield && daysSinceLastActivity <= 2 && daysSinceLastActivity > 0) {
+    shieldApplied = true;
+  }
+
+  const intensity = Math.max(
+    0.25,
+    1 - daysSinceLastActivity * 0.25 - missedDaysInLine * 0.2,
+  );
+
+  return {
+    daysSinceLastActivity,
+    intensity,
+    missedDaysInLine,
+    shieldApplied,
+    streakDays,
+  };
 }
 
 export function summarizeLocalGamificationStats(
   fastRecords: FastRecord[],
   mealRecords: MealRecord[],
   workoutRecords: WorkoutRecord[] = [],
+  hasStreakShield = false,
 ): LocalGamificationStats {
   const completedFasts = fastRecords.filter((fast) => fast.completed).length;
   const totalFastingMilliseconds = fastRecords.reduce(
@@ -230,12 +267,14 @@ export function summarizeLocalGamificationStats(
     ...mealRecords.map((meal) => getLocalDayOrdinal(meal.timestamp)),
     ...workoutRecords.map((workout) => getLocalDayOrdinal(workout.timestamp)),
   ];
-  const streak = calculateStreak(activityDays);
+  const streak = calculateStreak(activityDays, hasStreakShield);
 
   return {
     activeDays: new Set(activityDays).size,
     completedFasts,
     daysSinceLastActivity: streak.daysSinceLastActivity,
+    hasStreakShield,
+    isShieldActive: streak.shieldApplied,
     mealScans: mealRecords.length,
     missedDaysInLine: streak.missedDaysInLine,
     streakDays: streak.streakDays,

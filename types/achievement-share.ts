@@ -5,6 +5,7 @@ import type { AppLanguage } from "@/store/app-preferences-store";
 
 export interface AchievementSharePayload {
   badgeTitles: string[];
+  isPro?: boolean;
   language: AppLanguage;
   level: number;
   levelTitle: string;
