@@ -14,6 +14,8 @@ export interface SubscriptionState {
   dailyAiScansDate: string;
   dailyAiScansCount: number;
   maxFreeDailyAiScans: number;
+  bonusAiScans: number;
+  emergencyShields: number;
 
   // Actions
   activateSubscription: (tier: SubscriptionTier, durationDays?: number, purchaseToken?: string, orderId?: string) => void;
@@ -22,6 +24,9 @@ export interface SubscriptionState {
   canPerformAiScan: () => boolean;
   consumeAiScan: () => boolean;
   getRemainingAiScans: () => number;
+  addBonusAiScans: (count: number) => void;
+  addEmergencyShield: (count: number) => void;
+  useEmergencyShield: () => boolean;
 }
 
 const FREE_DAILY_AI_LIMIT = 3;
@@ -40,6 +45,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
       dailyAiScansDate: getTodayIsoDate(),
       dailyAiScansCount: 0,
       maxFreeDailyAiScans: FREE_DAILY_AI_LIMIT,
+      bonusAiScans: 0,
+      emergencyShields: 0,
 
       activateSubscription: (tier, durationDays, purchaseToken, orderId) => {
         let expiresAt: string | null = null;
@@ -94,6 +101,25 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         });
       },
 
+      addBonusAiScans: (count: number) => {
+        const state = get();
+        set({ bonusAiScans: (state.bonusAiScans || 0) + Math.max(0, count) });
+      },
+
+      addEmergencyShield: (count: number) => {
+        const state = get();
+        set({ emergencyShields: (state.emergencyShields || 0) + Math.max(0, count) });
+      },
+
+      useEmergencyShield: () => {
+        const state = get();
+        if ((state.emergencyShields || 0) > 0) {
+          set({ emergencyShields: state.emergencyShields - 1 });
+          return true;
+        }
+        return false;
+      },
+
       canPerformAiScan: () => {
         const state = get();
         if (state.isPro) {
@@ -111,7 +137,9 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           set({ dailyAiScansDate: today, dailyAiScansCount: 0 });
         }
 
-        return currentCount < state.maxFreeDailyAiScans;
+        const freeAvailable = currentCount < state.maxFreeDailyAiScans;
+        const bonusAvailable = (state.bonusAiScans || 0) > 0;
+        return freeAvailable || bonusAvailable;
       },
 
       consumeAiScan: () => {
@@ -129,15 +157,21 @@ export const useSubscriptionStore = create<SubscriptionState>()(
           currentCount = 0;
         }
 
-        if (currentCount >= state.maxFreeDailyAiScans) {
-          return false;
+        if (currentCount < state.maxFreeDailyAiScans) {
+          set({
+            dailyAiScansDate: today,
+            dailyAiScansCount: currentCount + 1,
+          });
+          return true;
         }
 
-        set({
-          dailyAiScansDate: today,
-          dailyAiScansCount: currentCount + 1,
-        });
-        return true;
+        // Consume bonus scan if available
+        if ((state.bonusAiScans || 0) > 0) {
+          set({ bonusAiScans: state.bonusAiScans - 1 });
+          return true;
+        }
+
+        return false;
       },
 
       getRemainingAiScans: () => {
@@ -149,7 +183,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         }
         const today = getTodayIsoDate();
         const currentCount = state.dailyAiScansDate === today ? state.dailyAiScansCount : 0;
-        return Math.max(0, state.maxFreeDailyAiScans - currentCount);
+        const freeRemaining = Math.max(0, state.maxFreeDailyAiScans - currentCount);
+        return freeRemaining + (state.bonusAiScans || 0);
       },
     }),
     {
@@ -161,6 +196,8 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         trialStartedAt: state.trialStartedAt,
         dailyAiScansDate: state.dailyAiScansDate,
         dailyAiScansCount: state.dailyAiScansCount,
+        bonusAiScans: state.bonusAiScans,
+        emergencyShields: state.emergencyShields,
       }),
       skipHydration: process.env.NODE_ENV === "test",
       storage: createJSONStorage(() => AsyncStorage),

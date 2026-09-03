@@ -19,6 +19,8 @@ export const IAP_SKUS = {
   ANNUAL_SUBSCRIPTION: "kynio_pro_yearly",
   MONTHLY_SUBSCRIPTION: "kynio_pro_monthly",
   LIFETIME_PRODUCT: "kynio_pro_lifetime",
+  AI_PACK_20: "kynio_pack_ai_20",
+  STREAK_SHIELD_PACK: "kynio_streak_shield_emergency",
 } as const;
 
 export const ALL_SUBSCRIPTION_SKUS = [
@@ -26,8 +28,14 @@ export const ALL_SUBSCRIPTION_SKUS = [
   IAP_SKUS.MONTHLY_SUBSCRIPTION,
 ];
 
+export const ALL_CONSUMABLE_SKUS = [
+  IAP_SKUS.AI_PACK_20,
+  IAP_SKUS.STREAK_SHIELD_PACK,
+];
+
 export const ALL_PRODUCT_SKUS = [
   IAP_SKUS.LIFETIME_PRODUCT,
+  ...ALL_CONSUMABLE_SKUS,
 ];
 
 export interface FormattedPlanInfo {
@@ -87,11 +95,18 @@ export async function closeIapConnection(): Promise<void> {
 /**
  * Fetches real subscription and product pricing from the Google Play Store.
  */
-export async function fetchStoreOfferings(): Promise<{
+export interface FormattedOfferings {
   annual?: FormattedPlanInfo;
   monthly?: FormattedPlanInfo;
   lifetime?: FormattedPlanInfo;
-}> {
+  aiPack20?: FormattedPlanInfo;
+  streakShield?: FormattedPlanInfo;
+}
+
+/**
+ * Fetches real subscription and product pricing from the Google Play Store.
+ */
+export async function fetchStoreOfferings(): Promise<FormattedOfferings> {
   if (Platform.OS === "web") {
     return getDefaultFallbacks();
   }
@@ -106,11 +121,7 @@ export async function fetchStoreOfferings(): Promise<{
       getProducts({ skus: ALL_PRODUCT_SKUS }).catch(() => [] as Product[]),
     ]);
 
-    const result: {
-      annual?: FormattedPlanInfo;
-      monthly?: FormattedPlanInfo;
-      lifetime?: FormattedPlanInfo;
-    } = {};
+    const result: FormattedOfferings = {};
 
     // Parse Subscriptions
     for (const sub of subscriptions) {
@@ -175,13 +186,29 @@ export async function fetchStoreOfferings(): Promise<{
       }
     }
 
-    // Parse Lifetime Product
+    // Parse Products (Lifetime and Consumables)
     for (const prod of products) {
       if (prod.productId === IAP_SKUS.LIFETIME_PRODUCT) {
         result.lifetime = {
           sku: prod.productId,
           title: prod.title || "Acesso Vitalício",
           priceFormatted: prod.localizedPrice || "69,99 €",
+          currency: prod.currency || "EUR",
+          hasFreeTrial: false,
+        };
+      } else if (prod.productId === IAP_SKUS.AI_PACK_20) {
+        result.aiPack20 = {
+          sku: prod.productId,
+          title: prod.title || "Pack 20 Análises IA",
+          priceFormatted: prod.localizedPrice || "1,49 €",
+          currency: prod.currency || "EUR",
+          hasFreeTrial: false,
+        };
+      } else if (prod.productId === IAP_SKUS.STREAK_SHIELD_PACK) {
+        result.streakShield = {
+          sku: prod.productId,
+          title: prod.title || "Escudo de Emergência",
+          priceFormatted: prod.localizedPrice || "0,99 €",
           currency: prod.currency || "EUR",
           hasFreeTrial: false,
         };
@@ -192,6 +219,8 @@ export async function fetchStoreOfferings(): Promise<{
       annual: result.annual || getDefaultFallbacks().annual,
       monthly: result.monthly || getDefaultFallbacks().monthly,
       lifetime: result.lifetime || getDefaultFallbacks().lifetime,
+      aiPack20: result.aiPack20 || getDefaultFallbacks().aiPack20,
+      streakShield: result.streakShield || getDefaultFallbacks().streakShield,
     };
   } catch (error) {
     console.warn("[IAP] Error fetching offerings, using local fallbacks:", error);
@@ -243,6 +272,13 @@ export async function buyOneTimeProductSku(sku: string): Promise<Purchase | null
   return (await requestPurchase(
     Platform.OS === "android" ? { skus: [sku] } : { sku },
   )) as unknown as Purchase;
+}
+
+/**
+ * Requests a consumable in-app purchase (e.g. AI Pack, Emergency Streak Shield).
+ */
+export async function buyConsumableProductSku(sku: string): Promise<Purchase | null> {
+  return buyOneTimeProductSku(sku);
 }
 
 /**
@@ -304,21 +340,21 @@ export async function restoreActivePurchases(): Promise<{
 
 /**
  * Acknowledges the purchase with Google Play to ensure no automatic refunds occur.
+ * For consumable products, isConsumable should be set to true so the item can be bought again.
  */
-export async function confirmPurchaseTransaction(purchase: Purchase): Promise<void> {
+export async function confirmPurchaseTransaction(
+  purchase: Purchase,
+  isConsumable = false,
+): Promise<void> {
   if (Platform.OS === "web") return;
   try {
-    await finishTransaction({ purchase, isConsumable: false });
+    await finishTransaction({ purchase, isConsumable });
   } catch (error) {
     console.warn("[IAP] finishTransaction error:", error);
   }
 }
 
-function getDefaultFallbacks(): {
-  annual: FormattedPlanInfo;
-  monthly: FormattedPlanInfo;
-  lifetime: FormattedPlanInfo;
-} {
+function getDefaultFallbacks(): FormattedOfferings {
   return {
     annual: {
       sku: IAP_SKUS.ANNUAL_SUBSCRIPTION,
@@ -341,6 +377,20 @@ function getDefaultFallbacks(): {
       sku: IAP_SKUS.LIFETIME_PRODUCT,
       title: "Acesso Vitalício",
       priceFormatted: "69,99 €",
+      currency: "EUR",
+      hasFreeTrial: false,
+    },
+    aiPack20: {
+      sku: IAP_SKUS.AI_PACK_20,
+      title: "Pack 20 Análises IA",
+      priceFormatted: "1,49 €",
+      currency: "EUR",
+      hasFreeTrial: false,
+    },
+    streakShield: {
+      sku: IAP_SKUS.STREAK_SHIELD_PACK,
+      title: "Escudo de Emergência",
+      priceFormatted: "0,99 €",
       currency: "EUR",
       hasFreeTrial: false,
     },

@@ -10,17 +10,21 @@ import {
   Linking,
 } from "react-native";
 import { AppText } from "@/components/ui/text";
-import { PAYWALL_PRO_FEATURES } from "@/components/ui/paywall-modal-data";
+import {
+  PAYWALL_PRO_FEATURES,
+  PAYWALL_COMPARISON_ROWS,
+} from "@/components/ui/paywall-modal-data";
 import { useSubscriptionStore, SubscriptionTier } from "@/store/use-subscription-store";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
   fetchStoreOfferings,
   buySubscriptionSku,
   buyOneTimeProductSku,
+  buyConsumableProductSku,
   restoreActivePurchases,
   confirmPurchaseTransaction,
   IAP_SKUS,
-  type FormattedPlanInfo,
+  type FormattedOfferings,
 } from "@/services/inAppPurchaseService";
 import { verifyPurchaseWithServer } from "@/services/purchaseVerificationService";
 import { translateText } from "@/services/i18n";
@@ -35,15 +39,13 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
   const language = useAppPreferencesStore((state) => state.language);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionTier>("annual");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [offerings, setOfferings] = useState<{
-    annual?: FormattedPlanInfo;
-    monthly?: FormattedPlanInfo;
-    lifetime?: FormattedPlanInfo;
-  }>({});
+  const [offerings, setOfferings] = useState<FormattedOfferings>({});
 
   const activateSubscription = useSubscriptionStore((state) => state.activateSubscription);
   const activateFreeTrial = useSubscriptionStore((state) => state.activateFreeTrial);
   const trialStartedAt = useSubscriptionStore((state) => state.trialStartedAt);
+  const addBonusAiScans = useSubscriptionStore((state) => state.addBonusAiScans);
+  const addEmergencyShield = useSubscriptionStore((state) => state.addEmergencyShield);
 
   const hasTrialAvailable = !trialStartedAt;
 
@@ -60,7 +62,6 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
 
     try {
       if (Platform.OS === "web") {
-        // Fallback local for web testing
         if (selectedPlan === "annual" && hasTrialAvailable) {
           activateFreeTrial();
         } else {
@@ -114,7 +115,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           }
         }
 
-        await confirmPurchaseTransaction(purchase);
+        await confirmPurchaseTransaction(purchase, false);
         activateSubscription(
           selectedPlan,
           undefined,
@@ -132,7 +133,6 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
       }
     } catch (error: unknown) {
       const err = error as { code?: string; message?: string };
-      // Ignore user cancellations
       if (err?.code !== "E_USER_CANCELLED") {
         console.warn("[IAP] Purchase error:", error);
         Alert.alert(
@@ -140,6 +140,72 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           language === "en"
             ? "The transaction could not be completed. Please try again or check your payment method on Google Play."
             : "A transação não pôde ser concluída. Por favor tenta novamente ou verifica o método de pagamento no Google Play.",
+        );
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleBuyConsumable = async (type: "aiPack" | "shield") => {
+    setIsProcessing(true);
+    try {
+      if (Platform.OS === "web") {
+        if (type === "aiPack") addBonusAiScans(20);
+        else addEmergencyShield(1);
+        Alert.alert(
+          language === "en" ? "Pack Activated! 🎉" : "Pack Ativado! 🎉",
+          language === "en"
+            ? type === "aiPack"
+              ? "20 bonus AI Scans added to your account."
+              : "Emergency Streak Shield added to your account."
+            : type === "aiPack"
+            ? "20 análises de IA adicionadas à tua conta."
+            : "Escudo de Emergência adicionado à tua conta.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+
+      const sku = type === "aiPack" ? IAP_SKUS.AI_PACK_20 : IAP_SKUS.STREAK_SHIELD_PACK;
+      const purchase = await buyConsumableProductSku(sku);
+
+      if (purchase) {
+        if (purchase.purchaseToken) {
+          await verifyPurchaseWithServer(
+            { productId: purchase.productId, purchaseToken: purchase.purchaseToken },
+            "product",
+          );
+        }
+        await confirmPurchaseTransaction(purchase, true);
+
+        if (type === "aiPack") {
+          addBonusAiScans(20);
+        } else {
+          addEmergencyShield(1);
+        }
+
+        Alert.alert(
+          language === "en" ? "Purchase Successful! 🎉" : "Compra Concluída! 🎉",
+          language === "en"
+            ? type === "aiPack"
+              ? "20 bonus AI Scans added to your balance."
+              : "Emergency Streak Shield added to your balance."
+            : type === "aiPack"
+            ? "20 análises de IA adicionadas ao teu saldo."
+            : "Escudo de Emergência adicionado ao teu saldo.",
+          [{ text: "OK" }]
+        );
+      }
+    } catch (error: unknown) {
+      const err = error as { code?: string; message?: string };
+      if (err?.code !== "E_USER_CANCELLED") {
+        console.warn("[IAP] Consumable error:", error);
+        Alert.alert(
+          language === "en" ? "Purchase Failed" : "Não foi possível concluir a compra",
+          language === "en"
+            ? "The transaction could not be completed. Please try again."
+            : "A transação não pôde ser concluída. Por favor tenta novamente.",
         );
       }
     } finally {
@@ -258,9 +324,46 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
           </View>
 
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            {/* Feature List */}
+            {/* Comparison Table (Gratuito vs Sol Pro) */}
+            <AppText style={styles.sectionLabel}>
+              {translateText("COMPARAÇÃO DE PLANOS", language)}
+            </AppText>
+            <View style={styles.comparisonContainer}>
+              <View style={styles.comparisonHeader}>
+                <AppText style={styles.compHeadColFeature}>
+                  {language === "en" ? "FEATURE" : "FUNCIONALIDADE"}
+                </AppText>
+                <AppText style={styles.compHeadColFree}>
+                  {translateText("GRATUITO", language)}
+                </AppText>
+                <AppText style={styles.compHeadColPro}>
+                  SOL PRO 👑
+                </AppText>
+              </View>
+              {PAYWALL_COMPARISON_ROWS.map((row, idx) => (
+                <View
+                  key={row.feature}
+                  style={[
+                    styles.compRow,
+                    idx === PAYWALL_COMPARISON_ROWS.length - 1 && styles.compRowLast,
+                  ]}
+                >
+                  <AppText style={styles.compFeatureText}>
+                    {translateText(row.feature, language)}
+                  </AppText>
+                  <AppText style={styles.compFreeText}>
+                    {translateText(row.free, language)}
+                  </AppText>
+                  <AppText style={styles.compProText}>
+                    {translateText(row.pro, language)}
+                  </AppText>
+                </View>
+              ))}
+            </View>
+
+            {/* Feature Highlights */}
             <View style={styles.featuresContainer}>
-              {PAYWALL_PRO_FEATURES.map((item) => (
+              {PAYWALL_PRO_FEATURES.slice(0, 4).map((item) => (
                 <View key={item.title} style={styles.featureRow}>
                   <AppText
                     accessibilityElementsHidden
@@ -286,7 +389,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
               {language === "en" ? "CHOOSE YOUR PLAN" : "ESCOLHE O TEU PLANO"}
             </AppText>
 
-            {/* Annual Plan (Featured) */}
+            {/* Annual Plan (Featured with daily anchor) */}
             <Pressable
               onPress={() => setSelectedPlan("annual")}
               style={[
@@ -313,6 +416,16 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                       ? `${offerings.annual?.priceFormatted || "34.99 €"} / year`
                       : `${offerings.annual?.priceFormatted || "34,99 €"} / ano`}
                   </AppText>
+
+                  {/* Daily Anchor */}
+                  <View style={styles.dailyAnchorContainer}>
+                    <AppText style={styles.dailyAnchorPrice}>
+                      {translateText("Apenas 0,09 € / dia", language)}
+                    </AppText>
+                    <AppText style={styles.dailyAnchorSub}>
+                      {translateText("Menos de 1 café por mês", language)}
+                    </AppText>
+                  </View>
                 </View>
                 <View style={styles.priceContainer}>
                   <AppText style={styles.monthlyEquivalent}>
@@ -320,6 +433,39 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                   </AppText>
                   <AppText style={styles.perMonthText}>
                     {language === "en" ? "/mo" : "/mês"}
+                  </AppText>
+                </View>
+              </View>
+            </Pressable>
+
+            {/* Lifetime Plan (Founder Offer) */}
+            <Pressable
+              onPress={() => setSelectedPlan("lifetime")}
+              style={[
+                styles.planCard,
+                selectedPlan === "lifetime" && styles.planCardSelected,
+              ]}
+            >
+              <View style={styles.founderBadge}>
+                <AppText style={styles.founderBadgeText}>
+                  {translateText("OFERTA DE FUNDADOR (BETA)", language)}
+                </AppText>
+              </View>
+              <View style={styles.planHeader}>
+                <View style={styles.planInfoContainer}>
+                  <AppText style={styles.planName}>
+                    {language === "en" ? "Lifetime Access" : "Acesso Vitalício"}
+                  </AppText>
+                  <AppText style={styles.planTrial}>
+                    {translateText("ACESSO VITALÍCIO · SEMPRE TEU", language)}
+                  </AppText>
+                </View>
+                <View style={styles.priceContainer}>
+                  <AppText style={styles.monthlyEquivalent}>
+                    {offerings.lifetime?.priceFormatted || (language === "en" ? "69.99 €" : "69,99 €")}
+                  </AppText>
+                  <AppText style={styles.perMonthText}>
+                    {language === "en" ? "once" : "único"}
                   </AppText>
                 </View>
               </View>
@@ -353,34 +499,15 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
               </View>
             </Pressable>
 
-            {/* Lifetime Plan */}
-            <Pressable
-              onPress={() => setSelectedPlan("lifetime")}
-              style={[
-                styles.planCard,
-                selectedPlan === "lifetime" && styles.planCardSelected,
-              ]}
-            >
-              <View style={styles.planHeader}>
-                <View style={styles.planInfoContainer}>
-                  <AppText style={styles.planName}>
-                    {language === "en" ? "Lifetime Access" : "Acesso Vitalício"}
-                  </AppText>
-                  <AppText style={styles.planTrial}>
-                    {language === "en" ? "One-time payment · Permanent access" : "Pagamento único · Acesso permanente"}
-                  </AppText>
-                </View>
-                <View style={styles.priceContainer}>
-                  <AppText style={styles.monthlyEquivalent}>
-                    {offerings.lifetime?.priceFormatted || (language === "en" ? "69.99 €" : "69,99 €")}
-                  </AppText>
-                  <AppText style={styles.perMonthText}>
-                    {language === "en" ? "once" : "único"}
-                  </AppText>
-                </View>
-              </View>
-            </Pressable>
-
+            {/* Zero-Risk Guarantee Box */}
+            <View style={styles.zeroRiskBox}>
+              <AppText style={styles.zeroRiskTitle}>
+                {translateText("0 € cobrados hoje · 7 dias para testar grátis", language)}
+              </AppText>
+              <AppText style={styles.zeroRiskSub}>
+                {translateText("Cancela em 1 toque na Google Play", language)}
+              </AppText>
+            </View>
 
             {/* CTA Button */}
             <Pressable
@@ -402,6 +529,58 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                   : "Desbloquear Sol Pro"}
               </AppText>
             </Pressable>
+
+            {/* Consumables (One-Time Packs) Section */}
+            <AppText style={styles.sectionLabel}>
+              {translateText("OPÇÕES AVULSAS (SEM SUBSCRIÇÃO)", language)}
+            </AppText>
+            <View style={styles.consumablesRow}>
+              {/* AI Pack 20 */}
+              <Pressable
+                disabled={isProcessing}
+                onPress={() => handleBuyConsumable("aiPack")}
+                style={styles.consumableCard}
+              >
+                <AppText style={styles.consumableIcon}>🥗</AppText>
+                <AppText style={styles.consumableTitle}>
+                  {translateText("Pack 20 Análises IA", language)}
+                </AppText>
+                <AppText style={styles.consumablePrice}>
+                  {offerings.aiPack20?.priceFormatted || "1,49 €"}
+                </AppText>
+                <AppText style={styles.consumableDesc}>
+                  {translateText("Créditos avulsos que nunca expiram", language)}
+                </AppText>
+                <View style={styles.consumableBuyBtn}>
+                  <AppText style={styles.consumableBuyBtnText}>
+                    {translateText("Comprar Pack", language)}
+                  </AppText>
+                </View>
+              </Pressable>
+
+              {/* Emergency Streak Shield */}
+              <Pressable
+                disabled={isProcessing}
+                onPress={() => handleBuyConsumable("shield")}
+                style={styles.consumableCard}
+              >
+                <AppText style={styles.consumableIcon}>🛡️</AppText>
+                <AppText style={styles.consumableTitle}>
+                  {translateText("Escudo de Emergência", language)}
+                </AppText>
+                <AppText style={styles.consumablePrice}>
+                  {offerings.streakShield?.priceFormatted || "0,99 €"}
+                </AppText>
+                <AppText style={styles.consumableDesc}>
+                  {translateText("Protege 1 falha de sequência", language)}
+                </AppText>
+                <View style={styles.consumableBuyBtn}>
+                  <AppText style={styles.consumableBuyBtnText}>
+                    {translateText("Comprar Escudo", language)}
+                  </AppText>
+                </View>
+              </Pressable>
+            </View>
 
             {/* Disclaimer & Legal Links */}
             <AppText style={styles.disclaimerText}>
@@ -498,58 +677,122 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   closeText: {
-    color: "#A79D88",
+    color: "#F1E9D6",
     fontSize: 14,
     fontWeight: "700",
   },
   content: {
     paddingHorizontal: 20,
   },
-  featuresContainer: {
-    marginTop: 16,
-    marginBottom: 20,
-    backgroundColor: "#26221C",
+  sectionLabel: {
+    color: "#A79D88",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    marginTop: 22,
+    marginBottom: 10,
+  },
+  comparisonContainer: {
+    backgroundColor: "#221D17",
     borderRadius: 16,
-    padding: 16,
     borderWidth: 1,
     borderColor: "#3A3428",
+    padding: 14,
+    marginBottom: 14,
+  },
+  comparisonHeader: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#3A3428",
+    paddingBottom: 8,
+    marginBottom: 8,
+  },
+  compHeadColFeature: {
+    flex: 2,
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#A79D88",
+    letterSpacing: 0.8,
+  },
+  compHeadColFree: {
+    flex: 1.2,
+    fontSize: 10,
+    fontWeight: "700",
+    color: "#7A7263",
+    textAlign: "center",
+  },
+  compHeadColPro: {
+    flex: 1.6,
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#E8A83E",
+    textAlign: "right",
+  },
+  compRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 7,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(58, 52, 40, 0.4)",
+  },
+  compRowLast: {
+    borderBottomWidth: 0,
+  },
+  compFeatureText: {
+    flex: 2,
+    fontSize: 12,
+    color: "#F1E9D6",
+    fontWeight: "500",
+  },
+  compFreeText: {
+    flex: 1.2,
+    fontSize: 11,
+    color: "#7A7263",
+    textAlign: "center",
+  },
+  compProText: {
+    flex: 1.6,
+    fontSize: 11,
+    color: "#E8A83E",
+    fontWeight: "700",
+    textAlign: "right",
+  },
+  featuresContainer: {
+    marginTop: 10,
+    marginBottom: 10,
   },
   featureRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 6,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#2B2620",
   },
   featureIcon: {
     fontSize: 20,
-    marginRight: 12,
+    marginRight: 14,
   },
   featureTextContainer: {
     flex: 1,
   },
   featureTitle: {
     color: "#F1E9D6",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 13.5,
+    fontWeight: "700",
   },
   featureDesc: {
-    color: "#8D8471",
-    fontSize: 12,
-    marginTop: 1,
-  },
-  sectionLabel: {
-    color: "#8D8471",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1,
-    marginBottom: 10,
+    color: "#A79D88",
+    fontSize: 11.5,
+    marginTop: 2,
+    lineHeight: 15,
   },
   planCard: {
-    backgroundColor: "#26221C",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: "#26221B",
+    borderRadius: 18,
     borderWidth: 1.5,
     borderColor: "#3A3428",
+    padding: 16,
+    marginBottom: 12,
     position: "relative",
   },
   planCardSelected: {
@@ -561,12 +804,27 @@ const styles = StyleSheet.create({
     top: -10,
     right: 16,
     backgroundColor: "#E8A83E",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
   popularBadgeText: {
-    color: "#000",
+    color: "#1C1915",
+    fontSize: 9.5,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  founderBadge: {
+    position: "absolute",
+    top: -10,
+    right: 16,
+    backgroundColor: "#D9922E",
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  founderBadgeText: {
+    color: "#1C1915",
     fontSize: 9,
     fontWeight: "800",
     letterSpacing: 0.5,
@@ -578,78 +836,164 @@ const styles = StyleSheet.create({
   },
   planInfoContainer: {
     flex: 1,
-    paddingRight: 14,
   },
   planName: {
     color: "#F1E9D6",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "700",
   },
   planTrial: {
     color: "#A79D88",
     fontSize: 12,
     marginTop: 3,
-    lineHeight: 16,
+  },
+  dailyAnchorContainer: {
+    marginTop: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  dailyAnchorPrice: {
+    color: "#E8A83E",
+    fontSize: 13,
+    fontWeight: "800",
+  },
+  dailyAnchorSub: {
+    color: "#A79D88",
+    fontSize: 11,
+    fontStyle: "italic",
   },
   priceContainer: {
     alignItems: "flex-end",
-    justifyContent: "center",
-    flexShrink: 0,
-    minWidth: 65,
+    marginLeft: 10,
   },
   monthlyEquivalent: {
     color: "#F1E9D6",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "800",
-    textAlign: "right",
   },
   perMonthText: {
-    color: "#8D8471",
+    color: "#A79D88",
     fontSize: 11,
-    textAlign: "right",
-    marginTop: 1,
   },
-
+  zeroRiskBox: {
+    backgroundColor: "rgba(232, 168, 62, 0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(232, 168, 62, 0.3)",
+    borderRadius: 14,
+    padding: 12,
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 14,
+  },
+  zeroRiskTitle: {
+    color: "#F1E9D6",
+    fontSize: 12.5,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  zeroRiskSub: {
+    color: "#E8A83E",
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 3,
+    textAlign: "center",
+  },
   ctaButton: {
     backgroundColor: "#E8A83E",
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: "center",
-    marginTop: 8,
-    marginBottom: 14,
+    justifyContent: "center",
     shadowColor: "#E8A83E",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,
   },
-
   ctaButtonText: {
-    color: "#000",
+    color: "#1C1915",
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
   },
-  disclaimerText: {
-    color: "#8D8471",
+  consumablesRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 18,
+  },
+  consumableCard: {
+    flex: 1,
+    backgroundColor: "#26221B",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#3A3428",
+    padding: 12,
+    alignItems: "center",
+  },
+  consumableIcon: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  consumableTitle: {
+    color: "#F1E9D6",
+    fontSize: 12,
+    fontWeight: "700",
+    textAlign: "center",
+    minHeight: 32,
+  },
+  consumablePrice: {
+    color: "#E8A83E",
+    fontSize: 15,
+    fontWeight: "800",
+    marginVertical: 4,
+  },
+  consumableDesc: {
+    color: "#A79D88",
     fontSize: 10,
     textAlign: "center",
-    lineHeight: 14,
-    marginBottom: 14,
+    marginBottom: 8,
+    minHeight: 26,
+  },
+  consumableBuyBtn: {
+    backgroundColor: "rgba(232, 168, 62, 0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(232, 168, 62, 0.4)",
+    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    width: "100%",
+    alignItems: "center",
+  },
+  consumableBuyBtnText: {
+    color: "#E8A83E",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  disclaimerText: {
+    color: "#7A7263",
+    fontSize: 11,
+    textAlign: "center",
+    lineHeight: 15,
+    marginTop: 14,
   },
   legalLinksRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    marginTop: 14,
+    marginBottom: 20,
+    gap: 12,
   },
   legalLink: {
     color: "#A79D88",
     fontSize: 12,
+    fontWeight: "600",
     textDecorationLine: "underline",
   },
   legalDot: {
-    color: "#6B6353",
-    marginHorizontal: 8,
+    color: "#5A5243",
+    fontSize: 12,
   },
 });

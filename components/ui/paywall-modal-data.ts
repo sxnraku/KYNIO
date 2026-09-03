@@ -4,6 +4,45 @@ export interface PaywallFeature {
   title: string;
 }
 
+export interface PlanComparisonRow {
+  feature: string;
+  free: string;
+  pro: string;
+}
+
+export const PAYWALL_COMPARISON_ROWS: readonly PlanComparisonRow[] = [
+  {
+    feature: "Scanner de Refeições com IA",
+    free: "3 / dia",
+    pro: "Ilimitado ♾️",
+  },
+  {
+    feature: "Proteção de Sequência (Streak)",
+    free: "Nenhuma",
+    pro: "2 Escudos/mês 🛡️",
+  },
+  {
+    feature: "Fases Metabólicas",
+    free: "Resumo básico",
+    pro: "Biologia & Autofagia 🧬",
+  },
+  {
+    feature: "Protocolos de Jejum",
+    free: "Apenas 16:8",
+    pro: "OMAD, 36h, ADF, Reset ⏱️",
+  },
+  {
+    feature: "Dossiê Clínico em PDF",
+    free: "Indisponível",
+    pro: "Relatório Completo 📄",
+  },
+  {
+    feature: "Temas Visuais",
+    free: "2 Temas",
+    pro: "Todos os Temas 🎨",
+  },
+];
+
 export const PAYWALL_PRO_FEATURES: readonly PaywallFeature[] = [
   {
     icon: '🥗',

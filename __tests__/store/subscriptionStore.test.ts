@@ -105,5 +105,37 @@ describe("useSubscriptionStore", () => {
     expect(useSubscriptionStore.getState().canPerformAiScan()).toBe(true);
     expect(useSubscriptionStore.getState().consumeAiScan()).toBe(true);
   });
+
+  it("permite adquirir e consumir packs de análises IA avulsas quando esgota a quota diária", () => {
+    const store = useSubscriptionStore.getState();
+    // Esgota as 3 análises diárias grátis
+    store.consumeAiScan();
+    store.consumeAiScan();
+    store.consumeAiScan();
+    expect(useSubscriptionStore.getState().getRemainingAiScans()).toBe(0);
+    expect(useSubscriptionStore.getState().canPerformAiScan()).toBe(false);
+
+    // Compra pack de 20 análises avulsas
+    store.addBonusAiScans(20);
+    expect(useSubscriptionStore.getState().getRemainingAiScans()).toBe(20);
+    expect(useSubscriptionStore.getState().canPerformAiScan()).toBe(true);
+
+    // Consome 1 análise do saldo bónus
+    expect(store.consumeAiScan()).toBe(true);
+    expect(useSubscriptionStore.getState().getRemainingAiScans()).toBe(19);
+    expect(useSubscriptionStore.getState().bonusAiScans).toBe(19);
+  });
+
+  it("permite adquirir e consumir escudos de emergência de streak", () => {
+    const store = useSubscriptionStore.getState();
+    expect(useSubscriptionStore.getState().emergencyShields).toBe(0);
+    expect(store.useEmergencyShield()).toBe(false);
+
+    store.addEmergencyShield(1);
+    expect(useSubscriptionStore.getState().emergencyShields).toBe(1);
+
+    expect(store.useEmergencyShield()).toBe(true);
+    expect(useSubscriptionStore.getState().emergencyShields).toBe(0);
+  });
 });
 
