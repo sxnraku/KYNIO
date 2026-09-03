@@ -1065,6 +1065,39 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
   let lang = localStorage.getItem("kynio-lang") || "pt";
 
+  const SCREENSHOTS = {
+    pt: [
+      { src: "assets/screenshots/00_jejum_tracker.png", alt: "Temporizador de jejum 16:8" },
+      { src: "assets/screenshots/01_refeicoes_nutricao_ia.png", alt: "Scanner de refeições com IA" },
+      { src: "assets/screenshots/02_treinos_movimento.png", alt: "Registo de treinos" },
+      { src: "assets/screenshots/03_progresso_gamificado.png", alt: "Progresso e níveis de XP" },
+      { src: "assets/screenshots/04_conquistas_partilha.png", alt: "Conquistas e partilha" },
+    ],
+    en: [
+      { src: "assets/screenshots/en/00_fasting_tracker.png", alt: "16:8 Fasting Timer" },
+      { src: "assets/screenshots/en/01_ai_meal_nutrition.png", alt: "AI Meal Scanner" },
+      { src: "assets/screenshots/en/02_workouts_movement.png", alt: "Workouts & Movement" },
+      { src: "assets/screenshots/en/03_gamified_progress.png", alt: "Gamified Progress & XP" },
+      { src: "assets/screenshots/en/04_achievements_share.png", alt: "Achievements & Sharing" },
+    ],
+  };
+
+  function updateScreenshots(l) {
+    const list = SCREENSHOTS[l] || SCREENSHOTS.pt;
+    const phoneImgs = document.querySelectorAll("#phoneScreen img");
+    const dragImgs = document.querySelectorAll("#dragStrip .shot-frame img");
+    list.forEach((item, idx) => {
+      if (phoneImgs[idx]) {
+        phoneImgs[idx].src = item.src;
+        phoneImgs[idx].alt = item.alt;
+      }
+      if (dragImgs[idx]) {
+        dragImgs[idx].src = item.src;
+        dragImgs[idx].alt = item.alt;
+      }
+    });
+  }
+
   function applyLang(l) {
     lang = l;
     localStorage.setItem("kynio-lang", l);
@@ -1075,6 +1108,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     });
     document.querySelectorAll(".lang-opt").forEach(el =>
       el.classList.toggle("active", el.dataset.lang === l));
+    updateScreenshots(l);
   }
 
   const langToggle = document.getElementById("langToggle");
