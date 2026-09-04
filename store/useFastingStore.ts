@@ -79,13 +79,27 @@ export const FASTING_GOALS: readonly FastingGoal[] = [
   },
 ];
 
+export interface CompletedFastSummary {
+  completed: boolean;
+  elapsedHours: number;
+  elapsedMs: number;
+  endTime: number;
+  goalId: FastingGoalId;
+  goalLabel: string;
+  startTime: number;
+  targetHours: number;
+  xpEarned: number;
+}
+
 interface FastingState {
+  clearLastCompletedFast: () => void;
   endFasting: () => Promise<void>;
   goal: FastingGoal;
   hasHydrated: boolean;
   historyRevision: number;
   isActive: boolean;
   isSaving: boolean;
+  lastCompletedFast: CompletedFastSummary | null;
   persistenceError: string | null;
   resetFasting: () => void;
   setGoal: (goalId: FastingGoalId) => void;
@@ -151,10 +165,24 @@ export const useFastingStore = create<FastingState>()(
             xpEarned,
           });
           void cancelFastingNotifications();
+          const completedSummary: CompletedFastSummary = {
+            completed,
+            elapsedHours,
+            elapsedMs,
+            endTime,
+            goalId: goal.id,
+            goalLabel: goal.label,
+            startTime: startedAt,
+            targetHours:
+              goal.id === "open" ? Math.round(elapsedHours) : goal.fastingHours,
+            xpEarned,
+          };
+
           set({
             historyRevision: (historyRevision || 0) + 1,
             isActive: false,
             isSaving: false,
+            lastCompletedFast: completedSummary,
             startedAt: null,
           });
 
@@ -168,15 +196,17 @@ export const useFastingStore = create<FastingState>()(
           const message =
             error instanceof Error
               ? error.message
-              : 'Não foi possível guardar o jejum localmente.';
+              : "Não foi possível guardar o jejum localmente.";
           set({ isSaving: false, persistenceError: message });
         }
       },
+      clearLastCompletedFast: () => set({ lastCompletedFast: null }),
       goal: DEFAULT_GOAL,
       hasHydrated: false,
       historyRevision: 0,
       isActive: false,
       isSaving: false,
+      lastCompletedFast: null,
 
       persistenceError: null,
       resetFasting: () => {
@@ -185,6 +215,7 @@ export const useFastingStore = create<FastingState>()(
           goal: DEFAULT_GOAL,
           isActive: false,
           isSaving: false,
+          lastCompletedFast: null,
           persistenceError: null,
           startedAt: null,
           targetDurationMs: DEFAULT_GOAL.fastingHours * HOURS_TO_MILLISECONDS,

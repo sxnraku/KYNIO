@@ -1,15 +1,60 @@
-import { Ionicons } from "@expo/vector-icons";
-import { forwardRef } from "react";
-import { View } from "react-native";
+import { forwardRef, useMemo } from "react";
+import { Image, View } from "react-native";
+import Svg, { Circle, Line, Path } from "react-native-svg";
 import { Text } from "@/components/ui/text";
 
-import { COLORS } from "@/constants/colors";
 import { getShareUrlLabel } from "@/services/achievementShareContent";
 import { translateText } from "@/services/i18n";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type { AchievementSharePayload } from "@/types/achievement-share";
 
 interface AchievementShareCardProps {
   payload: AchievementSharePayload;
+}
+
+// ---- Circadiano: Paleta Nobre --------------------------------------------
+const THEMES = {
+  dark: {
+    amber: "#E8A83E",
+    amberSoft: "#E8A83E",
+    bg: "#1C1915",
+    chipFill: "rgba(232,168,62,0.12)",
+    hairline: "rgba(246,240,222,0.18)",
+    ink: "#F6F0DE",
+    inkMuted: "rgba(246,240,222,0.45)",
+    inkSoft: "#EDE6D3",
+  },
+  light: {
+    amber: "#D9922E",
+    amberSoft: "#E8A83E",
+    bg: "#F6F0DE",
+    chipFill: "rgba(217,146,46,0.08)",
+    hairline: "rgba(58,58,56,0.18)",
+    ink: "#1C1915",
+    inkMuted: "rgba(58,58,56,0.45)",
+    inkSoft: "#3A3A38",
+  },
+};
+
+// ---- Arco solar (Calculado por coordenadas polares) ----------------------
+const ARC_WIDTH = 260;
+const ARC_HEIGHT = 130;
+const RADIUS = 115;
+const CENTER_X = ARC_WIDTH / 2;
+const CENTER_Y = ARC_HEIGHT;
+
+const DAY_START = 6;  // 06:00 (Aurora)
+const DAY_END = 20;   // 20:00 (Crepúsculo)
+
+function calculateSunPosition(hoursIntoDay: number) {
+  const span = DAY_END - DAY_START; // 14 horas
+  const progress = Math.min(Math.max(hoursIntoDay / span, 0), 1);
+  const angle = Math.PI * (1 - progress); // PI (06h / esq) -> 0 (20h / dir)
+
+  return {
+    x: CENTER_X + RADIUS * Math.cos(angle),
+    y: CENTER_Y - RADIUS * Math.sin(angle),
+  };
 }
 
 export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
@@ -17,108 +62,262 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
     const visibleBadges = payload.badgeTitles.slice(0, 3);
     const isEn = payload.language === "en";
 
+    const themeMode = useAppPreferencesStore((state) => state.themeMode);
+    const theme =
+      themeMode === "dark" || themeMode === "amoled" || themeMode === "midnight"
+        ? THEMES.dark
+        : THEMES.light;
+
+    const sunPosition = useMemo(() => {
+      const now = new Date();
+      const currentHours = now.getHours() + now.getMinutes() / 60;
+      return calculateSunPosition(currentHours - DAY_START);
+    }, []);
+
+    const statDivider = (
+      <View
+        className="w-px self-stretch"
+        style={{ backgroundColor: theme.hairline }}
+      />
+    );
+
     return (
       <View
-        className="overflow-hidden rounded-2xl border border-[#D5CBAF] bg-[#F6F0DE]"
+        className="overflow-hidden rounded-3xl border"
         collapsable={false}
         ref={ref}
+        style={{
+          backgroundColor: theme.bg,
+          borderColor: theme.hairline,
+        }}
       >
-        <View className="bg-success px-5 pb-6 pt-5">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-2.5">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FBF7EA]">
-                <Ionicons
-                  color={COLORS.success}
-                  name="shield-checkmark-outline"
-                  size={23}
-                />
-              </View>
-              <View>
-                <Text className="font-headline text-lg tracking-wide text-[#3A2200]">
-                  KYNIO
-                </Text>
-                <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]/80">
-                  {isEn ? "My journey" : "A minha jornada"}
-                </Text>
-              </View>
-            </View>
-            <View className="rounded-full bg-[#3A2200]/15 px-3 py-2">
-              <Text className="font-label text-[8px] uppercase tracking-widest text-[#3A2200]">
-                {isEn ? "Achievement" : "Conquista"}
-              </Text>
-            </View>
-          </View>
-
-          <Text className="mt-7 font-label text-[9px] uppercase tracking-widest text-[#3A2200]/75">
-            {isEn ? "Current level" : "Nível atual"}
+        {/* Header com Ícone Oficial da App */}
+        <View className="items-center pt-7">
+          <Image
+            accessibilityLabel="KYNIO App Icon"
+            className="h-9 w-9 rounded-xl"
+            source={require("@/assets/images/icon-kynio-v1.png")}
+          />
+          <Text
+            className="mt-2.5 font-headline text-base"
+            style={{ color: theme.ink, letterSpacing: 6 }}
+          >
+            KYNIO
           </Text>
-          <Text className="mt-1 font-headline text-[32px] leading-9 text-[#3A2200]">
+          <Text
+            className="mt-0.5 font-label text-[9px] uppercase"
+            style={{ color: theme.inkMuted, letterSpacing: 4 }}
+          >
+            {isEn ? "MY JOURNEY" : "A MINHA JORNADA"}
+          </Text>
+        </View>
+
+        <View
+          className="mx-8 mt-5 h-px"
+          style={{ backgroundColor: theme.hairline }}
+        />
+
+        {/* Arco Solar Vetorial com Sol Cravado na Linha */}
+        <View className="items-center pt-6">
+          <View style={{ height: ARC_HEIGHT + 24, width: ARC_WIDTH }}>
+            <Svg height={ARC_HEIGHT + 2} width={ARC_WIDTH}>
+              {/* Arco Semicircular Tracejado */}
+              <Path
+                d={`M ${CENTER_X - RADIUS} ${CENTER_Y} A ${RADIUS} ${RADIUS} 0 0 1 ${CENTER_X + RADIUS} ${CENTER_Y}`}
+                fill="none"
+                stroke={theme.hairline}
+                strokeDasharray="4 4"
+                strokeWidth={1.5}
+              />
+              {/* Linha do Horizonte */}
+              <Line
+                stroke={theme.hairline}
+                strokeWidth={1}
+                x1={10}
+                x2={ARC_WIDTH - 10}
+                y1={CENTER_Y}
+                y2={CENTER_Y}
+              />
+              {/* Halo suave de luz */}
+              <Circle
+                cx={sunPosition.x}
+                cy={sunPosition.y}
+                fill={theme.chipFill}
+                r={14}
+              />
+              {/* Sol com precisão vetorial milimétrica */}
+              <Circle
+                cx={sunPosition.x}
+                cy={sunPosition.y}
+                fill={theme.amberSoft}
+                r={8}
+                stroke={theme.bg}
+                strokeWidth={3}
+              />
+            </Svg>
+
+            {/* Escala Horária Circadiana */}
+            <Text
+              className="absolute font-label text-[9px]"
+              style={{ color: theme.inkMuted, left: 10, top: CENTER_Y + 5 }}
+            >
+              06
+            </Text>
+            <Text
+              className="absolute font-label text-[9px]"
+              style={{
+                color: theme.inkMuted,
+                left: CENTER_X - 6,
+                top: CENTER_Y + 5,
+              }}
+            >
+              13
+            </Text>
+            <Text
+              className="absolute font-label text-[9px]"
+              style={{ color: theme.inkMuted, right: 10, top: CENTER_Y + 5 }}
+            >
+              20
+            </Text>
+          </View>
+        </View>
+
+        {/* Nível Mitológico Solar */}
+        <View className="items-center px-6 pt-2">
+          <Text
+            className="font-label text-[9px] uppercase"
+            style={{ color: theme.inkMuted, letterSpacing: 5 }}
+          >
+            {isEn ? "CURRENT LEVEL" : "NÍVEL ATUAL"}
+          </Text>
+          <Text
+            className="mt-1 font-headline text-5xl tracking-tight"
+            style={{ color: theme.ink }}
+          >
             {isEn ? `Level ${payload.level}` : `Nível ${payload.level}`}
           </Text>
-          <Text className="mt-1 font-body text-base text-[#3A2200]/90">
+          <Text
+            className="mt-1 font-label text-[11px] uppercase"
+            style={{ color: theme.amber, letterSpacing: 4 }}
+          >
             {translateText(payload.levelTitle, payload.language)}
           </Text>
         </View>
 
-        <View className="px-5 pb-5 pt-4">
-          <View className="flex-row gap-2">
-            <View className="flex-1 rounded-xl bg-[#EDE6D3] p-3">
-              <Text className="font-headline text-xl text-[#3A3A38]">
-                {payload.totalXp}
-              </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                {isEn ? "Total XP" : "XP total"}
-              </Text>
-            </View>
-            <View className="flex-1 rounded-xl bg-[#EDE6D3] p-3">
-              <Text className="font-headline text-xl text-[#3A3A38]">
-                {payload.streakDays}
-              </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                {isEn ? "Streak days" : "Dias seguidos"}
-              </Text>
-            </View>
-            <View className="flex-1 rounded-xl bg-[#F0DFC0] p-3">
-              <Text className="font-headline text-xl text-xp">
-                {payload.badgeTitles.length}
-              </Text>
-              <Text className="mt-1 font-label text-[8px] uppercase text-[#6F6E66]">
-                {isEn ? "Badges" : "Insígnias"}
-              </Text>
-            </View>
-          </View>
+        <View
+          className="mx-8 mt-6 h-px"
+          style={{ backgroundColor: theme.hairline }}
+        />
 
-          <View className="mt-4 min-h-9 flex-row flex-wrap gap-2">
-            {visibleBadges.length ? (
-              visibleBadges.map((badge) => (
-                <View
-                  className="rounded-full bg-[#F0DFC0] px-3 py-2"
-                  key={badge}
+        {/* Estatísticas (Instrumento com Divisores de Linha) */}
+        <View className="flex-row items-stretch px-6 py-4">
+          <View className="flex-1 items-center">
+            <Text className="font-headline text-2xl" style={{ color: theme.ink }}>
+              {payload.totalXp}
+            </Text>
+            <Text
+              className="mt-1 font-label text-[8px] uppercase"
+              style={{ color: theme.inkMuted, letterSpacing: 2 }}
+            >
+              {isEn ? "TOTAL XP" : "XP TOTAL"}
+            </Text>
+          </View>
+          {statDivider}
+          <View className="flex-1 items-center">
+            <Text className="font-headline text-2xl" style={{ color: theme.ink }}>
+              {payload.streakDays}
+            </Text>
+            <Text
+              className="mt-1 font-label text-[8px] uppercase"
+              style={{ color: theme.inkMuted, letterSpacing: 2 }}
+            >
+              {isEn ? "STREAK DAYS" : "DIAS SEGUIDOS"}
+            </Text>
+          </View>
+          {statDivider}
+          <View className="flex-1 items-center">
+            <Text className="font-headline text-2xl" style={{ color: theme.ink }}>
+              {payload.badgeTitles.length}
+            </Text>
+            <Text
+              className="mt-1 font-label text-[8px] uppercase"
+              style={{ color: theme.inkMuted, letterSpacing: 2 }}
+            >
+              {isEn ? "BADGES" : "INSÍGNIAS"}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          className="mx-8 h-px"
+          style={{ backgroundColor: theme.hairline }}
+        />
+
+        {/* Insígnias (Painéis Retangulares Minimalistas) */}
+        <View className="flex-row flex-wrap justify-center gap-2 px-6 py-4">
+          {visibleBadges.length ? (
+            visibleBadges.map((badge) => (
+              <View
+                className="border px-3 py-1.5"
+                key={badge}
+                style={{
+                  backgroundColor: theme.chipFill,
+                  borderColor: theme.hairline,
+                }}
+              >
+                <Text
+                  className="font-label text-[8px] uppercase"
+                  style={{ color: theme.amber, letterSpacing: 1 }}
                 >
-                  <Text className="font-label text-[8px] text-xp">
-                    {translateText(badge, payload.language)}
-                  </Text>
-                </View>
-              ))
-            ) : (
-              <View className="rounded-full bg-success-dark px-3 py-2">
-                <Text className="font-label text-[8px] text-success">
-                  {isEn ? "Journey started" : "Jornada iniciada"}
+                  {translateText(badge, payload.language)}
                 </Text>
               </View>
-            )}
-          </View>
+            ))
+          ) : (
+            <View
+              className="border px-3 py-1.5"
+              style={{
+                backgroundColor: theme.chipFill,
+                borderColor: theme.hairline,
+              }}
+            >
+              <Text
+                className="font-label text-[8px] uppercase"
+                style={{ color: theme.amber, letterSpacing: 1 }}
+              >
+                {isEn ? "JOURNEY STARTED" : "JORNADA INICIADA"}
+              </Text>
+            </View>
+          )}
+        </View>
 
-          <View className="mt-5 flex-row items-center justify-between border-t border-[#D5CBAF] pt-4">
-            <Text className="font-body text-[11px] text-[#6F6E66]">
-              {isEn ? "Habits at my own pace." : "Hábitos ao meu ritmo."}
-            </Text>
-            <Text className="font-label text-[8px] text-success">
+        {/* Rodapé Editorial */}
+        <View className="items-center pb-6 pt-1">
+          <Text
+            className="font-body text-[11px]"
+            style={{ color: theme.inkSoft }}
+          >
+            {isEn ? "“Habits at my own pace.”" : "“Hábitos ao meu ritmo.”"}
+          </Text>
+          <View className="mt-2.5 flex-row items-center gap-3">
+            <View
+              className="h-px w-8"
+              style={{ backgroundColor: theme.hairline }}
+            />
+            <Text
+              className="font-label text-[8px] uppercase"
+              style={{ color: theme.inkMuted, letterSpacing: 2 }}
+            >
               {getShareUrlLabel()}
             </Text>
+            <View
+              className="h-px w-8"
+              style={{ backgroundColor: theme.hairline }}
+            />
           </View>
         </View>
       </View>
     );
   },
 );
+

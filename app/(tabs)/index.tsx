@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
 
+import { FastCompletionModal } from "@/components/ui/fast-completion-modal";
 import { FastingHistoryCard } from "@/components/ui/fasting-history-card";
 import { FastingSummaryCard } from "@/components/ui/fasting-summary-card";
 import { MetabolicPhases } from "@/components/ui/metabolic-phases";
@@ -44,6 +45,8 @@ export default function HomeScreen() {
   const persistenceError = useFastingStore((state) => state.persistenceError);
   const startedAt = useFastingStore((state) => state.startedAt);
   const targetDurationMs = useFastingStore((state) => state.targetDurationMs);
+  const lastCompletedFast = useFastingStore((state) => state.lastCompletedFast);
+  const clearLastCompletedFast = useFastingStore((state) => state.clearLastCompletedFast);
   const { elapsedHours, elapsedMs, progress } = useFastingTimer();
   const currentPhaseIndex = getEstimatedPhaseIndex(elapsedHours);
   const currentPhase =
@@ -138,6 +141,12 @@ export default function HomeScreen() {
           Fases metabólicas estimadas com base em literatura científica de jejum. Varia de pessoa para pessoa. Toca nas fases para ver todos os detalhes biológicos.
         </Text>
       </View>
+
+      <FastCompletionModal
+        onClose={clearLastCompletedFast}
+        summary={lastCompletedFast}
+        visible={Boolean(lastCompletedFast)}
+      />
     </Screen>
   );
 }

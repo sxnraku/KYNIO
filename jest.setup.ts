@@ -87,5 +87,15 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+jest.mock('react-native-share', () => ({
+  __esModule: true,
+  default: {
+    open: jest.fn().mockResolvedValue({ success: true }),
+  },
+  open: jest.fn().mockResolvedValue({ success: true }),
+}));
 
-
+jest.mock('react-native-view-shot', () => ({
+  captureRef: jest.fn().mockResolvedValue('file://mock-card-capture.png'),
+  releaseCapture: jest.fn(),
+}));
