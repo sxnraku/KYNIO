@@ -34,6 +34,13 @@ export function BiometricLockGuard() {
     }
   }, [language]);
 
+  // Disparar autenticação logo na abertura se protegido
+  useEffect(() => {
+    if (shouldProtect) {
+      void performUnlock();
+    }
+  }, [shouldProtect, performUnlock]);
+
   // Bloquear ao voltar de background
   useEffect(() => {
     if (!shouldProtect) {
