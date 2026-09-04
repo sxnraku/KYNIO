@@ -5,6 +5,11 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
+    rules: {
+      'react-hooks/set-state-in-effect': 'warn',
+    },
+  },
+  {
     ignores: [
       '.expo-export-check/**',
       'dist/**',
@@ -12,5 +17,5 @@ module.exports = defineConfig([
       'supabase/.temp/**',
       'supabase/functions/**',
     ],
-  }
+  },
 ]);

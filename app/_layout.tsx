@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
 import { AppThemeProvider } from "@/components/app-theme-provider";
+import { BiometricLockGuard } from "@/components/biometric-lock-guard";
 import { CloudSyncBootstrap } from "@/components/cloud-sync-bootstrap";
 import { HydrationRemindersBootstrap } from "@/components/hydration-reminders-bootstrap";
 import { ForceUpdateModal } from "@/components/ui/force-update-modal";
@@ -55,6 +56,7 @@ export default function RootLayout() {
       />
       <CloudSyncBootstrap />
       <HydrationRemindersBootstrap />
+      <BiometricLockGuard />
       <LegalOnboardingModal />
       <ProfileOnboardingModal />
       <GuidedTutorialModal />

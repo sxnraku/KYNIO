@@ -51,6 +51,7 @@ export function MealHistoryList({
   const [meals, setMeals] = useState<MealRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'gallery'>('list');
 
   const loadMeals = useCallback(async () => {
     try {
@@ -126,11 +127,43 @@ export function MealHistoryList({
             {translateText('Refeições Registadas', language)}
           </Text>
         </View>
-        <View className="flex-row items-center px-1 py-1">
-          <Ionicons color={COLORS.muted} name="restaurant-outline" size={14} />
-          <Text className="ml-1.5 font-mono text-xs text-muted">
-            {meals.length} {language === 'en' ? 'meals' : 'refeições'}
-          </Text>
+
+        <View className="flex-row items-center gap-1 rounded-xl border border-border bg-surface p-1">
+          <Pressable
+            accessibilityLabel={language === 'en' ? 'List view' : 'Vista em lista'}
+            className={`rounded-lg px-2.5 py-1.5 ${
+              viewMode === 'list' ? 'bg-foreground' : 'bg-transparent'
+            }`}
+            onPress={() => setViewMode('list')}
+            testID="meal-view-mode-list"
+          >
+            <Ionicons
+              color={viewMode === 'list' ? COLORS.background : COLORS.muted}
+              name="list-outline"
+              size={15}
+            />
+          </Pressable>
+          <Pressable
+            accessibilityLabel={language === 'en' ? 'Visual diary grid' : 'Diário visual em grelha'}
+            className={`flex-row items-center gap-1 rounded-lg px-2.5 py-1.5 ${
+              viewMode === 'gallery' ? 'bg-foreground' : 'bg-transparent'
+            }`}
+            onPress={() => setViewMode('gallery')}
+            testID="meal-view-mode-gallery"
+          >
+            <Ionicons
+              color={viewMode === 'gallery' ? COLORS.background : COLORS.muted}
+              name="grid-outline"
+              size={15}
+            />
+            <Text
+              className={`font-label text-[9px] uppercase tracking-wider ${
+                viewMode === 'gallery' ? 'text-background' : 'text-muted'
+              }`}
+            >
+              {language === 'en' ? 'Diary' : 'Diário'}
+            </Text>
+          </Pressable>
         </View>
       </View>
 
@@ -154,8 +187,86 @@ export function MealHistoryList({
             )}
           </Text>
         </View>
+      ) : viewMode === 'gallery' ? (
+        /* Modo Diário Visual (Grelha) */
+        <View className="mt-4 flex-row flex-wrap justify-between gap-y-3" testID="meal-gallery-grid">
+          {meals.map((meal) => {
+            const dishName =
+              meal.tags && meal.tags.length > 0 && meal.tags[0]?.trim().length > 0
+                ? meal.tags[0].trim()
+                : translateText('Refeição', language);
+            const calories = Math.round(meal.estimatedCalories ?? 0);
+            const protein = Math.round(meal.proteinGrams ?? 0);
+            const isDeleting = deletingId === meal.id;
+
+            return (
+              <View
+                className="overflow-hidden rounded-2xl border border-border bg-surface"
+                key={meal.id}
+                style={{ width: '48.5%' }}
+              >
+                {/* Imagem do Prato */}
+                <View className="relative h-36 w-full bg-background">
+                  {meal.imageUrl ? (
+                    <Image
+                      accessibilityLabel={dishName}
+                      className="h-full w-full"
+                      resizeMode="cover"
+                      source={{ uri: meal.imageUrl }}
+                    />
+                  ) : (
+                    <View className="h-full w-full items-center justify-center bg-surfaceRaised p-3">
+                      <Ionicons color={COLORS.muted} name="camera-outline" size={26} />
+                      <Text className="mt-1 font-body text-[10px] text-muted">
+                        {language === 'en' ? 'No photo' : 'Sem foto'}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Botão Eliminar sutil no canto superior */}
+                  <Pressable
+                    accessibilityLabel={translateText('Eliminar refeição', language)}
+                    accessibilityRole="button"
+                    className="absolute right-2 top-2 h-7 w-7 items-center justify-center rounded-full bg-background/80 active:opacity-70"
+                    disabled={isDeleting}
+                    onPress={() => handleDelete(meal.id)}
+                  >
+                    {isDeleting ? (
+                      <ActivityIndicator color="#F87171" size="small" />
+                    ) : (
+                      <Ionicons color="#F87171" name="trash-outline" size={13} />
+                    )}
+                  </Pressable>
+                </View>
+
+                {/* Detalhes do Prato no rodapé */}
+                <View className="p-2.5">
+                  <Text
+                    className="font-headline text-xs text-foreground"
+                    numberOfLines={1}
+                  >
+                    {dishName}
+                  </Text>
+                  <Text className="mt-0.5 font-body text-[10px] text-muted">
+                    {formatMealDate(meal.timestamp, language)}
+                  </Text>
+
+                  <View className="mt-1.5 flex-row items-center justify-between">
+                    <Text className="font-label text-[10px] font-semibold text-success">
+                      {protein}g P
+                    </Text>
+                    <Text className="font-label text-[10px] text-foreground">
+                      {calories} kcal
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            );
+          })}
+        </View>
       ) : (
-        <View className="mt-4 gap-3">
+        /* Modo Lista Tradicional */
+        <View className="mt-4 gap-3" testID="meal-list-view">
           {meals.map((meal) => {
             const dishName =
               meal.tags && meal.tags.length > 0 && meal.tags[0]?.trim().length > 0

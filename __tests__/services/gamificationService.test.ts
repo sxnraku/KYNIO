@@ -78,11 +78,11 @@ describe('gamificationService', () => {
 
   it('retorna os títulos corretos de acordo com o nível', () => {
 
-    expect(getLevelTitle(1)).toBe('Aprendiz');
-    expect(getLevelTitle(2)).toBe('Iniciado');
-    expect(getLevelTitle(3)).toBe('Consistente');
-    expect(getLevelTitle(5)).toBe('Disciplinado');
-    expect(getLevelTitle(10)).toBe('Mestre da Consistência');
+    expect(getLevelTitle(1)).toBe('Aprendiz da Luz');
+    expect(getLevelTitle(2)).toBe('Guardião da Aurora');
+    expect(getLevelTitle(3)).toBe('Guardião da Aurora');
+    expect(getLevelTitle(5)).toBe('Mestre do Fogo Metabólico');
+    expect(getLevelTitle(10)).toBe('Nível 10 Sol Invictus');
   });
 
   it('retorna os escalões de recompensas XP com desbloqueios corretos', () => {

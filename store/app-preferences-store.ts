@@ -35,9 +35,11 @@ export function getDefaultAppLanguage(): AppLanguage {
 }
 
 interface AppPreferencesState {
+  biometricLockEnabled: boolean;
   healthConnectEnabled: boolean;
   hydrationRemindersEnabled: boolean;
   language: AppLanguage;
+  setBiometricLockEnabled: (enabled: boolean) => void;
   setHealthConnectEnabled: (enabled: boolean) => void;
   setHydrationRemindersEnabled: (enabled: boolean) => void;
   setLanguage: (language: AppLanguage) => void;
@@ -48,9 +50,12 @@ interface AppPreferencesState {
 export const useAppPreferencesStore = create<AppPreferencesState>()(
   persist(
     (set) => ({
+      biometricLockEnabled: false,
       healthConnectEnabled: false,
       hydrationRemindersEnabled: false,
       language: getDefaultAppLanguage(),
+      setBiometricLockEnabled: (biometricLockEnabled) =>
+        set({ biometricLockEnabled }),
       setHealthConnectEnabled: (healthConnectEnabled) =>
         set({ healthConnectEnabled }),
       setHydrationRemindersEnabled: (hydrationRemindersEnabled) =>
@@ -63,11 +68,13 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
     {
       name: "kynio-app-preferences-v1",
       partialize: ({
+        biometricLockEnabled,
         healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
         themeMode,
       }) => ({
+        biometricLockEnabled,
         healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
