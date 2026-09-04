@@ -95,8 +95,18 @@ header {
   display: flex;
   font-size: 18px;
   font-weight: 900;
-  gap: 10px;
+  gap: 12px;
+  letter-spacing: 0.03em;
   text-decoration: none;
+}
+
+.brand-icon {
+  border-radius: 9px;
+  display: block;
+  flex: none;
+  height: 34px;
+  object-fit: cover;
+  width: 34px;
 }
 
 .mark {
