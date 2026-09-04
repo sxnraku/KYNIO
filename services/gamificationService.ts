@@ -71,22 +71,18 @@ export function calculateLevel(totalXp: number): number {
 
 export function getLevelTitle(level: number): string {
   if (level >= 10) {
-    return 'Mestre da Consistência';
+    return 'Nível 10 Sol Invictus';
   }
 
   if (level >= 5) {
-    return 'Disciplinado';
-  }
-
-  if (level >= 3) {
-    return 'Consistente';
+    return 'Mestre do Fogo Metabólico';
   }
 
   if (level >= 2) {
-    return 'Iniciado';
+    return 'Guardião da Aurora';
   }
 
-  return 'Aprendiz';
+  return 'Aprendiz da Luz';
 }
 
 export function calculateLevelProgress(totalXp: number): LevelProgress {

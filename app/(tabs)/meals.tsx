@@ -10,6 +10,7 @@ import { MealAnalysisCard } from "@/components/ui/meal-analysis-card";
 import { MealCameraModal } from "@/components/ui/meal-camera-modal";
 import { MealCaptureCard } from "@/components/ui/meal-capture-card";
 import { MealHistoryList } from "@/components/ui/meal-history-list";
+import { FastingBreakCard } from "@/components/ui/fasting-break-card";
 import { PageTitle } from "@/components/ui/page-title";
 import { PaywallModal } from "@/components/ui/paywall-modal";
 import { PrivacyNote } from "@/components/ui/privacy-note";
@@ -18,11 +19,15 @@ import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
 import { useDailyMealSummary } from "@/hooks/use-daily-meal-summary";
 import { useMealAnalysis } from "@/hooks/use-meal-analysis";
+import { analyzeFastingBreak } from "@/services/fastingBreakService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import type { FastingBreakAnalysis } from "@/types/fasting-break";
 
 export default function MealsScreen() {
   const language = useAppPreferencesStore((state) => state.language);
   const [summaryRevision, setSummaryRevision] = useState(0);
+  const [scanTarget, setScanTarget] = useState<'meal' | 'fasting_break'>('meal');
+  const [fastingBreakResult, setFastingBreakResult] = useState<FastingBreakAnalysis | null>(null);
   const refreshSummary = useCallback(() => {
     setSummaryRevision((current) => current + 1);
   }, []);
@@ -137,11 +142,61 @@ export default function MealsScreen() {
       </View>
 
       <View className="mt-5">
+        {/* Alternador de Modo: Refeição vs Quebra de Jejum */}
+        <View className="mb-3 flex-row rounded-xl border border-border bg-surface p-1">
+          <Pressable
+            accessibilityRole="button"
+            className={`flex-1 items-center justify-center rounded-lg py-2 ${
+              scanTarget === 'meal' ? 'bg-foreground' : 'bg-transparent'
+            }`}
+            onPress={() => {
+              setScanTarget('meal');
+              setFastingBreakResult(null);
+            }}
+          >
+            <Text
+              className={`font-label text-xs uppercase tracking-wider ${
+                scanTarget === 'meal' ? 'text-background' : 'text-muted'
+              }`}
+            >
+              {language === 'en' ? '🍽️ Meal' : '🍽️ Refeição'}
+            </Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            className={`flex-1 items-center justify-center rounded-lg py-2 ${
+              scanTarget === 'fasting_break' ? 'bg-foreground' : 'bg-transparent'
+            }`}
+            onPress={() => {
+              setScanTarget('fasting_break');
+            }}
+          >
+            <Text
+              className={`font-label text-xs uppercase tracking-wider ${
+                scanTarget === 'fasting_break' ? 'text-background' : 'text-muted'
+              }`}
+            >
+              {language === 'en' ? '🏷️ Check Fast' : '🏷️ Verificar Jejum'}
+            </Text>
+          </Pressable>
+        </View>
+
         <MealCaptureCard
           canAnalyze={canAnalyze}
           description={description}
           isAnalyzing={isAnalyzing}
-          onAnalyze={runAnalysis}
+          onAnalyze={async () => {
+            if (scanTarget === 'fasting_break') {
+              const res = analyzeFastingBreak({
+                description: description || 'Suplemento / Bebida',
+                language,
+              });
+              setFastingBreakResult(res);
+            } else {
+              setFastingBreakResult(null);
+              await runAnalysis();
+            }
+          }}
           onChangeDescription={setDescription}
           onChangePortionQuantity={setPortionQuantity}
           onPickPhoto={pickPhoto}
@@ -151,6 +206,16 @@ export default function MealsScreen() {
           selectedImage={selectedImage}
         />
       </View>
+
+      {/* Cartão de Resultado do Verificador de Quebra de Jejum */}
+      {fastingBreakResult ? (
+        <View className="mt-5">
+          <FastingBreakCard
+            analysis={fastingBreakResult}
+            onDismiss={() => setFastingBreakResult(null)}
+          />
+        </View>
+      ) : null}
 
       {errorMessage ? (
         <View

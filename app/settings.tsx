@@ -23,6 +23,7 @@ import {
 } from "@/services/fastingNotificationService";
 import { openHealthConnectSettings } from "@/services/healthConnectService";
 import { exportClinicalReportPdf } from "@/services/healthReportPdfService";
+import { authenticateBiometric } from "@/services/biometricsService";
 import { translateText } from "@/services/i18n";
 import {
   IAP_SKUS,
@@ -51,6 +52,12 @@ export default function SettingsScreen() {
   );
   const setHealthConnectEnabled = useAppPreferencesStore(
     (state) => state.setHealthConnectEnabled,
+  );
+  const biometricLockEnabled = useAppPreferencesStore(
+    (state) => state.biometricLockEnabled,
+  );
+  const setBiometricLockEnabled = useAppPreferencesStore(
+    (state) => state.setBiometricLockEnabled,
   );
   const language = useAppPreferencesStore((state) => state.language);
   const setHydrationRemindersEnabled = useAppPreferencesStore(
@@ -437,6 +444,60 @@ export default function SettingsScreen() {
               }
               trackColor={{ false: COLORS.border, true: COLORS.success }}
               value={healthConnectEnabled}
+            />
+          </View>
+        </View>
+
+        {/* Cofre Biométrico (Sol Pro) */}
+        <View className="mt-5 rounded-2xl border border-border bg-surface p-5">
+          <View className="flex-row items-center gap-3">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/10">
+              <Ionicons color={COLORS.success} name="finger-print-outline" size={21} />
+            </View>
+            <View className="flex-1 pr-3">
+              <View className="flex-row items-center gap-2">
+                <Text className="font-headline text-base text-foreground">
+                  {translateText("Cofre Biométrico", language)}
+                </Text>
+                <ProBadge size="small" />
+              </View>
+              <Text className="mt-1 font-body text-xs leading-4 text-muted">
+                {translateText(
+                  "Protege os teus registos, fotos e peso com impressão digital ou reconhecimento facial.",
+                  language,
+                )}
+              </Text>
+            </View>
+            <Switch
+              accessibilityLabel={translateText("Cofre Biométrico", language)}
+              onValueChange={async (value) => {
+                if (!isPro) {
+                  setPaywallOpen(true);
+                  return;
+                }
+                if (value) {
+                  const auth = await authenticateBiometric(
+                    translateText("Confirmar biometria para ativar o cofre", language),
+                    translateText("Cancelar", language),
+                  );
+                  if (auth.success) {
+                    setBiometricLockEnabled(true);
+                  } else {
+                    Alert.alert(
+                      language === 'en' ? 'Biometrics' : 'Biometria',
+                      auth.error || 'Não foi possível confirmar a biometria.',
+                    );
+                  }
+                } else {
+                  setBiometricLockEnabled(false);
+                }
+              }}
+              testID="biometric-lock-toggle"
+              thumbColor={
+                biometricLockEnabled ? COLORS.surfaceRaised : COLORS.muted
+              }
+              trackColor={{ false: COLORS.border, true: COLORS.success }}
+              value={biometricLockEnabled}
             />
           </View>
         </View>

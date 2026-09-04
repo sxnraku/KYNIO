@@ -8,6 +8,7 @@ import { TextInput } from "@/components/ui/text-input";
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
 import { translateText } from "@/services/i18n";
+import { calculateSatiety } from "@/services/satietyService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type {
   EditableMealNutrition,
@@ -162,8 +163,74 @@ export function MealAnalysisCard({
         />
       </View>
 
+      {/* Superpoder Pro: Índice de Saciedade & Janela de Fome */}
+      {(() => {
+        const calories = Number(editableNutrition.estimatedCalories) || analysis.estimated_calories;
+        const protein = Number(editableNutrition.proteinGrams) || analysis.macros.protein_g;
+        const carbs = Number(editableNutrition.carbsGrams) || analysis.macros.carbs_g;
+        const fat = Number(editableNutrition.fatGrams) || analysis.macros.fat_g;
+        const satiety = calculateSatiety({
+          calories,
+          macros: { carbs_g: carbs, fat_g: fat, protein_g: protein },
+          tags: analysis.tags,
+        });
+
+        const levelColor =
+          satiety.level === "high"
+            ? COLORS.success
+            : satiety.level === "moderate"
+            ? COLORS.warning
+            : COLORS.muted;
+
+        const levelLabel =
+          satiety.level === "high"
+            ? language === "en" ? "High Satiety" : "Alta Saciedade"
+            : satiety.level === "moderate"
+            ? language === "en" ? "Moderate Satiety" : "Saciedade Moderada"
+            : language === "en" ? "Light Satiety" : "Digestão Rápida";
+
+        return (
+          <View className="mt-4 rounded-xl border border-border bg-background p-3.5">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-2">
+                <Ionicons color={COLORS.success} name="time-outline" size={16} />
+                <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+                  {language === "en" ? "Hunger Window Prediction" : "Previsão de Janela de Fome"}
+                </Text>
+              </View>
+              <View
+                className="rounded-full px-2.5 py-1"
+                style={{ backgroundColor: `${levelColor}1A` }}
+              >
+                <Text
+                  className="font-label text-[9px] uppercase tracking-wide"
+                  style={{ color: levelColor }}
+                >
+                  {levelLabel}
+                </Text>
+              </View>
+            </View>
+
+            <View className="mt-2.5 flex-row items-baseline justify-between">
+              <Text className="font-headline text-base text-foreground">
+                {language === "en"
+                  ? `Comfortable until ${satiety.estimatedFullUntilTime}`
+                  : `Aguenta confortavelmente até às ${satiety.estimatedFullUntilTime}`}
+              </Text>
+              <Text className="font-label text-xs font-semibold text-success">
+                ~{satiety.hoursOfSatiety}h
+              </Text>
+            </View>
+
+            <Text className="mt-1 font-body text-xs text-muted">
+              {language === "en" ? satiety.dominantFactorEn : satiety.dominantFactor}
+            </Text>
+          </View>
+        );
+      })()}
+
       {analysis.tags.length > 0 ? (
-        <View className="mt-5 flex-row flex-wrap gap-2">
+        <View className="mt-4 flex-row flex-wrap gap-2">
           {analysis.tags.map((tag, index) => (
             <View
               className="rounded-full border border-border bg-background px-3 py-2"
