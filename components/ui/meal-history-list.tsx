@@ -213,6 +213,7 @@ export function MealHistoryList({
                       className="h-full w-full"
                       resizeMode="cover"
                       source={{ uri: meal.imageUrl }}
+                      style={{ height: "100%", width: "100%" }}
                     />
                   ) : (
                     <View className="h-full w-full items-center justify-center bg-surfaceRaised p-3">

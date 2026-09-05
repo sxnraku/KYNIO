@@ -117,10 +117,14 @@ async function createDatabase(): Promise<LocalDatabase> {
 }
 
 function isInvalidWebVfsState(error: unknown): boolean {
+  if (Platform.OS !== 'web' || !(error instanceof Error)) {
+    return false;
+  }
+  const msg = error.message.toLowerCase();
   return (
-    Platform.OS === 'web' &&
-    error instanceof Error &&
-    error.message.toLowerCase().includes('invalid vfs state')
+    msg.includes('invalid vfs state') ||
+    msg.includes('nomodificationallowederror') ||
+    msg.includes('createsyncaccesshandle')
   );
 }
 
