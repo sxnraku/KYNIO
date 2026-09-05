@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
+// Este patch corrige separadores de caminho no Windows; em Linux/macOS não é necessário
+if (process.platform !== 'win32') {
+  console.log('[patch-metro-config] Plataforma não-Windows, patch ignorado.');
+  process.exit(0);
+}
+
 const targetFile = path.join(
   __dirname,
   '..',
