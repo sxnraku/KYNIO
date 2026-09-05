@@ -117,6 +117,7 @@ export const FastCompletionShareCard = forwardRef<
           accessibilityLabel="KYNIO App Icon"
           className="h-9 w-9 rounded-xl"
           source={require("@/assets/images/icon-kynio-v1.png")}
+          style={{ borderRadius: 12, height: 36, width: 36 }}
         />
         <Text
           className="mt-2.5 font-headline text-base"
