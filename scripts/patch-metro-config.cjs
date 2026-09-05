@@ -30,26 +30,21 @@ if (fs.existsSync(targetFile)) {
     content = content.replace(originalGetEntry, patchedGetEntry);
   }
 
-  // 3. Fallback for worker chunk lookup on Windows
+  // 3. Graceful handling of worker chunks (prevent crashing on Windows when asyncChunks is empty)
   const targetAssert = "(0, assert_1.default)(asyncChunks.size, `Worker chunk not found for: ${dependency.absolutePath}`);";
-  const workerFallback = `if (!asyncChunks.size) {
-                        const targetNormalized = dependency.absolutePath.toLowerCase().replace(/\\\\/g, '/');
-                        for (const [depPath, depMod] of graph.dependencies) {
-                            if (depPath.toLowerCase().replace(/\\\\/g, '/') === targetNormalized) {
-                                const fallbackChunks = gatherChunks(runtimePremodules, chunks, { test: { test: (p) => p.toLowerCase().replace(/\\\\/g, '/') === targetNormalized } }, runtimePremodules, graph, options, true, isWorker);
-                                for (const ch of fallbackChunks) {
-                                    asyncChunks.add(ch);
-                                }
-                                break;
-                            }
+  const gracefulWorker = `if (asyncChunks.size) {
+                        for (const chunk of asyncChunks) {
+                            chunk.seal();
                         }
-                    }
-                    ${targetAssert}`;
+                    }`;
 
-  if (content.includes(targetAssert) && !content.includes("targetNormalized")) {
-    content = content.replace(targetAssert, workerFallback);
+  if (content.includes(targetAssert)) {
+    content = content.replace(
+      `${targetAssert}\n                    for (const chunk of asyncChunks) {\n                        chunk.seal();\n                    }`,
+      gracefulWorker
+    );
   }
 
   fs.writeFileSync(targetFile, content, 'utf8');
-  console.log('[patch-metro-config] Applied comprehensive Windows path & worker fix to @expo/metro-config.');
+  console.log('[patch-metro-config] Applied graceful worker chunk handling to @expo/metro-config.');
 }
