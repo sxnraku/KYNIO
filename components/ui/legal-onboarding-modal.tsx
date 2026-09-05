@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Linking,
   Modal,
+  Platform,
   Pressable,
   View,
 } from "react-native";
@@ -50,10 +51,18 @@ export function LegalOnboardingModal() {
       transparent
       visible={isVisible}
     >
-      <SafeAreaView className="flex-1 justify-end bg-black/80 px-4 pb-4">
+      <SafeAreaView
+        className="flex-1 justify-end bg-black/80 px-4 pb-4"
+        style={Platform.OS === "web" ? { backgroundColor: "rgba(0, 0, 0, 0.75)" } : undefined}
+      >
         <View
           className="rounded-[32px] border border-border bg-surface p-6"
-          style={{ alignSelf: "center", maxWidth: 560, width: "100%" }}
+          style={{
+            alignSelf: "center",
+            maxWidth: 560,
+            width: "100%",
+            backgroundColor: COLORS.surface,
+          }}
         >
           <View className="mb-4 h-1 w-10 self-center rounded-full bg-border" />
           <View className="flex-row items-center justify-between">
@@ -110,7 +119,10 @@ export function LegalOnboardingModal() {
                 {LEGAL_DISCLAIMER}
               </Text>
 
-              <View className="mt-5 rounded-2xl border border-border bg-background p-4">
+              <View
+                className="mt-5 rounded-2xl border border-border bg-background p-4"
+                style={{ backgroundColor: COLORS.background }}
+              >
                 <View className="flex-row items-start gap-3">
                   <Ionicons
                     color={COLORS.success}
@@ -176,6 +188,7 @@ export function LegalOnboardingModal() {
                 accessibilityState={{ checked: isChecked }}
                 className="mt-2 flex-row items-center gap-3 rounded-2xl border border-border bg-surface-raised p-4 active:opacity-70"
                 onPress={() => setIsChecked((current) => !current)}
+                style={{ backgroundColor: COLORS.surfaceRaised }}
                 testID="legal-terms-checkbox"
               >
                 <View

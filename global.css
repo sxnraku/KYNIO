@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-background: 237 230 211;
+  --color-surface: 246 240 222;
+  --color-surface-raised: 251 247 234;
+  --color-border: 213 203 175;
+  --color-danger: 179 67 36;
+  --color-foreground: 58 58 56;
+  --color-muted: 111 110 102;
+  --color-success: 217 146 46;
+  --color-success-dark: 240 223 192;
+  --color-xp: 217 146 46;
+}
+
 html,
 body,
 #root {
