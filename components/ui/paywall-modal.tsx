@@ -537,57 +537,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
               </AppText>
             </Pressable>
 
-            {/* Consumables (One-Time Packs) Section */}
-            <AppText style={styles.sectionLabel}>
-              {translateText("OPÇÕES AVULSAS (SEM SUBSCRIÇÃO)", language)}
-            </AppText>
-            <View style={styles.consumablesRow}>
-              {/* AI Pack 20 */}
-              <Pressable
-                disabled={isProcessing}
-                onPress={() => handleBuyConsumable("aiPack")}
-                style={styles.consumableCard}
-              >
-                <AppText style={styles.consumableIcon}>🥗</AppText>
-                <AppText style={styles.consumableTitle}>
-                  {translateText("Pack 20 Análises IA", language)}
-                </AppText>
-                <AppText style={styles.consumablePrice}>
-                  {offerings.aiPack20?.priceFormatted || "1,49 €"}
-                </AppText>
-                <AppText style={styles.consumableDesc}>
-                  {translateText("Créditos avulsos que nunca expiram", language)}
-                </AppText>
-                <View style={styles.consumableBuyBtn}>
-                  <AppText style={styles.consumableBuyBtnText}>
-                    {translateText("Comprar Pack", language)}
-                  </AppText>
-                </View>
-              </Pressable>
 
-              {/* Emergency Streak Shield */}
-              <Pressable
-                disabled={isProcessing}
-                onPress={() => handleBuyConsumable("shield")}
-                style={styles.consumableCard}
-              >
-                <AppText style={styles.consumableIcon}>🛡️</AppText>
-                <AppText style={styles.consumableTitle}>
-                  {translateText("Escudo de Emergência", language)}
-                </AppText>
-                <AppText style={styles.consumablePrice}>
-                  {offerings.streakShield?.priceFormatted || "0,99 €"}
-                </AppText>
-                <AppText style={styles.consumableDesc}>
-                  {translateText("Protege 1 falha de sequência", language)}
-                </AppText>
-                <View style={styles.consumableBuyBtn}>
-                  <AppText style={styles.consumableBuyBtnText}>
-                    {translateText("Comprar Escudo", language)}
-                  </AppText>
-                </View>
-              </Pressable>
-            </View>
 
             {/* Disclaimer & Legal Links */}
             <AppText style={styles.disclaimerText}>
@@ -925,59 +875,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 0.5,
   },
-  consumablesRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 18,
-  },
-  consumableCard: {
-    flex: 1,
-    backgroundColor: "#26221B",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#3A3428",
-    padding: 12,
-    alignItems: "center",
-  },
-  consumableIcon: {
-    fontSize: 22,
-    marginBottom: 4,
-  },
-  consumableTitle: {
-    color: "#F1E9D6",
-    fontSize: 12,
-    fontWeight: "700",
-    textAlign: "center",
-    minHeight: 32,
-  },
-  consumablePrice: {
-    color: "#E8A83E",
-    fontSize: 15,
-    fontWeight: "800",
-    marginVertical: 4,
-  },
-  consumableDesc: {
-    color: "#A79D88",
-    fontSize: 10,
-    textAlign: "center",
-    marginBottom: 8,
-    minHeight: 26,
-  },
-  consumableBuyBtn: {
-    backgroundColor: "rgba(232, 168, 62, 0.15)",
-    borderWidth: 1,
-    borderColor: "rgba(232, 168, 62, 0.4)",
-    borderRadius: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    width: "100%",
-    alignItems: "center",
-  },
-  consumableBuyBtnText: {
-    color: "#E8A83E",
-    fontSize: 11,
-    fontWeight: "700",
-  },
+
   disclaimerText: {
     color: "#7A7263",
     fontSize: 11,
