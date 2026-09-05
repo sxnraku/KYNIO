@@ -695,7 +695,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     <button class="lang-toggle" id="langToggle" aria-label="Idioma">
       <span data-lang="pt" data-language="pt" class="lang-opt active">PT</span><span class="lang-sep">/</span><span data-lang="en" data-language="en" class="lang-opt">EN</span>
     </button>
-    <button class="btn btn-ink btn-sm" data-open-beta data-i18n="nav.cta">Aderir à Beta</button>
+    <a class="btn btn-amber btn-sm" href="app/" data-i18n="nav.openApp">Abrir Web App</a>
+    <button class="btn btn-ink btn-sm" data-open-beta data-i18n="nav.cta">Beta Android</button>
   </div>
 </header>
 
@@ -712,9 +713,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       </h1>
       <p class="hero-sub" data-i18n="hero.sub">Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.</p>
       <div class="hero-ctas">
+        <a class="btn btn-amber" href="app/">
+          <span data-i18n="hero.ctaWeb">Abrir no Navegador / iPhone</span>
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
         <button class="btn btn-ink" data-open-beta>
           <span data-i18n="hero.cta1">Entrar na Beta do Android</span>
-          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <a class="link-quiet" href="#fases" data-i18n="hero.cta2">Ver como funciona</a>
       </div>
@@ -905,10 +909,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     <p class="eyebrow eyebrow-amber" data-i18n="fin.eyebrow">Beta fechada no Google Play</p>
     <h2 class="final-title" data-i18n="fin.title">Pronto para o teu<br>primeiro jejum?</h2>
     <p class="final-sub" data-i18n="fin.sub">Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.</p>
-    <button class="btn btn-amber btn-lg" data-open-beta>
-      <span data-i18n="fin.cta">Aderir à Beta no Google Play</span>
-      <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+      <a class="btn btn-amber btn-lg" href="app/">
+        <span data-i18n="fin.ctaWeb">Usar no iPhone / Navegador (Web App)</span>
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <button class="btn btn-ink btn-lg" data-open-beta style="border:1px solid var(--hairline-d);">
+        <span data-i18n="fin.cta">Aderir à Beta no Google Play</span>
+      </button>
+    </div>
   </div>
 </section>
 
@@ -922,6 +931,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <span class="nav-word">KYNIO</span>
     </div>
     <nav class="footer-links">
+      <a href="app/" data-i18n="ft.app">Web App</a>
       <a href="privacy.html" data-i18n="ft.privacy">Política de Privacidade</a>
       <a href="terms.html" data-i18n="ft.terms">Termos de Utilização</a>
       <a href="account-deletion.html" data-i18n="ft.delete">Eliminar Conta</a>
@@ -973,10 +983,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   const I18N = {
     pt: {
       "nav.phases": "Fases", "nav.features": "Funcionalidades", "nav.screens": "Ecrãs",
-      "nav.cta": "Aderir à Beta",
-      "hero.badge": "Beta fechada · Google Play",
+      "nav.openApp": "Abrir Web App",
+      "nav.cta": "Beta Android",
+      "hero.badge": "Beta fechada · Google Play & Web PWA",
       "hero.t1": "Constrói o teu ritmo.", "hero.t2": "Sem pressão.",
       "hero.sub": "Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.",
+      "hero.ctaWeb": "Abrir no Navegador / iPhone",
       "hero.cta1": "Entrar na Beta do Android", "hero.cta2": "Ver como funciona",
       "hero.meta": "Privacidade local&nbsp;&nbsp;·&nbsp;&nbsp;Sem anúncios&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
       "chip.water": "2000 ml", "chip.level": "Nível 4 · Consistente",
@@ -1005,6 +1017,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       "fin.title": "Pronto para o teu<br>primeiro jejum?",
       "fin.sub": "Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.",
       "fin.cta": "Aderir à Beta no Google Play",
+      "fin.ctaWeb": "Usar no iPhone / Navegador (Web App)",
+      "ft.app": "Web App",
       "ft.privacy": "Política de Privacidade", "ft.terms": "Termos de Utilização",
       "ft.delete": "Eliminar Conta", "ft.support": "Suporte & Contacto",
       "ft.note": "KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.",
@@ -1018,10 +1032,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
     },
     en: {
       "nav.phases": "Phases", "nav.features": "Features", "nav.screens": "Screens",
-      "nav.cta": "Join Beta",
-      "hero.badge": "Closed Beta · Google Play",
+      "nav.openApp": "Open Web App",
+      "nav.cta": "Android Beta",
+      "hero.badge": "Closed Beta · Google Play & Web PWA",
       "hero.t1": "Build your rhythm.", "hero.t2": "Without pressure.",
       "hero.sub": "Track when your body transitions to fat burning, ketosis, and cellular autophagy. Snap a meal photo to review calorie and macro estimates. 100% private, in your phone's local SQLite.",
+      "hero.ctaWeb": "Open in Browser / iPhone",
       "hero.cta1": "Join the Android Beta", "hero.cta2": "See how it works",
       "hero.meta": "Local privacy&nbsp;&nbsp;·&nbsp;&nbsp;Ad-free&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
       "chip.water": "2000 ml", "chip.level": "Level 4 · Consistent",
@@ -1050,6 +1066,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       "fin.title": "Ready for your<br>first fast?",
       "fin.sub": "Get access to the official closed beta on the Google Play Store. Two steps and you're in.",
       "fin.cta": "Join Beta on Google Play",
+      "fin.ctaWeb": "Use on iPhone / Browser (Web App)",
+      "ft.app": "Web App",
       "ft.privacy": "Privacy Policy", "ft.terms": "Terms of Use",
       "ft.delete": "Delete Account", "ft.support": "Support & Contact",
       "ft.note": "KYNIO · Personal lifestyle and gamification tracking tool. Does not provide medical or nutritional advice.",
