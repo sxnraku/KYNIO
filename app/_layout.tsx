@@ -20,6 +20,7 @@ import { GuidedTutorialModal } from "@/components/ui/guided-tutorial-modal";
 import { LegalOnboardingModal } from "@/components/ui/legal-onboarding-modal";
 import { ProfileOnboardingModal } from "@/components/ui/profile-onboarding-modal";
 import { getColorPalette } from "@/constants/colors";
+import { handleStripeReturnIfPresent } from "@/services/stripeSubscriptionService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 void SplashScreen.preventAutoHideAsync();
@@ -36,6 +37,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    handleStripeReturnIfPresent();
     if (fontsLoaded) {
       void SplashScreen.hideAsync();
     }
