@@ -129,18 +129,30 @@ function isInvalidWebVfsState(error: unknown): boolean {
 }
 
 async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
-  try {
-    return await createDatabase();
-  } catch (error) {
-    if (!isInvalidWebVfsState(error)) {
-      throw error;
-    }
+  const maxAttempts = Platform.OS === 'web' ? 3 : 1;
+  let lastError: unknown;
 
-    await new Promise<void>((resolve) => {
-      setTimeout(resolve, 200);
-    });
-    return createDatabase();
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await createDatabase();
+    } catch (error) {
+      lastError = error;
+      if (!isInvalidWebVfsState(error) || attempt === maxAttempts) {
+        break;
+      }
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, attempt * 300);
+      });
+    }
   }
+
+  if (isInvalidWebVfsState(lastError)) {
+    throw new Error(
+      'A base de dados local está bloqueada por outro separador aberto no navegador. Fecha os outros separadores do KYNIO para continuar.',
+    );
+  }
+
+  throw lastError;
 }
 
 export type LocalDatabase = SqliteRemoteDatabase<typeof schema>;
