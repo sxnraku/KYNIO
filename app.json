@@ -28,7 +28,13 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/icon-kynio-v1.png"
+      "favicon": "./assets/images/icon-kynio-v1.png",
+      "name": "KYNIO · Jejum & Nutrição",
+      "shortName": "KYNIO",
+      "backgroundColor": "#EDE6D3",
+      "themeColor": "#EDE6D3",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       [

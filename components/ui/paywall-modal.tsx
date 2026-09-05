@@ -26,6 +26,7 @@ import {
   IAP_SKUS,
   type FormattedOfferings,
 } from "@/services/inAppPurchaseService";
+import { openStripeCheckout } from "@/services/stripeSubscriptionService";
 import { verifyPurchaseWithServer } from "@/services/purchaseVerificationService";
 import { translateText } from "@/services/i18n";
 
@@ -62,6 +63,12 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
 
     try {
       if (Platform.OS === "web") {
+        const opened = openStripeCheckout(selectedPlan);
+        if (opened) {
+          setIsProcessing(false);
+          return;
+        }
+
         if (selectedPlan === "annual" && hasTrialAvailable) {
           activateFreeTrial();
         } else {

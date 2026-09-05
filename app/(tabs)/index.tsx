@@ -6,6 +6,7 @@ import { FastCompletionModal } from "@/components/ui/fast-completion-modal";
 import { FastingHistoryCard } from "@/components/ui/fasting-history-card";
 import { FastingSummaryCard } from "@/components/ui/fasting-summary-card";
 import { MetabolicPhases } from "@/components/ui/metabolic-phases";
+import { PwaInstallBanner } from "@/components/ui/pwa-install-banner";
 import { Screen } from "@/components/ui/screen";
 import { Text } from "@/components/ui/text";
 import { WaterTrackerCard } from "@/components/ui/water-tracker-card";
@@ -89,6 +90,7 @@ export default function HomeScreen() {
 
   return (
     <Screen>
+      <PwaInstallBanner />
       <View className="mb-5 flex-row items-baseline justify-between">
         <Text
           className="font-label text-[11px] uppercase text-success"
