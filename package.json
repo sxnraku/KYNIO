@@ -76,7 +76,7 @@
     "build:android:production": "npx eas-cli build --platform android --profile production",
     "postinstall": "node scripts/patch-metro-config.cjs",
     "start": "expo start",
-    "dev": "expo start --web",
+    "dev": "expo start --web --clear",
     "android": "expo run:android",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
