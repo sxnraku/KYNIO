@@ -74,6 +74,7 @@
     "build:android:local-aab": "cmd /c android\\build-aab.bat",
     "build:android:preview": "npx eas-cli build --platform android --profile preview",
     "build:android:production": "npx eas-cli build --platform android --profile production",
+    "postinstall": "node scripts/patch-metro-config.cjs",
     "start": "expo start",
     "dev": "expo start --web",
     "android": "expo run:android",
