@@ -172,7 +172,7 @@ export function PwaInstallBanner() {
       ]}
     >
       <View style={styles.leadingCol}>
-        <View style={[styles.dotIndicator, { backgroundColor: colors.accent }]} />
+        <View style={[styles.dotIndicator, { backgroundColor: colors.success }]} />
         <View style={styles.textStack}>
           <Text style={[styles.titleText, { color: colors.foreground }]} numberOfLines={1}>
             {showManualGuide
@@ -200,7 +200,7 @@ export function PwaInstallBanner() {
           accessibilityRole="button"
           accessibilityLabel={isEn ? "Install" : "Instalar"}
           onPress={handleInstallClick}
-          style={[styles.miniButton, { backgroundColor: colors.accent }]}
+          style={[styles.miniButton, { backgroundColor: colors.success }]}
         >
           <Text style={styles.miniButtonText}>
             {isEn ? "Instalar" : "Instalar"}
