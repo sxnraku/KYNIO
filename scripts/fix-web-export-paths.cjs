@@ -11,7 +11,9 @@ function replaceInDir(dir) {
       let updated = content
         .replaceAll('href="/favicon.png"', 'href="/KYNIO/app/favicon.png"')
         .replaceAll('href="/apple-touch-icon.png"', 'href="/KYNIO/app/apple-touch-icon.png"')
-        .replaceAll('href="/manifest.json"', 'href="/KYNIO/app/manifest.json"');
+        .replaceAll('href="/manifest.json"', 'href="/KYNIO/app/manifest.json"')
+        // Preencher o título vazio gerado pelo Expo
+        .replace(/<title data-rh="true"><\/title>/, '<title data-rh="true">KYNIO · Jejum &amp; Nutrição</title>');
       if (!updated.includes('window.__kynioDeferredPrompt')) {
         updated = updated.replace(
           '</head>',
