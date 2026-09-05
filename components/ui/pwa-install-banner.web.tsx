@@ -55,7 +55,6 @@ export function PwaInstallBanner() {
       return;
     }
 
-    // Check if running in standalone mode (already installed)
     const isStandalone =
       ("standalone" in navigator && Boolean((navigator as { standalone?: boolean }).standalone)) ||
       window.matchMedia("(display-mode: standalone)").matches;
@@ -64,10 +63,8 @@ export function PwaInstallBanner() {
       return;
     }
 
-    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
     const isDismissed = getStorageItem(STORAGE_KEY) === "true";
 
-    // If there's an existing prompt captured on window
     if (window.__kynioDeferredPrompt) {
       setDeferredPrompt(window.__kynioDeferredPrompt);
     }
@@ -84,7 +81,6 @@ export function PwaInstallBanner() {
       window.addEventListener("beforeinstallprompt", handlePrompt);
     }
 
-    // Show banner if not dismissed (on iOS, Android, or desktop web)
     if (!isDismissed) {
       setIsVisible(true);
     }
@@ -130,130 +126,170 @@ export function PwaInstallBanner() {
     }
   };
 
+  if (isIos) {
+    return (
+      <View
+        style={[
+          styles.compactBar,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        <View style={styles.contentCol}>
+          <Text style={[styles.titleText, { color: colors.foreground }]}>
+            {isEn ? "Install KYNIO on iPhone" : "Instala o KYNIO no teu iPhone"}
+          </Text>
+          <Text style={[styles.subtitleText, { color: colors.muted }]}>
+            {isEn
+              ? "Tap Share (⎋) and select 'Add to Home Screen' (⊞)"
+              : "Toca em Partilhar (⎋) e seleciona 'Adicionar ao Ecrã' (⊞)"}
+          </Text>
+        </View>
+        <Pressable
+          testID="close-pwa-banner"
+          accessibilityRole="button"
+          accessibilityLabel={isEn ? "Close banner" : "Fechar aviso"}
+          onPress={handleDismiss}
+          hitSlop={8}
+          style={styles.closeBtn}
+        >
+          <Text style={[styles.closeIcon, { color: colors.muted }]}>✕</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View
       style={[
-        styles.container,
+        styles.compactBar,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
         },
       ]}
     >
-      <View style={styles.textContainer}>
-        <Text style={[styles.title, { color: colors.foreground }]}>
-          {isIos
-            ? isEn
-              ? "Install KYNIO on iPhone"
-              : "Instala o KYNIO no teu iPhone"
-            : isEn
-            ? "Install KYNIO App"
-            : "Instala a app KYNIO"}
-        </Text>
-
-        {isIos ? (
-          <Text style={[styles.description, { color: colors.muted }]}>
-            {isEn
-              ? "Tap Share (⎋) below and select 'Add to Home Screen' (⊞) for full-screen mode."
-              : "Toca em Partilhar (⎋) no Safari e escolhe 'Adicionar ao Ecrã Principal' (⊞)."}
+      <View style={styles.leadingCol}>
+        <View style={[styles.dotIndicator, { backgroundColor: colors.accent }]} />
+        <View style={styles.textStack}>
+          <Text style={[styles.titleText, { color: colors.foreground }]} numberOfLines={1}>
+            {showManualGuide
+              ? isEn
+                ? "Menu (⋮) → Install app"
+                : "Menu (⋮) → Instalar app"
+              : isEn
+              ? "Install KYNIO Web App"
+              : "Instalar aplicação KYNIO"}
           </Text>
-        ) : showManualGuide ? (
-          <Text style={[styles.description, { color: colors.muted }]}>
-            {isEn
-              ? "Tap the 3 dots (⋮) in Chrome menu and tap 'Install application'."
-              : "Toca nos 3 pontos (⋮) no topo do Chrome e escolhe 'Instalar aplicação'."}
+          <Text style={[styles.subtitleText, { color: colors.muted }]} numberOfLines={1}>
+            {showManualGuide
+              ? isEn
+                ? "Tap Chrome menu at top right"
+                : "No topo do Chrome à direita"
+              : isEn
+              ? "Full-screen & instant offline access"
+              : "Ecrã inteiro e acesso instantâneo"}
           </Text>
-        ) : (
-          <Text style={[styles.description, { color: colors.muted }]}>
-            {isEn
-              ? "Add to home screen for full-screen circadian experience and instant access."
-              : "Adiciona ao ecrã inicial para teres acesso instantâneo e modo ecrã inteiro."}
-          </Text>
-        )}
-
-        {!isIos && (
-          <View style={styles.actionRow}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={isEn ? "Install KYNIO" : "Instalar KYNIO"}
-              onPress={handleInstallClick}
-              style={[styles.installButton, { backgroundColor: colors.accent }]}
-            >
-              <Text style={[styles.installButtonText, { color: "#1C1915" }]}>
-                {isEn ? "Install Now" : "Instalar Agora"}
-              </Text>
-            </Pressable>
-          </View>
-        )}
+        </View>
       </View>
 
-      <Pressable
-        testID="close-pwa-banner"
-        accessibilityRole="button"
-        accessibilityLabel={isEn ? "Close install banner" : "Fechar aviso de instalação"}
-        onPress={handleDismiss}
-        style={[styles.closeButton, { borderColor: colors.border }]}
-      >
-        <Text style={[styles.closeText, { color: colors.foreground }]}>✕</Text>
-      </Pressable>
+      <View style={styles.actionsGroup}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={isEn ? "Install" : "Instalar"}
+          onPress={handleInstallClick}
+          style={[styles.miniButton, { backgroundColor: colors.accent }]}
+        >
+          <Text style={styles.miniButtonText}>
+            {isEn ? "Instalar" : "Instalar"}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          testID="close-pwa-banner"
+          accessibilityRole="button"
+          accessibilityLabel={isEn ? "Close" : "Fechar"}
+          onPress={handleDismiss}
+          hitSlop={10}
+          style={styles.closeBtn}
+        >
+          <Text style={[styles.closeIcon, { color: colors.muted }]}>✕</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  compactBar: {
     borderWidth: 1,
-    borderRadius: 14,
-    marginHorizontal: 16,
-    marginVertical: 10,
-    padding: 14,
+    borderRadius: 12,
+    marginBottom: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 8,
   },
-  textContainer: {
+  leadingCol: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
     flex: 1,
   },
-  title: {
+  contentCol: {
+    flex: 1,
+    gap: 2,
+  },
+  dotIndicator: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+  },
+  textStack: {
+    flex: 1,
+    gap: 1,
+  },
+  titleText: {
     fontFamily: "HankenGrotesk_700Bold",
-    fontSize: 14,
-    letterSpacing: -0.2,
-    marginBottom: 4,
+    fontSize: 13,
+    letterSpacing: -0.1,
+    lineHeight: 16,
   },
-  description: {
+  subtitleText: {
     fontFamily: "HankenGrotesk_400Regular",
-    fontSize: 12.5,
-    lineHeight: 17,
+    fontSize: 11,
+    lineHeight: 14,
   },
-  actionRow: {
-    marginTop: 10,
+  actionsGroup: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
-  installButton: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-  },
-  installButtonText: {
-    fontFamily: "HankenGrotesk_700Bold",
-    fontSize: 12,
-    letterSpacing: 0.2,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
+  miniButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 7,
     alignItems: "center",
     justifyContent: "center",
-    flexShrink: 0,
-    marginTop: 2,
   },
-  closeText: {
-    fontSize: 13,
+  miniButtonText: {
+    color: "#1C1915",
+    fontFamily: "HankenGrotesk_700Bold",
+    fontSize: 11.5,
+    letterSpacing: 0.2,
+  },
+  closeBtn: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeIcon: {
+    fontSize: 12,
     fontWeight: "700",
   },
 });
