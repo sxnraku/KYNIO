@@ -1,12 +1,16 @@
-name: Publish legal pages
+name: Build e publica web app
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/legal-pages.yml"
-      - "legal-site/**"
+    paths-ignore:
+      - "legal-site/app/**"
+      - "docs/**"
+      - "design-proposta/**"
+      - "store/**"
+      - ".maestro/**"
+      - "*.md"
 
 permissions:
   contents: read
@@ -18,16 +22,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar export web
+        env:
+          EXPO_PUBLIC_APP_SHARE_URL: ${{ secrets.EXPO_PUBLIC_APP_SHARE_URL }}
+          EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+          EXPO_PUBLIC_LEGAL_BASE_URL: ${{ secrets.EXPO_PUBLIC_LEGAL_BASE_URL }}
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+        run: npm run export:web
+
+      - name: Copiar páginas legais para a pasta de deploy
+        run: |
+          cp legal-site/privacy.html legal-site/app/privacy.html || true
+          cp legal-site/terms.html legal-site/app/terms.html || true
+          cp legal-site/delete-account.html legal-site/app/delete-account.html || true
+          cp legal-site/support.html legal-site/app/support.html || true
+          cp legal-site/*.html legal-site/app/ 2>/dev/null || true
+
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: legal-site
+
       - id: deployment
         uses: actions/deploy-pages@v4
