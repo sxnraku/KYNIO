@@ -53,7 +53,25 @@ export function AppThemeProvider({ children }: PropsWithChildren) {
 
   return (
     <View className="flex-1 bg-background" style={themeVariables}>
-      {children}
+      <View
+        style={
+          Platform.OS === "web"
+            ? {
+                width: "100%",
+                maxWidth: 480,
+                marginHorizontal: "auto",
+                height: "100%",
+                flex: 1,
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderColor: palette.border,
+                overflow: "hidden",
+              }
+            : { flex: 1 }
+        }
+      >
+        {children}
+      </View>
     </View>
   );
 }
