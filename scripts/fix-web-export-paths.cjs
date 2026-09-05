@@ -8,10 +8,16 @@ function replaceInDir(dir) {
       replaceInDir(fullPath);
     } else if (entry.name.endsWith('.html')) {
       let content = fs.readFileSync(fullPath, 'utf8');
-      const updated = content
+      let updated = content
         .replaceAll('href="/favicon.png"', 'href="/KYNIO/app/favicon.png"')
         .replaceAll('href="/apple-touch-icon.png"', 'href="/KYNIO/app/apple-touch-icon.png"')
         .replaceAll('href="/manifest.json"', 'href="/KYNIO/app/manifest.json"');
+      if (!updated.includes('window.__kynioDeferredPrompt')) {
+        updated = updated.replace(
+          '</head>',
+          '<script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__kynioDeferredPrompt=e;});</script></head>'
+        );
+      }
       if (updated !== content) {
         fs.writeFileSync(fullPath, updated, 'utf8');
         console.log('Updated:', entry.name);
