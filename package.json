@@ -96,6 +96,7 @@
     "test:watch": "jest --watch",
     "web": "expo start --web",
     "lint": "expo lint",
+    "export:web": "npx expo export --platform web --output-dir legal-site/app",
     "release:check": "npm run typecheck && npm run lint && npm test && npm run test:ai-contract && npm run test:legal-site && npx expo-doctor && npx expo export --platform android --output-dir .expo-export-check",
     "submit:android": "npx eas-cli submit --platform android --profile production",
     "typecheck": "tsc --noEmit"
