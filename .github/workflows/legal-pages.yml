@@ -42,11 +42,11 @@ jobs:
 
       - name: Gerar export web
         env:
-          EXPO_PUBLIC_APP_SHARE_URL: ${{ secrets.EXPO_PUBLIC_APP_SHARE_URL }}
-          EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ secrets.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
-          EXPO_PUBLIC_LEGAL_BASE_URL: ${{ secrets.EXPO_PUBLIC_LEGAL_BASE_URL }}
-          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_URL: https://vdsrqvreytvnusxesuqi.supabase.co
+          EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_7ttyMyvlRXUg2L5LKNJCsA_gm-lN5MO
+          EXPO_PUBLIC_APP_SHARE_URL: https://play.google.com/store/apps/details?id=com.kynio.app
+          EXPO_PUBLIC_LEGAL_BASE_URL: https://sxnraku.github.io/KYNIO
+          EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: 590155512529-0r43ejrr20iousklkjvkjtqmr3l1kmm7.apps.googleusercontent.com
         run: npm run export:web
 
       - name: Copiar páginas legais para a pasta de deploy
