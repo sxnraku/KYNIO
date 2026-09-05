@@ -124,12 +124,14 @@ function isInvalidWebVfsState(error: unknown): boolean {
   return (
     msg.includes('invalid vfs state') ||
     msg.includes('nomodificationallowederror') ||
-    msg.includes('createsyncaccesshandle')
+    msg.includes('createsyncaccesshandle') ||
+    msg.includes('access handle') ||
+    msg.includes('locked')
   );
 }
 
 async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
-  const maxAttempts = Platform.OS === 'web' ? 3 : 1;
+  const maxAttempts = Platform.OS === 'web' ? 5 : 1;
   let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -141,14 +143,14 @@ async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
         break;
       }
       await new Promise<void>((resolve) => {
-        setTimeout(resolve, attempt * 300);
+        setTimeout(resolve, attempt * 350);
       });
     }
   }
 
   if (isInvalidWebVfsState(lastError)) {
     throw new Error(
-      'A base de dados local está bloqueada por outro separador aberto no navegador. Fecha os outros separadores do KYNIO para continuar.',
+      'A base de dados local está em uso noutro separador do navegador. Fecha os outros separadores do KYNIO e clica em "Tentar novamente".',
     );
   }
 

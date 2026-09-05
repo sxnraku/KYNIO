@@ -14,8 +14,23 @@ interface LegalConsentState {
 }
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof Error && error.message.toLowerCase().includes('invalid vfs state')) {
-    return 'O armazenamento local do browser foi interrompido durante a atualização. Tenta novamente.';
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    if (
+      msg.includes('separador') ||
+      msg.includes('bloqueada') ||
+      msg.includes('invalid vfs state') ||
+      msg.includes('nomodificationallowederror') ||
+      msg.includes('createsyncaccesshandle') ||
+      msg.includes('access handle') ||
+      msg.includes('locked')
+    ) {
+      return 'A base de dados local está em uso noutro separador do navegador. Fecha o separador onde abriste o KYNIO e clica em "Tentar novamente".';
+    }
+
+    if (error.message && !error.message.includes('[object Object]')) {
+      return error.message;
+    }
   }
 
   return 'Não foi possível preparar o armazenamento local. Tenta novamente.';
