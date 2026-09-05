@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import { Platform } from "react-native";
 
 export interface RemoteVersionInfo {
   minimumVersionCode: number;
@@ -59,6 +60,9 @@ const REMOTE_VERSION_URLS = [
 ];
 
 export async function fetchRemoteVersionInfo(timeoutMs = 4000): Promise<RemoteVersionInfo | null> {
+  if (Platform.OS === "web") {
+    return null;
+  }
   for (const url of REMOTE_VERSION_URLS) {
     try {
       const controller = new AbortController();
