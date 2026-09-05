@@ -10,6 +10,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 
 import { AppThemeProvider } from "@/components/app-theme-provider";
 import { BiometricLockGuard } from "@/components/biometric-lock-guard";
@@ -22,6 +23,8 @@ import { ProfileOnboardingModal } from "@/components/ui/profile-onboarding-modal
 import { getColorPalette } from "@/constants/colors";
 import { handleStripeReturnIfPresent } from "@/services/stripeSubscriptionService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+
+import { setupTabCoordination } from "@/services/webTabCoordinator";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -38,10 +41,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     handleStripeReturnIfPresent();
-    if (Platform.OS === "web" && typeof window !== "undefined" && "serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/KYNIO/app/sw.js", { scope: "/KYNIO/app/" })
-        .catch(() => undefined);
+    if (Platform.OS === "web" && typeof window !== "undefined") {
+      setupTabCoordination();
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/KYNIO/app/sw.js", { scope: "/KYNIO/app/" })
+          .catch(() => undefined);
+      }
     }
     if (fontsLoaded) {
       void SplashScreen.hideAsync();

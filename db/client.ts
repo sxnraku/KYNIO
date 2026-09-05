@@ -9,6 +9,7 @@ import { Platform } from 'react-native';
 
 import * as schema from '@/db/schema';
 import migrations from '@/drizzle/migrations';
+import { claimDatabaseLock, forceClaimDatabaseLock } from '@/services/webTabCoordinator';
 
 const DATABASE_NAME = 'kynio.db';
 const MIGRATIONS_TABLE = '__drizzle_migrations';
@@ -131,8 +132,12 @@ function isInvalidWebVfsState(error: unknown): boolean {
 }
 
 async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
-  const maxAttempts = Platform.OS === 'web' ? 5 : 1;
+  const maxAttempts = Platform.OS === 'web' ? 8 : 1;
   let lastError: unknown;
+
+  if (Platform.OS === 'web') {
+    await claimDatabaseLock();
+  }
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -142,15 +147,18 @@ async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
       if (!isInvalidWebVfsState(error) || attempt === maxAttempts) {
         break;
       }
+      if (Platform.OS === 'web') {
+        await forceClaimDatabaseLock();
+      }
       await new Promise<void>((resolve) => {
-        setTimeout(resolve, attempt * 350);
+        setTimeout(resolve, Math.min(attempt * 250, 1500));
       });
     }
   }
 
   if (isInvalidWebVfsState(lastError)) {
     throw new Error(
-      'A base de dados local está em uso noutro separador do navegador. Fecha os outros separadores do KYNIO e clica em "Tentar novamente".',
+      'A sincronizar armazenamento local... Clica em "Tentar novamente".',
     );
   }
 

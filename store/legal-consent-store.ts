@@ -25,7 +25,7 @@ function getErrorMessage(error: unknown): string {
       msg.includes('access handle') ||
       msg.includes('locked')
     ) {
-      return 'A base de dados local está em uso noutro separador do navegador. Fecha o separador onde abriste o KYNIO e clica em "Tentar novamente".';
+      return 'A sincronizar armazenamento local... Toca em "Tentar novamente".';
     }
 
     if (error.message && !error.message.includes('[object Object]')) {
