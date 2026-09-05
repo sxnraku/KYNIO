@@ -38,6 +38,11 @@ export default function RootLayout() {
 
   useEffect(() => {
     handleStripeReturnIfPresent();
+    if (Platform.OS === "web" && typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/KYNIO/app/sw.js", { scope: "/KYNIO/app/" })
+        .catch(() => undefined);
+    }
     if (fontsLoaded) {
       void SplashScreen.hideAsync();
     }
