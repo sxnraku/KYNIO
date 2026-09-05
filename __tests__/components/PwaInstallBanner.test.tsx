@@ -1,7 +1,6 @@
-import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { PwaInstallBanner as NativeBanner } from "@/components/ui/pwa-install-banner";
 import { PwaInstallBanner as WebBanner } from "@/components/ui/pwa-install-banner.web";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 describe("PwaInstallBanner", () => {
   let mockStore: Record<string, string> = {};

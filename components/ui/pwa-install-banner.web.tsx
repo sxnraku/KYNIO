@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { getColorPalette } from "@/constants/colors";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useEffect, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const STORAGE_KEY = "kynio_pwa_prompt_dismissed";
 
@@ -180,8 +180,8 @@ export function PwaInstallBanner() {
                 ? "Menu (⋮) → Install app"
                 : "Menu (⋮) → Instalar app"
               : isEn
-              ? "Install KYNIO Web App"
-              : "Instalar aplicação KYNIO"}
+                ? "Install KYNIO Web App"
+                : "Instalar aplicação KYNIO"}
           </Text>
           <Text style={[styles.subtitleText, { color: colors.muted }]} numberOfLines={1}>
             {showManualGuide
@@ -189,8 +189,8 @@ export function PwaInstallBanner() {
                 ? "Tap Chrome menu at top right"
                 : "No topo do Chrome à direita"
               : isEn
-              ? "Full-screen & instant offline access"
-              : "Ecrã inteiro e acesso instantâneo"}
+                ? "Full-screen & instant offline access"
+                : "Ecrã inteiro e acesso instantâneo"}
           </Text>
         </View>
       </View>
