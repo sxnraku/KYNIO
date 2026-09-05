@@ -54,9 +54,8 @@ jobs:
         run: |
           cp legal-site/privacy.html legal-site/app/privacy.html || true
           cp legal-site/terms.html legal-site/app/terms.html || true
-          cp legal-site/delete-account.html legal-site/app/delete-account.html || true
+          cp legal-site/account-deletion.html legal-site/app/account-deletion.html || true
           cp legal-site/support.html legal-site/app/support.html || true
-          cp legal-site/*.html legal-site/app/ 2>/dev/null || true
 
       - uses: actions/configure-pages@v5
 
