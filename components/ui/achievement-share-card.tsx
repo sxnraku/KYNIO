@@ -193,7 +193,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
           </Text>
           <Text
             className="mt-1 font-headline text-5xl tracking-tight"
-            style={{ color: theme.ink }}
+            style={{ color: theme.ink, lineHeight: 52 }}
           >
             {isEn ? `Level ${payload.level}` : `Nível ${payload.level}`}
           </Text>
@@ -307,6 +307,7 @@ export const AchievementShareCard = forwardRef<View, AchievementShareCardProps>(
             />
             <Text
               className="font-label text-[8px] uppercase"
+              numberOfLines={1}
               style={{ color: theme.inkMuted, letterSpacing: 2 }}
             >
               {getShareUrlLabel()}

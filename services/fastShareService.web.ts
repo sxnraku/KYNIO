@@ -3,7 +3,6 @@ import type { View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 
 import {
-  APP_SHARE_URL,
   buildFastCompletionShareMessage,
   getFastShareTitle,
 } from "@/services/fastShareContent";
@@ -53,10 +52,8 @@ export async function shareFastCompletionCard(
 
   const dataUri = await captureRef(cardRef, {
     format: "png",
-    height: 1080,
     quality: 1,
     result: "data-uri",
-    width: 1080,
   });
 
   const file = dataUriToFile(dataUri, fileName);
@@ -67,7 +64,6 @@ export async function shareFastCompletionCard(
       const shareData: ShareData = {
         text: message,
         title: getFastShareTitle(language),
-        url: APP_SHARE_URL,
       };
 
       if (

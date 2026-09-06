@@ -29,10 +29,8 @@ export async function shareFastCompletionCard(
   const imageUri = await captureRef(cardRef, {
     fileName: `kynio-jejum-${hours}h`,
     format: "png",
-    height: 1080,
     quality: 1,
     result: "tmpfile",
-    width: 1080,
   });
 
   try {

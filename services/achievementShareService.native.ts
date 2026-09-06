@@ -22,10 +22,8 @@ export async function shareAchievementCard(
   const imageUri = await captureRef(cardRef, {
     fileName: `kynio-nivel-${payload.level}`,
     format: "png",
-    height: 1080,
     quality: 1,
     result: "tmpfile",
-    width: 1080,
   });
 
   try {

@@ -189,12 +189,12 @@ export const FastCompletionShareCard = forwardRef<
         <View className="items-center px-6 pt-1">
           <Text
             className="font-headline text-5xl tracking-tight"
-            style={{ color: theme.ink }}
+            style={{ color: theme.ink, lineHeight: 52 }}
           >
             {`${hours}h ${minutes}m`}
           </Text>
           <Text
-            className="mt-1 font-label text-[10px] uppercase"
+            className="mt-2 font-label text-[10px] uppercase"
             style={{ color: theme.inkMuted, letterSpacing: 3 }}
           >
             {isEn
@@ -300,6 +300,7 @@ export const FastCompletionShareCard = forwardRef<
           />
           <Text
             className="font-label text-[8px] uppercase"
+            numberOfLines={1}
             style={{ color: theme.inkMuted, letterSpacing: 2 }}
           >
             {getShareUrlLabel()}

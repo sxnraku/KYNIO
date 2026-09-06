@@ -68,10 +68,8 @@ export async function shareAchievementCard(
 
   const dataUri = await captureRef(cardRef, {
     format: "png",
-    height: 1080,
     quality: 1,
     result: "data-uri",
-    width: 1080,
   });
   const file = dataUriToFile(dataUri, `kynio-nivel-${payload.level}.png`);
   const message = buildAchievementShareMessage(payload);
@@ -79,7 +77,6 @@ export async function shareAchievementCard(
     files: [file],
     text: message,
     title: ACHIEVEMENT_SHARE_TITLE,
-    url: APP_SHARE_URL,
   };
 
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -102,7 +99,6 @@ export async function shareAchievementCard(
       await navigator.share({
         text: message,
         title: ACHIEVEMENT_SHARE_TITLE,
-        url: APP_SHARE_URL,
       });
       return {
         mode: "downloaded",

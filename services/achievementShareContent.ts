@@ -6,7 +6,7 @@ const configuredShareUrl = process.env.EXPO_PUBLIC_APP_SHARE_URL?.trim();
 export const APP_SHARE_URL =
   configuredShareUrl && /^https:\/\//i.test(configuredShareUrl)
     ? configuredShareUrl
-    : "https://github.com/sxnraku/KYNIO";
+    : "https://sxnraku.github.io/KYNIO";
 
 export const ACHIEVEMENT_SHARE_TITLE = "As minhas conquistas no KYNIO";
 
