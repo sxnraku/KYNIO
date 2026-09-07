@@ -124,7 +124,7 @@ export function MealCaptureCard({
       <TextInput
         accessibilityLabel={translateText("Descrição da refeição", language)}
         className="min-h-24 rounded-xl border border-border bg-background px-4 py-3 font-body text-base text-foreground"
-        maxLength={500}
+        maxLength={200}
         multiline
         onChangeText={onChangeDescription}
         placeholder={
@@ -136,6 +136,11 @@ export function MealCaptureCard({
         textAlignVertical="top"
         value={description}
       />
+      {description.length > 0 && (
+        <Text className="mt-1 self-end font-label text-[10px] text-muted">
+          {description.length}/200
+        </Text>
+      )}
 
       <Text className="mb-2 mt-4 font-label text-[10px] uppercase tracking-widest text-muted">
         {language === "en"

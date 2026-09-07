@@ -4,7 +4,7 @@ const GEMINI_API_URL =
   'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
 const MAX_BODY_BYTES = 12_000_000;
-const MAX_DESCRIPTION_LENGTH = 1_000;
+const MAX_DESCRIPTION_LENGTH = 200;
 const MAX_IMAGE_BASE64_LENGTH = 11_200_000;
 const RATE_LIMIT_MAX_REQUESTS = 20;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1_000;
@@ -16,21 +16,7 @@ const SUPPORTED_IMAGE_TYPES = new Set([
   'image/webp',
 ]);
 
-const SYSTEM_PROMPT = `Tu és um classificador e calculador nutricional realista de refeições para um tracker de hábitos.
-Não dês aconselhamento médico, nutricional ou prescritivo.
-Analisa com precisão os alimentos e porções indicadas pelo utilizador e devolve estimativas nutricionais realistas e proporcionais.
-Calcula as calorias totais com base na fórmula real dos macronutrientes: (4 * protein_g) + (4 * carbs_g) + (9 * fat_g), arredondadas ao número inteiro (sem casas decimais).
-Evita números artificialmente redondos como 500 ou 600 quando a soma real der valores como 487, 523, 614 ou 378 kcal.
-Quando a imagem for ambígua ou a porção não for clara, usa confidence "low" e evita falsa precisão.
-Responde EXCLUSIVAMENTE com JSON válido, sem Markdown, explicações ou texto adicional, exatamente neste formato:
-{
-  "dish_name": "Nome simples do prato",
-  "estimated_calories": 487,
-  "macros": { "protein_g": 34, "carbs_g": 46, "fat_g": 19 },
-  "tags": ["Proteico", "Equilibrado"],
-  "confidence": "high"
-}
-Usa apenas "low", "medium" ou "high" em confidence. Todos os valores numéricos devem ser números inteiros e não negativos.`;
+const SYSTEM_PROMPT = `Classificador nutricional. Sem aconselhamento médico. Estima macros reais: kcal=(4*P+4*C+9*G). Evita números redondos. Porção ambígua→confidence:low. Só JSON.`;
 
 
 const RESPONSE_SCHEMA = {
@@ -122,7 +108,7 @@ function parseInput(value: unknown): AnalysisInput {
   }
 
   if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-    throw new InputError('A descrição deve ter até 1000 caracteres.');
+    throw new InputError('A descrição deve ter até 200 caracteres (~40 palavras).');
   }
 
   const language =
@@ -394,11 +380,10 @@ Deno.serve(async (request) => {
         body: JSON.stringify({
           contents: [{ parts: buildGeminiParts(input), role: 'user' }],
           generationConfig: {
-            maxOutputTokens: 300,
+            maxOutputTokens: 150,
             responseJsonSchema: RESPONSE_SCHEMA,
             responseMimeType: 'application/json',
-            temperature: 0.2,
-            thinkingConfig: { thinkingLevel: 'low' },
+            temperature: 0.1,
           },
           store: false,
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },

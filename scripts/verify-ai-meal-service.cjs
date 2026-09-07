@@ -69,7 +69,7 @@ async function main() {
   assert.doesNotMatch(clientSource, /EXPO_PUBLIC_GEMINI_API_KEY/);
   assert.doesNotMatch(clientSource, /generativelanguage\.googleapis\.com/);
   assert.match(edgeFunctionSource, /Deno\.env\.get\('GEMINI_API_KEY'\)/);
-  assert.match(edgeFunctionSource, /EXCLUSIVAMENTE com JSON válido/);
+  assert.match(edgeFunctionSource, /Só JSON/);
   assert.match(edgeFunctionSource, /responseJsonSchema: RESPONSE_SCHEMA/);
   assert.match(edgeFunctionSource, /store: false/);
   // A função tem verify_jwt=false, por isso valida internamente a chave

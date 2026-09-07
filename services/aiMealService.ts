@@ -6,7 +6,7 @@ import type {
 
 const ANALYZE_MEAL_FUNCTION = 'analyze-meal';
 const ANALYSIS_TIMEOUT_MS = 60_000;
-const MAX_DESCRIPTION_LENGTH = 1_000;
+const MAX_DESCRIPTION_LENGTH = 200;
 const MAX_IMAGE_BASE64_LENGTH = 11_200_000;
 const SUPPORTED_IMAGE_TYPES = new Set([
   'image/heic',
@@ -118,7 +118,7 @@ function validateInput(input: AnalyzeMealInput): AnalyzeMealInput {
   }
 
   if (description && description.length > MAX_DESCRIPTION_LENGTH) {
-    throw new Error('A descrição é demasiado longa. Usa até 1000 caracteres.');
+    throw new Error('A descrição é demasiado longa. Usa até 200 caracteres (~40 palavras).');
   }
 
   if (input.image) {
