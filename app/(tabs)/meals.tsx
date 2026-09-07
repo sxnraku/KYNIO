@@ -23,7 +23,7 @@ import { useDailyMealSummary } from "@/hooks/use-daily-meal-summary";
 import { useMealAnalysis } from "@/hooks/use-meal-analysis";
 import type { ScannedFoodProduct } from "@/services/barcodeFoodService";
 import { getUserProfile, saveScannedMealRecord } from "@/services/dbService";
-import { analyzeFastingBreak } from "@/services/fastingBreakService";
+import { analyzeFastingBreak, analyzeFastingBreakWithAi } from "@/services/fastingBreakService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useFastingStore } from "@/store/useFastingStore";
 import { useUserProgressStore } from "@/store/user-progress-store";
@@ -35,10 +35,12 @@ export default function MealsScreen() {
   const [summaryRevision, setSummaryRevision] = useState(0);
   const [scanTarget, setScanTarget] = useState<'meal' | 'fasting_break'>('meal');
   const [fastingBreakResult, setFastingBreakResult] = useState<FastingBreakAnalysis | null>(null);
+  const [isAnalyzingBreak, setIsAnalyzingBreak] = useState(false);
   const [barcodeScannerVisible, setBarcodeScannerVisible] = useState(false);
   const [scannedProduct, setScannedProduct] = useState<ScannedFoodProduct | null>(null);
   const [productModalVisible, setProductModalVisible] = useState(false);
   const [savedBarcodeMessage, setSavedBarcodeMessage] = useState<string | null>(null);
+
 
   const refreshSummary = useCallback(() => {
     setSummaryRevision((current) => current + 1);
@@ -273,16 +275,39 @@ export default function MealsScreen() {
         </View>
 
         <MealCaptureCard
+          analyzeButtonLabel={
+            scanTarget === 'fasting_break'
+              ? language === 'en'
+                ? 'Check Fast with AI'
+                : 'Verificar Jejum com IA'
+              : undefined
+          }
           canAnalyze={canAnalyze}
           description={description}
-          isAnalyzing={isAnalyzing}
+          isAnalyzing={isAnalyzing || isAnalyzingBreak}
           onAnalyze={async () => {
             if (scanTarget === 'fasting_break') {
-              const res = analyzeFastingBreak({
-                description: description || 'Suplemento / Bebida',
-                language,
-              });
-              setFastingBreakResult(res);
+              if (!canAnalyze) return;
+              try {
+                setIsAnalyzingBreak(true);
+                setFastingBreakResult(null);
+                const res = await analyzeFastingBreakWithAi({
+                  description,
+                  imageBase64: selectedImage?.base64,
+                  imageMimeType: selectedImage?.mimeType,
+                  language,
+                  portionQuantity,
+                });
+                setFastingBreakResult(res);
+              } catch {
+                const fallback = analyzeFastingBreak({
+                  description: description || 'Alimento / Refeição',
+                  language,
+                });
+                setFastingBreakResult(fallback);
+              } finally {
+                setIsAnalyzingBreak(false);
+              }
             } else {
               setFastingBreakResult(null);
               await runAnalysis();

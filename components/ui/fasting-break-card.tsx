@@ -149,6 +149,24 @@ export function FastingBreakCard({ analysis, onDismiss }: FastingBreakCardProps)
         </View>
       ) : null}
 
+      {/* Resumo Nutricional Detetado (quando analisado com IA) */}
+      {analysis.estimatedCalories !== undefined && analysis.macros ? (
+        <View className="mt-3 flex-row items-center justify-between rounded-xl border border-border bg-background p-3 px-3.5">
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons color={COLORS.xp} name="sparkles" size={14} />
+            <Text className="font-label text-[10px] font-bold uppercase tracking-wider text-muted">
+              {language === 'en' ? 'AI Estimate' : 'Estimativa IA'}
+            </Text>
+          </View>
+          <Text className="font-headline text-xs text-foreground">
+            {analysis.estimatedCalories} kcal ·{' '}
+            <Text className="font-body text-xs text-muted">
+              {analysis.macros.carbs_g}g HC · {analysis.macros.protein_g}g P · {analysis.macros.fat_g}g G
+            </Text>
+          </Text>
+        </View>
+      ) : null}
+
       {/* Explicação e Diagnóstico */}
       <View className="mt-3 rounded-xl border border-border bg-background p-3.5">
         <Text className="font-body text-xs leading-5 text-foreground">

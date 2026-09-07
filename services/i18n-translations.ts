@@ -921,7 +921,10 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Défice Energético": "Energy Deficit",
   "Balanço Equilibrado": "Energy Balance",
   "Aguardar mais registos": "Awaiting more logs",
+  "Verificar Jejum com IA": "Check Fast with AI",
+  "Estimativa IA": "AI Estimate",
 };
+
 
 
 

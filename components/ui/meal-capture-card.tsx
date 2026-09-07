@@ -10,6 +10,7 @@ import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type { SelectedMealImage } from "@/types/meal";
 
 interface MealCaptureCardProps {
+  analyzeButtonLabel?: string;
   canAnalyze: boolean;
   description: string;
   isAnalyzing: boolean;
@@ -45,6 +46,7 @@ function SourceButton({ accentColor, icon, label, onPress }: SourceButtonProps) 
 }
 
 export function MealCaptureCard({
+  analyzeButtonLabel,
   canAnalyze,
   description,
   isAnalyzing,
@@ -177,6 +179,8 @@ export function MealCaptureCard({
         <Text className="font-headline text-base text-background">
           {isAnalyzing
             ? translateText("A analisar…", language)
+            : analyzeButtonLabel
+            ? translateText(analyzeButtonLabel, language)
             : translateText("Analisar refeição", language)}
         </Text>
       </Pressable>

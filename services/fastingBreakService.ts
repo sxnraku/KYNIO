@@ -1,7 +1,10 @@
+import { analyzeMeal } from '@/services/aiMealService';
+import type { MealAnalysisResult } from '@/types/meal';
 import type {
   AnalyzeFastingBreakInput,
   FastingBreakAnalysis,
 } from '@/types/fasting-break';
+
 
 interface IngredientRule {
   autophagyDisrupted: boolean;
@@ -295,4 +298,136 @@ export function analyzeFastingBreak(input: AnalyzeFastingBreakInput): FastingBre
     verdictTitleEn: 'Breaks Fasting',
   };
 }
+
+/**
+ * Analisa o impacto metabólico no jejum a partir do resultado estruturado da IA (Gemini).
+ */
+export function analyzeFastingBreakFromMeal(
+  meal: MealAnalysisResult,
+  language: 'en' | 'pt' = 'pt',
+): FastingBreakAnalysis {
+  const isEn = language === 'en';
+  const carbs = Math.max(0, Math.round(meal.macros.carbs_g));
+  const protein = Math.max(0, Math.round(meal.macros.protein_g));
+  const fat = Math.max(0, Math.round(meal.macros.fat_g));
+  const calories = Math.max(0, Math.round(meal.estimated_calories));
+  const dishName = meal.dish_name || (isEn ? 'Food / Meal' : 'Alimento / Refeição');
+
+  // Critérios biológicos de jejum:
+  // 1. Limpo (< 10 kcal e < 1.5g hidratos e < 2g proteína)
+  const isClean = calories <= 10 && carbs < 1.5 && protein < 2;
+
+  // 2. Gordura pura / cetose com pausa de autofagia (hidratos < 1.5g, proteína < 2.5g, mas calorias de gordura > 10)
+  const isPureFat = !isClean && carbs < 1.5 && protein < 2.5 && fat > 0;
+
+  // 3. Quebra metabólica real (qualquer consumo relevante de hidratos, proteínas ou calorias mistas)
+  const breaksFasting = !isClean && !isPureFat;
+  const autophagyDisrupted = !isClean; // qualquer caloria ativa o trato digestivo e abranda autofagia
+  const ketoSafe = carbs <= 5; // cetose mantém-se se hidratos forem muito reduzidos
+
+  const impact = breaksFasting
+    ? 'metabolic_break'
+    : autophagyDisrupted
+    ? 'autophagy_break'
+    : 'clean';
+
+  const verdictTitle = breaksFasting
+    ? 'Interrompe o Jejum'
+    : autophagyDisrupted
+    ? 'Pausa a Autofagia'
+    : 'Seguro para Jejum ✦';
+
+  const verdictTitleEn = breaksFasting
+    ? 'Breaks Fasting'
+    : autophagyDisrupted
+    ? 'Pauses Autophagy'
+    : 'Fasting Safe ✦';
+
+  const sensitiveIngredients: string[] = [];
+  if (carbs > 0) sensitiveIngredients.push(isEn ? `${carbs}g Carbs` : `${carbs}g Hidratos`);
+  if (protein > 1) sensitiveIngredients.push(isEn ? `${protein}g Protein` : `${protein}g Proteína`);
+  if (calories > 10) sensitiveIngredients.push(`~${calories} kcal`);
+
+  let explanation = '';
+  let explanationEn = '';
+
+  if (breaksFasting) {
+    if (carbs >= 5) {
+      explanation = `"${dishName}" contém ~${calories} kcal e ${carbs}g de hidratos. O consumo de hidratos eleva a glicemia e a insulina, interrompendo imediatamente o jejum metabólico, a cetose e a autofagia.`;
+      explanationEn = `"${dishName}" contains ~${calories} kcal and ${carbs}g carbohydrates. Carbohydrate intake elevates blood glucose and insulin, stopping metabolic fasting, ketosis, and autophagy.`;
+    } else if (protein >= 3) {
+      explanation = `"${dishName}" contém ~${calories} kcal e ${protein}g de proteína. A ingestão de aminoácidos estimula a via mTOR e a digestão, encerrando o jejum metabólico.`;
+      explanationEn = `"${dishName}" contains ~${calories} kcal and ${protein}g protein. Amino acid intake activates the mTOR pathway and digestion, ending metabolic fasting.`;
+    } else {
+      explanation = `"${dishName}" fornece ~${calories} kcal. A digestão de macronutrientes interrompe o estado de jejum metabólico e a autofagia celular.`;
+      explanationEn = `"${dishName}" provides ~${calories} kcal. Macronutrient digestion ends the metabolic fast and halts cellular autophagy.`;
+    }
+  } else if (isPureFat) {
+    explanation = `"${dishName}" é predominantemente gordura (~${calories} kcal). Não causa pico de insulina nem quebra a cetose, mas o aporte calórico pausa a autofagia celular máxima.`;
+    explanationEn = `"${dishName}" is predominantly fat (~${calories} kcal). It causes no insulin spike and preserves ketosis, but caloric intake pauses maximal autophagy.`;
+  } else {
+    explanation = `"${dishName}" tem impacto calórico quase nulo (~${calories} kcal). Não estimula a insulina, mantendo o jejum metabólico, a cetose e a autofagia totalmente ativos.`;
+    explanationEn = `"${dishName}" has negligible caloric impact (~${calories} kcal). It does not stimulate insulin, keeping metabolic fasting, ketosis, and autophagy fully active.`;
+  }
+
+  return {
+    autophagyDisrupted,
+    breaksFasting,
+    confidence: meal.confidence,
+    estimatedCalories: calories,
+    explanation,
+    explanationEn,
+    impact,
+    ketoSafe,
+    macros: {
+      carbs_g: carbs,
+      fat_g: fat,
+      protein_g: protein,
+    },
+    productName: dishName,
+    sensitiveIngredients,
+    verdictTitle,
+    verdictTitleEn,
+  };
+}
+
+/**
+ * Analisa a quebra de jejum utilizando a IA (Google Gemini via Supabase Edge Function).
+ * Se a chamada falhar ou estiver offline, recorre transparentemente ao analisador heurístico local.
+ */
+export async function analyzeFastingBreakWithAi(
+  input: AnalyzeFastingBreakInput,
+): Promise<FastingBreakAnalysis> {
+  const text = (input.description || '').trim();
+  const portion = (input.portionQuantity || '').trim();
+  const fullDescription = [
+    text,
+    portion ? (input.language === 'en' ? `Portion: ${portion}` : `Quantidade/Porção: ${portion}`) : '',
+  ]
+    .filter(Boolean)
+    .join(' - ');
+
+  if (!fullDescription && !input.imageBase64) {
+    return analyzeFastingBreak(input);
+  }
+
+  try {
+    const mealResult = await analyzeMeal({
+      description: fullDescription || undefined,
+      image: input.imageBase64
+        ? {
+            base64: input.imageBase64,
+            mimeType: input.imageMimeType || 'image/jpeg',
+          }
+        : undefined,
+      ...(input.language === 'en' ? { language: 'en' as const } : {}),
+    });
+
+    return analyzeFastingBreakFromMeal(mealResult, input.language);
+  } catch (error) {
+    console.warn('[fastingBreakService] Análise IA falhou, a usar analisador local:', error);
+    return analyzeFastingBreak(input);
+  }
+}
+
 

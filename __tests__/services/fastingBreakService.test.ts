@@ -1,4 +1,8 @@
-import { analyzeFastingBreak } from '@/services/fastingBreakService';
+import {
+  analyzeFastingBreak,
+  analyzeFastingBreakFromMeal,
+} from '@/services/fastingBreakService';
+
 
 describe('fastingBreakService', () => {
   it('identifica café preto puro como seguro para jejum, cetose e autofagia', () => {
@@ -81,6 +85,61 @@ describe('fastingBreakService', () => {
     const unknownMeal = analyzeFastingBreak({ description: 'lasanha de cogumelos' });
     expect(unknownMeal.breaksFasting).toBe(true);
     expect(unknownMeal.impact).toBe('metabolic_break');
+  });
+
+  describe('analyzeFastingBreakFromMeal (análise via IA)', () => {
+    it('avalia refeição rica em hidratos (pão integral) via IA com quebra de jejum e explicação precisa', () => {
+      const result = analyzeFastingBreakFromMeal({
+        confidence: 'high',
+        dish_name: 'Pão Integral com Queijo Fresco',
+        estimated_calories: 220,
+        macros: { carbs_g: 32, fat_g: 4, protein_g: 12 },
+        tags: ['Pequeno-almoço', 'Cereais'],
+      });
+
+      expect(result.breaksFasting).toBe(true);
+      expect(result.autophagyDisrupted).toBe(true);
+      expect(result.ketoSafe).toBe(false);
+      expect(result.impact).toBe('metabolic_break');
+      expect(result.verdictTitle).toBe('Interrompe o Jejum');
+      expect(result.productName).toBe('Pão Integral com Queijo Fresco');
+      expect(result.explanation).toContain('220 kcal');
+      expect(result.explanation).toContain('32g de hidratos');
+      expect(result.macros?.carbs_g).toBe(32);
+    });
+
+    it('avalia bebida acalórica analisada pela IA como totalmente limpa', () => {
+      const result = analyzeFastingBreakFromMeal({
+        confidence: 'high',
+        dish_name: 'Café Expresso Longo',
+        estimated_calories: 3,
+        macros: { carbs_g: 0, fat_g: 0, protein_g: 0 },
+        tags: ['Bebida', 'Sem Calorias'],
+      });
+
+      expect(result.breaksFasting).toBe(false);
+      expect(result.autophagyDisrupted).toBe(false);
+      expect(result.ketoSafe).toBe(true);
+      expect(result.impact).toBe('clean');
+      expect(result.verdictTitle).toContain('Seguro');
+      expect(result.explanation).toContain('Café Expresso Longo');
+    });
+
+    it('avalia gordura pura (café com óleo MCT) como preservando cetose mas pausando autofagia', () => {
+      const result = analyzeFastingBreakFromMeal({
+        confidence: 'high',
+        dish_name: 'Bulletproof Coffee com MCT',
+        estimated_calories: 130,
+        macros: { carbs_g: 0, fat_g: 14, protein_g: 0 },
+        tags: ['Keto'],
+      });
+
+      expect(result.breaksFasting).toBe(false);
+      expect(result.autophagyDisrupted).toBe(true);
+      expect(result.ketoSafe).toBe(true);
+      expect(result.impact).toBe('autophagy_break');
+      expect(result.verdictTitle).toBe('Pausa a Autofagia');
+    });
   });
 });
 
