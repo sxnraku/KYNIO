@@ -14,6 +14,12 @@ function replaceInDir(dir) {
         .replaceAll('href="/manifest.json"', 'href="/KYNIO/app/manifest.json"')
         // Preencher o título vazio gerado pelo Expo
         .replace(/<title data-rh="true"><\/title>/, '<title data-rh="true">KYNIO · Jejum &amp; Nutrição</title>');
+      if (!updated.includes('http-equiv="Cache-Control"')) {
+        updated = updated.replace(
+          '<head>',
+          '<head><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /><meta http-equiv="Pragma" content="no-cache" /><meta http-equiv="Expires" content="0" />'
+        );
+      }
       if (!updated.includes('window.__kynioDeferredPrompt')) {
         updated = updated.replace(
           '</head>',
@@ -76,16 +82,47 @@ const manifestData = {
 };
 fs.writeFileSync(manifestPath, JSON.stringify(manifestData, null, 2), 'utf8');
 
-// Ensure sw.js exists
+// Always regenerate sw.js with fresh build timestamp to invalidate old PWA caches
 const swPath = path.join(appDir, 'sw.js');
-if (!fs.existsSync(swPath)) {
-  const swContent = `// KYNIO PWA Service Worker
-self.addEventListener('install', (e) => self.skipWaiting());
-self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+const buildTimestamp = Date.now();
+const swContent = `// KYNIO PWA Service Worker (Build ${buildTimestamp})
+const CACHE_NAME = 'kynio-pwa-${buildTimestamp}';
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  // HTML or navigation requests: always network-first to guarantee latest app version
+  if (req.mode === 'navigate' || req.destination === 'document' || req.url.endsWith('.html')) {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Other assets: Network first, cache fallback
+  event.respondWith(
+    fetch(req).catch(() => caches.match(req))
+  );
+});
 `;
-  fs.writeFileSync(swPath, swContent, 'utf8');
-}
+fs.writeFileSync(swPath, swContent, 'utf8');
 
 // Ensure standby.html exists for automatic multi-tab OPFS lock yielding
 const standbyPath = path.join(appDir, 'standby.html');

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,8 @@ import { DailyMealSummaryCard } from "@/components/ui/daily-meal-summary-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { MealAnalysisCard } from "@/components/ui/meal-analysis-card";
 import { MealCameraModal } from "@/components/ui/meal-camera-modal";
+import { BarcodeScannerModal } from "@/components/ui/barcode-scanner-modal";
+import { ScannedProductModal } from "@/components/ui/scanned-product-modal";
 import { MealCaptureCard } from "@/components/ui/meal-capture-card";
 import { MealHistoryList } from "@/components/ui/meal-history-list";
 import { FastingBreakCard } from "@/components/ui/fasting-break-card";
@@ -19,19 +21,58 @@ import { Screen } from "@/components/ui/screen";
 import { COLORS } from "@/constants/colors";
 import { useDailyMealSummary } from "@/hooks/use-daily-meal-summary";
 import { useMealAnalysis } from "@/hooks/use-meal-analysis";
+import type { ScannedFoodProduct } from "@/services/barcodeFoodService";
+import { getUserProfile, saveScannedMealRecord } from "@/services/dbService";
 import { analyzeFastingBreak } from "@/services/fastingBreakService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useFastingStore } from "@/store/useFastingStore";
+import { useUserProgressStore } from "@/store/user-progress-store";
 import type { FastingBreakAnalysis } from "@/types/fasting-break";
 
 export default function MealsScreen() {
   const language = useAppPreferencesStore((state) => state.language);
+  const syncProfile = useUserProgressStore((state) => state.syncProfile);
   const [summaryRevision, setSummaryRevision] = useState(0);
   const [scanTarget, setScanTarget] = useState<'meal' | 'fasting_break'>('meal');
   const [fastingBreakResult, setFastingBreakResult] = useState<FastingBreakAnalysis | null>(null);
+  const [barcodeScannerVisible, setBarcodeScannerVisible] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState<ScannedFoodProduct | null>(null);
+  const [productModalVisible, setProductModalVisible] = useState(false);
+  const [savedBarcodeMessage, setSavedBarcodeMessage] = useState<string | null>(null);
+
   const refreshSummary = useCallback(() => {
     setSummaryRevision((current) => current + 1);
   }, []);
   const dailySummary = useDailyMealSummary(summaryRevision);
+  const checkActiveFastAfterMeal = useCallback(() => {
+    const fastingStore = useFastingStore.getState();
+    if (fastingStore.isActive) {
+      Alert.alert(
+        language === "en" ? "Active Fast in Progress" : "Jejum em Curso",
+        language === "en"
+          ? "You registered a meal. Do you want to end and record your active fast now?"
+          : "Registaste uma refeição. Desejas encerrar o contador e registar o jejum agora?",
+        [
+          {
+            text: language === "en" ? "Keep Fasting" : "Manter Jejum",
+            style: "cancel",
+          },
+          {
+            text: language === "en" ? "End Fast" : "Terminar Jejum",
+            onPress: () => {
+              void fastingStore.endFasting();
+            },
+          },
+        ],
+      );
+    }
+  }, [language]);
+
+  const handleMealSaved = useCallback(() => {
+    refreshSummary();
+    checkActiveFastAfterMeal();
+  }, [checkActiveFastAfterMeal, refreshSummary]);
+
   const {
     analysis,
     cameraVisible,
@@ -60,8 +101,39 @@ export default function MealsScreen() {
     paywallVisible,
     openPaywall,
     closePaywall,
-  } = useMealAnalysis({ onMealSaved: refreshSummary });
+  } = useMealAnalysis({ onMealSaved: handleMealSaved });
 
+  const handleSaveBarcodeMeal = useCallback(
+    async (mealData: {
+      carbsGrams: number;
+      dishName: string;
+      estimatedCalories: number;
+      fatGrams: number;
+      imageUrl?: string;
+      proteinGrams: number;
+      tags: string[];
+    }) => {
+      await saveScannedMealRecord({
+        carbsGrams: mealData.carbsGrams,
+        estimatedCalories: mealData.estimatedCalories,
+        fatGrams: mealData.fatGrams,
+        imageUrl: mealData.imageUrl || null,
+        proteinGrams: mealData.proteinGrams,
+        tags: mealData.tags,
+        timestamp: Date.now(),
+      });
+      syncProfile(await getUserProfile());
+      refreshSummary();
+      checkActiveFastAfterMeal();
+      setSavedBarcodeMessage(
+        language === "en"
+          ? "Meal saved via barcode · +30 XP"
+          : "Refeição guardada via código de barras · +30 XP",
+      );
+      setTimeout(() => setSavedBarcodeMessage(null), 4500);
+    },
+    [checkActiveFastAfterMeal, language, refreshSummary, syncProfile],
+  );
 
   return (
     <Screen>
@@ -69,6 +141,25 @@ export default function MealsScreen() {
         onClose={closeCamera}
         onUsePhoto={useCapturedPhoto}
         visible={cameraVisible}
+      />
+
+      <BarcodeScannerModal
+        onClose={() => setBarcodeScannerVisible(false)}
+        onProductDetected={(product) => {
+          setScannedProduct(product);
+          setProductModalVisible(true);
+        }}
+        visible={barcodeScannerVisible}
+      />
+
+      <ScannedProductModal
+        onClose={() => {
+          setProductModalVisible(false);
+          setScannedProduct(null);
+        }}
+        onSaveMeal={handleSaveBarcodeMeal}
+        product={scannedProduct}
+        visible={productModalVisible}
       />
 
       <PaywallModal
@@ -201,6 +292,7 @@ export default function MealsScreen() {
           onChangePortionQuantity={setPortionQuantity}
           onPickPhoto={pickPhoto}
           onRemovePhoto={removePhoto}
+          onScanBarcode={() => setBarcodeScannerVisible(true)}
           onTakePhoto={openCamera}
           portionQuantity={portionQuantity}
           selectedImage={selectedImage}
@@ -237,6 +329,18 @@ export default function MealsScreen() {
           <Ionicons color={COLORS.xp} name="sparkles" size={19} />
           <Text className="flex-1 font-headline text-sm text-foreground">
             {savedMessage}
+          </Text>
+        </View>
+      ) : null}
+
+      {savedBarcodeMessage ? (
+        <View
+          accessibilityLiveRegion="polite"
+          className="mt-4 flex-row items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4"
+        >
+          <Ionicons color={COLORS.xp} name="barcode" size={20} />
+          <Text className="flex-1 font-headline text-sm text-foreground">
+            {savedBarcodeMessage}
           </Text>
         </View>
       ) : null}

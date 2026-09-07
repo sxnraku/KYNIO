@@ -11,10 +11,12 @@ import {
 
 import { Text } from '@/components/ui/text';
 import { COLORS } from '@/constants/colors';
-import type { MealRecord } from '@/db/schema';
-import { deleteMealRecord, getMealRecords } from '@/services/dbService';
+import type { FastRecord, MealRecord } from '@/db/schema';
+import { deleteMealRecord, getFastRecords, getMealRecords } from '@/services/dbService';
+import { getMealFastingContext } from '@/services/fastingWindowService';
 import { translateText } from '@/services/i18n';
 import { useAppPreferencesStore } from '@/store/app-preferences-store';
+import { useFastingStore } from '@/store/useFastingStore';
 
 interface MealHistoryListProps {
   onMealDeleted?: () => void;
@@ -48,7 +50,10 @@ export function MealHistoryList({
   refreshToken = 0,
 }: MealHistoryListProps) {
   const language = useAppPreferencesStore((state) => state.language);
+  const isActive = useFastingStore((state) => state.isActive);
+  const startedAt = useFastingStore((state) => state.startedAt);
   const [meals, setMeals] = useState<MealRecord[]>([]);
+  const [fasts, setFasts] = useState<FastRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'gallery'>('list');
@@ -56,9 +61,13 @@ export function MealHistoryList({
   const loadMeals = useCallback(async () => {
     try {
       setIsLoading(true);
-      const records = await getMealRecords();
+      const [records, fastRecords] = await Promise.all([
+        getMealRecords(),
+        getFastRecords(),
+      ]);
       const sorted = [...records].sort((a, b) => b.timestamp - a.timestamp);
       setMeals(sorted);
+      setFasts(fastRecords);
     } catch {
       // Keep previous state if load fails
     } finally {
@@ -198,6 +207,12 @@ export function MealHistoryList({
             const calories = Math.round(meal.estimatedCalories ?? 0);
             const protein = Math.round(meal.proteinGrams ?? 0);
             const isDeleting = deletingId === meal.id;
+            const fastingContext = getMealFastingContext(
+              meal.timestamp,
+              fasts,
+              isActive && startedAt ? { startTime: startedAt } : null,
+              language,
+            );
 
             return (
               <View
@@ -252,6 +267,24 @@ export function MealHistoryList({
                     {formatMealDate(meal.timestamp, language)}
                   </Text>
 
+                  {/* Badge de Janela Alimentar / Quebra */}
+                  <View className="mt-1 flex-row items-center gap-1">
+                    <View
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        fastingContext.type === 'fast_break' ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                    />
+                    <Text
+                      className="font-label text-[8px] uppercase tracking-wider"
+                      numberOfLines={1}
+                      style={{
+                        color: fastingContext.type === 'fast_break' ? COLORS.xp : COLORS.success,
+                      }}
+                    >
+                      {fastingContext.label}
+                    </Text>
+                  </View>
+
                   <View className="mt-1.5 flex-row items-center justify-between">
                     <Text className="font-label text-[10px] font-semibold text-success">
                       {protein}g P
@@ -278,6 +311,12 @@ export function MealHistoryList({
             const carbs = Math.round(meal.carbsGrams ?? 0);
             const fat = Math.round(meal.fatGrams ?? 0);
             const isDeleting = deletingId === meal.id;
+            const fastingContext = getMealFastingContext(
+              meal.timestamp,
+              fasts,
+              isActive && startedAt ? { startTime: startedAt } : null,
+              language,
+            );
 
             return (
               <View
@@ -319,6 +358,24 @@ export function MealHistoryList({
                   <Text className="mt-0.5 font-body text-[11px] text-muted">
                     {formatMealDate(meal.timestamp, language)}
                   </Text>
+
+                  {/* Badge de Janela Alimentar / Quebra */}
+                  <View className="mt-1 flex-row items-center gap-1">
+                    <View
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        fastingContext.type === 'fast_break' ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                    />
+                    <Text
+                      className="font-label text-[9px] uppercase tracking-wider"
+                      numberOfLines={1}
+                      style={{
+                        color: fastingContext.type === 'fast_break' ? COLORS.xp : COLORS.success,
+                      }}
+                    >
+                      {fastingContext.label}
+                    </Text>
+                  </View>
 
                   <View className="mt-1.5 flex-row items-center gap-1.5">
                     <Text className="font-label text-[10px] text-success">

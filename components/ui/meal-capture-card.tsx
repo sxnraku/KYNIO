@@ -18,27 +18,28 @@ interface MealCaptureCardProps {
   onChangePortionQuantity?: (value: string) => void;
   onPickPhoto: () => void;
   onRemovePhoto: () => void;
+  onScanBarcode?: () => void;
   onTakePhoto: () => void;
   portionQuantity?: string;
   selectedImage: SelectedMealImage | null;
 }
 
-
 interface SourceButtonProps {
-  icon: "camera-outline" | "images-outline";
+  accentColor?: string;
+  icon: "camera-outline" | "images-outline" | "barcode-outline";
   label: string;
-  onPress: () => void;
+  onPress?: () => void;
 }
 
-function SourceButton({ icon, label, onPress }: SourceButtonProps) {
+function SourceButton({ accentColor, icon, label, onPress }: SourceButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 py-3.5 active:opacity-70"
+      className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-2 py-3 active:opacity-70"
       onPress={onPress}
     >
-      <Ionicons color={COLORS.success} name={icon} size={19} />
-      <Text className="font-headline text-sm text-foreground">{label}</Text>
+      <Ionicons color={accentColor || COLORS.success} name={icon} size={18} />
+      <Text className="font-headline text-xs text-foreground">{label}</Text>
     </Pressable>
   );
 }
@@ -52,6 +53,7 @@ export function MealCaptureCard({
   onChangePortionQuantity,
   onPickPhoto,
   onRemovePhoto,
+  onScanBarcode,
   onTakePhoto,
   portionQuantity = "",
   selectedImage,
@@ -68,12 +70,18 @@ export function MealCaptureCard({
       </Text>
       <Text className="mt-1 font-body text-sm leading-5 text-muted">
         {translateText(
-          "Abre a câmara em direto, escolhe uma imagem da galeria ou descreve o que comeste.",
+          "Lê o código de barras, tira uma foto, escolhe da galeria ou descreve o que comeste.",
           language,
         )}
       </Text>
 
-      <View className="mt-5 flex-row gap-3">
+      <View className="mt-5 flex-row gap-2">
+        <SourceButton
+          accentColor={COLORS.xp}
+          icon="barcode-outline"
+          label={translateText("Código", language)}
+          onPress={onScanBarcode}
+        />
         <SourceButton
           icon="camera-outline"
           label={translateText("Câmara", language)}

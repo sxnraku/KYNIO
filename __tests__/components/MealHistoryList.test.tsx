@@ -52,6 +52,7 @@ describe('MealHistoryList - Visual Diary & List Toggle', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (dbService.getMealRecords as jest.Mock).mockResolvedValue(mockMeals);
+    (dbService.getFastRecords as jest.Mock).mockResolvedValue([]);
   });
 
   it('renderiza inicialmente em modo lista com refeições', async () => {

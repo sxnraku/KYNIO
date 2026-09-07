@@ -83,6 +83,11 @@ export interface LocalDataExport {
     targetDurationMs: number;
   };
   app: 'KYNIO';
+  demographics: {
+    ageYears: number;
+    biologicalSex: 'male' | 'female' | 'other';
+    heightCm: number;
+  };
   exportedAt: string;
   fasts: FastRecord[];
   meals: MealRecord[];
@@ -136,6 +141,7 @@ export async function collectLocalData(): Promise<LocalDataExport> {
     getWorkoutsForExport(),
   ]);
   const fastingState = useFastingStore.getState();
+  const preferencesState = useAppPreferencesStore.getState();
 
   return {
     activeFasting: {
@@ -145,6 +151,11 @@ export async function collectLocalData(): Promise<LocalDataExport> {
       targetDurationMs: fastingState.targetDurationMs,
     },
     app: 'KYNIO',
+    demographics: {
+      ageYears: preferencesState.userAgeYears ?? 30,
+      biologicalSex: preferencesState.userBiologicalSex ?? 'other',
+      heightCm: preferencesState.userHeightCm ?? 170,
+    },
     exportedAt: new Date().toISOString(),
     fasts: fastRecords,
     meals: mealRecords,

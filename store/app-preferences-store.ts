@@ -44,7 +44,13 @@ interface AppPreferencesState {
   setHydrationRemindersEnabled: (enabled: boolean) => void;
   setLanguage: (language: AppLanguage) => void;
   setThemeMode: (themeMode: AppThemeMode) => void;
+  setUserAgeYears: (userAgeYears: number) => void;
+  setUserBiologicalSex: (userBiologicalSex: "male" | "female" | "other") => void;
+  setUserHeightCm: (userHeightCm: number) => void;
   themeMode: AppThemeMode;
+  userAgeYears: number;
+  userBiologicalSex: "male" | "female" | "other";
+  userHeightCm: number;
 }
 
 export const useAppPreferencesStore = create<AppPreferencesState>()(
@@ -62,7 +68,13 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
         set({ hydrationRemindersEnabled }),
       setLanguage: (language) => set({ language }),
       setThemeMode: (themeMode) => set({ themeMode }),
+      setUserAgeYears: (userAgeYears) => set({ userAgeYears }),
+      setUserBiologicalSex: (userBiologicalSex) => set({ userBiologicalSex }),
+      setUserHeightCm: (userHeightCm) => set({ userHeightCm }),
       themeMode: "light",
+      userAgeYears: 30,
+      userBiologicalSex: "other",
+      userHeightCm: 170,
     }),
 
     {
@@ -73,12 +85,18 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
         hydrationRemindersEnabled,
         language,
         themeMode,
+        userAgeYears,
+        userBiologicalSex,
+        userHeightCm,
       }) => ({
         biometricLockEnabled,
         healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
         themeMode,
+        userAgeYears,
+        userBiologicalSex,
+        userHeightCm,
       }),
       skipHydration: process.env.NODE_ENV === "test",
       storage: createJSONStorage(() => AsyncStorage),

@@ -46,7 +46,28 @@ export default function RootLayout() {
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("/KYNIO/app/sw.js", { scope: "/KYNIO/app/" })
+          .then((reg) => {
+            void reg.update();
+            reg.addEventListener("updatefound", () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener("statechange", () => {
+                  if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+          })
           .catch(() => undefined);
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
       }
     }
     if (fontsLoaded) {

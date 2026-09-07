@@ -14,6 +14,7 @@ import { Screen } from "@/components/ui/screen";
 import { WeeklyChallengesCard } from "@/components/ui/weekly-challenges-card";
 import { WeeklyFastingChart } from "@/components/ui/weekly-fasting-chart";
 import { WeightTrackingCard } from "@/components/ui/weight-tracking-card";
+import { MetabolicExpenditureCard } from "@/components/ui/metabolic-expenditure-card";
 
 import { XpRewardsCard } from "@/components/ui/xp-rewards-card";
 import { COLORS } from "@/constants/colors";
@@ -138,6 +139,11 @@ export default function ProgressScreen() {
           {/* Gráfico de Peso com Filtros de Período e Objetivo */}
           <View className="mt-5">
             <WeightTrackingCard />
+          </View>
+
+          {/* Despesa Energética Diária Estimada (TDEE) */}
+          <View className="mt-5">
+            <MetabolicExpenditureCard />
           </View>
 
           <View className="mt-5">
