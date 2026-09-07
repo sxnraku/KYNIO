@@ -1,5 +1,5 @@
-// KYNIO PWA Service Worker (Build 1788816758218)
-const CACHE_NAME = 'kynio-pwa-1788816758218';
+// KYNIO PWA Service Worker (Build 1788817603164)
+const CACHE_NAME = 'kynio-pwa-1788817603164';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

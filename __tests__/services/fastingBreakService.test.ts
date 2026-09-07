@@ -54,4 +54,33 @@ describe('fastingBreakService', () => {
     expect(result.autophagyDisrupted).toBe(false);
     expect(result.impact).toBe('clean');
   });
+
+  it('deteta pão integral como quebra direta de jejum metabólico, pico de insulina e fim de autofagia', () => {
+    const result = analyzeFastingBreak({
+      description: 'pão integral , ém um apo nao a bebida',
+    });
+
+    expect(result.breaksFasting).toBe(true);
+    expect(result.autophagyDisrupted).toBe(true);
+    expect(result.ketoSafe).toBe(false);
+    expect(result.impact).toBe('metabolic_break');
+    expect(result.verdictTitle).toBe('Interrompe o Jejum');
+    expect(result.sensitiveIngredients).toContain('Pão / Cereais / Amidos');
+  });
+
+  it('deteta alimentos sólidos e refeições gerais como quebra de jejum', () => {
+    const riceTest = analyzeFastingBreak({ description: 'arroz com frango grelhado' });
+    expect(riceTest.breaksFasting).toBe(true);
+    expect(riceTest.autophagyDisrupted).toBe(true);
+    expect(riceTest.impact).toBe('metabolic_break');
+
+    const appleTest = analyzeFastingBreak({ description: '1 maçã' });
+    expect(appleTest.breaksFasting).toBe(true);
+    expect(appleTest.autophagyDisrupted).toBe(true);
+
+    const unknownMeal = analyzeFastingBreak({ description: 'lasanha de cogumelos' });
+    expect(unknownMeal.breaksFasting).toBe(true);
+    expect(unknownMeal.impact).toBe('metabolic_break');
+  });
 });
+
