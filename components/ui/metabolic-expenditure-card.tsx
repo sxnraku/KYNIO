@@ -44,7 +44,7 @@ export function MetabolicExpenditureCard() {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Form states for editing (incluindo peso corporal)
+  // Form states for editing (peso corporal incluído)
   const [tempWeight, setTempWeight] = useState("70");
   const [tempHeight, setTempHeight] = useState(String(userHeightCm || 170));
   const [tempAge, setTempAge] = useState(String(userAgeYears || 30));
@@ -63,13 +63,13 @@ export function MetabolicExpenditureCard() {
       setData(snapshot);
       setTempWeight(String(snapshot.currentWeightKg));
     } catch {
-      // Ignora erro e mantém estado anterior
+      // Mantém estado anterior se falhar
     } finally {
       setIsLoading(false);
     }
   }, [language, userAgeYears, userBiologicalSex, userHeightCm]);
 
-  // Atualização em foco de navegação
+  // Atualização em foco de ecrã
   useFocusEffect(
     useCallback(() => {
       void loadData();
@@ -159,7 +159,7 @@ export function MetabolicExpenditureCard() {
 
   return (
     <View className="rounded-2xl border border-border bg-surface p-5">
-      {/* Header */}
+      {/* Cabeçalho */}
       <View className="flex-row items-start justify-between gap-2">
         <View className="flex-1 pr-1">
           <Text className="font-label text-[10px] uppercase tracking-wider text-xp">
@@ -170,92 +170,147 @@ export function MetabolicExpenditureCard() {
           </Text>
         </View>
         <Pressable
-          accessibilityLabel={language === "en" ? "Adjust metabolic profile" : "Ajustar perfil metabólico"}
+          accessibilityLabel={
+            language === "en"
+              ? "Adjust metabolic profile"
+              : "Ajustar perfil metabólico"
+          }
           accessibilityRole="button"
           className="flex-row items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 active:opacity-70"
           onPress={handleOpenEdit}
         >
           <Ionicons color={COLORS.muted} name="options-outline" size={11} />
           <Text className="font-label text-[9px] uppercase tracking-wider text-muted">
-            {data.currentWeightKg}kg · {data.heightCm ?? 170}cm · {data.ageYears ?? 30}a
+            {data.currentWeightKg}kg · {data.heightCm ?? 170}cm ·{" "}
+            {data.ageYears ?? 30}a
           </Text>
         </Pressable>
       </View>
 
-      {/* Valor Principal TDEE */}
-      <View className="mt-4 items-center rounded-2xl border border-border/80 bg-background py-4">
-        <View className="flex-row items-baseline gap-1">
-          <Text className="font-headline text-4xl tracking-tight text-foreground">
+      {/* BLOCO 1: O QUE O TEU CORPO QUEIMA (SAÍDAS) */}
+      <View className="mt-4 rounded-2xl border border-border/80 bg-background p-4">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons color={COLORS.xp} name="flame-outline" size={16} />
+            <Text className="font-label text-[11px] uppercase tracking-wider text-foreground font-bold">
+              {language === "en" ? "Energy Burned (Out)" : "Gasto Total do Teu Corpo (Saídas)"}
+            </Text>
+          </View>
+          <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+            {language === "en" ? "Burned / Day" : "Queimado / Dia"}
+          </Text>
+        </View>
+
+        <View className="mt-2 flex-row items-baseline gap-1">
+          <Text className="font-headline text-3xl tracking-tight text-foreground">
             ~{data.tdeeKcal}
           </Text>
           <Text className="font-label text-xs uppercase tracking-wider text-muted">
             kcal / {language === "en" ? "day" : "dia"}
           </Text>
         </View>
+
         <Text className="mt-0.5 font-body text-[11px] text-muted">
           {language === "en"
-            ? "Total Daily Energy Expenditure (TDEE)"
-            : "Despesa Energética Diária Total (TDEE)"}
+            ? "Everything your body burns = Basal + Daily Routine + Workouts"
+            : "Tudo o que o teu corpo queima = Basal + Rotina + Treinos"}
         </Text>
+
+        {/* Decomposição transparente dos 3 componentes do gasto */}
+        <View className="mt-3.5 flex-row gap-2">
+          <View className="flex-1 rounded-xl border border-border/60 bg-surface/80 p-2">
+            <Text className="font-label text-[9px] uppercase tracking-wider text-muted">
+              {language === "en" ? "Basal (BMR)" : "Metabolismo Basal"}
+            </Text>
+            <Text className="mt-0.5 font-headline text-xs text-foreground">
+              {data.bmrKcal} kcal
+            </Text>
+            <Text className="text-[8px] text-muted">
+              {language === "en" ? "Organs at rest" : "Em repouso"}
+            </Text>
+          </View>
+
+          <View className="flex-1 rounded-xl border border-border/60 bg-surface/80 p-2">
+            <Text className="font-label text-[9px] uppercase tracking-wider text-muted">
+              {language === "en" ? "Routine / NEAT" : "Rotina Diária"}
+            </Text>
+            <Text className="mt-0.5 font-headline text-xs text-foreground">
+              +{data.dailyRoutineBurnKcal} kcal
+            </Text>
+            <Text className="text-[8px] text-muted">
+              {language === "en" ? "Steps & living" : "Passos e tarefas"}
+            </Text>
+          </View>
+
+          <View className="flex-1 rounded-xl border border-border/60 bg-surface/80 p-2">
+            <Text className="font-label text-[9px] uppercase tracking-wider text-muted">
+              {language === "en" ? "Workouts / Day" : "Treinos / Dia"}
+            </Text>
+            <Text className="mt-0.5 font-headline text-xs text-foreground">
+              +{data.dailyWorkoutBurnKcal} kcal
+            </Text>
+            <Text className="text-[8px] text-muted">
+              {language === "en" ? "Exercise logged" : "Exercício registado"}
+            </Text>
+          </View>
+        </View>
       </View>
 
-      {/* Decomposição do Gasto Energético (Soma exata do TDEE) */}
-      <View className="mt-3 flex-row gap-2">
-        <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
-          <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
-            {language === "en" ? "Basal (BMR)" : "Metabolismo Basal"}
-          </Text>
-          <Text className="mt-0.5 font-headline text-sm text-foreground">
-            {data.bmrKcal} kcal
-          </Text>
-        </View>
-
-        <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
-          <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
-            {language === "en" ? "Routine / NEAT" : "Rotina Diária"}
-          </Text>
-          <Text className="mt-0.5 font-headline text-sm text-foreground">
-            +{data.dailyRoutineBurnKcal} kcal
-          </Text>
-        </View>
-
-        <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
-          <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
-            {language === "en" ? "Workouts / Day" : "Treinos / Dia"}
-          </Text>
-          <Text className="mt-0.5 font-headline text-sm text-foreground">
-            +{data.dailyWorkoutBurnKcal} kcal
-          </Text>
-        </View>
-      </View>
-
-      {/* Ingestão Nutricional Registada */}
-      <View className="mt-2.5 flex-row items-center justify-between rounded-xl border border-border/60 bg-background/50 px-3 py-2.5">
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons color={COLORS.xp} name="restaurant-outline" size={14} />
+      {/* BLOCO 2: O QUE COMES (ENTRADAS) */}
+      <View className="mt-3 rounded-2xl border border-border/80 bg-background p-4">
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5">
+            <Ionicons color={COLORS.success} name="restaurant-outline" size={15} />
+            <Text className="font-label text-[11px] uppercase tracking-wider text-foreground font-bold">
+              {language === "en" ? "Energy Consumed (In)" : "Ingestão Alimentar (Entradas)"}
+            </Text>
+          </View>
           <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
             {data.isPartialIntake
               ? language === "en"
-                ? "Logged Intake (Today)"
-                : "Ingestão Registada (Hoje)"
+                ? "Today (in progress)"
+                : "Hoje (em curso)"
               : language === "en"
-              ? "Daily Average Intake"
-              : "Ingestão Média Diária"}
+              ? "Daily average"
+              : "Média diária"}
           </Text>
         </View>
-        <Text className="font-headline text-sm text-foreground">
-          {data.recentDailyIntakeKcal !== null
-            ? `${data.recentDailyIntakeKcal} kcal`
-            : "—"}
-        </Text>
+
+        <View className="mt-2 flex-row items-baseline justify-between">
+          <View className="flex-row items-baseline gap-1">
+            <Text className="font-headline text-2xl tracking-tight text-foreground">
+              {data.recentDailyIntakeKcal !== null
+                ? `${data.recentDailyIntakeKcal} kcal`
+                : "—"}
+            </Text>
+            {data.recentDailyIntakeKcal !== null ? (
+              <Text className="font-label text-xs uppercase tracking-wider text-muted">
+                {data.isPartialIntake
+                  ? language === "en"
+                    ? "logged today"
+                    : "ingeridas hoje"
+                  : language === "en"
+                  ? "kcal / day"
+                  : "kcal / dia"}
+              </Text>
+            ) : null}
+          </View>
+
+          {data.recentDailyIntakeKcal !== null && data.tdeeKcal > 0 ? (
+            <Text className="font-label text-[10px] uppercase text-muted">
+              {Math.round((data.recentDailyIntakeKcal / data.tdeeKcal) * 100)}%{" "}
+              {language === "en" ? "of daily burn" : "do gasto diário"}
+            </Text>
+          ) : null}
+        </View>
       </View>
 
-      {/* Cartão de Estado / Balanço Energético */}
+      {/* BLOCO 3: O BALANÇO (ENTRADAS VS SAÍDAS) */}
       <View
         className={`mt-3 rounded-xl border p-3.5 ${badgeColors.bg} ${badgeColors.border}`}
       >
         <View className="flex-row items-center gap-1.5">
-          <Ionicons color={badgeColors.text} name="analytics-outline" size={15} />
+          <Ionicons color={badgeColors.text} name="scale-outline" size={15} />
           <Text
             className="font-headline text-xs font-semibold"
             style={{ color: badgeColors.text }}
@@ -264,14 +319,19 @@ export function MetabolicExpenditureCard() {
           </Text>
         </View>
         <Text className="mt-1 font-body text-xs leading-4 text-foreground/80">
-          {data.statusDescription}
+          {data.isPartialIntake && data.recentDailyIntakeKcal !== null
+            ? language === "en"
+              ? `You've consumed ${data.recentDailyIntakeKcal} kcal so far today against ~${data.tdeeKcal} kcal estimated daily burn.`
+              : `Consumiste ${data.recentDailyIntakeKcal} kcal hoje face a cerca de ~${data.tdeeKcal} kcal que o teu corpo queima no total do dia.`
+            : data.statusDescription}
         </Text>
       </View>
 
       {/* Parâmetros biométricos rápidos com botão de ajuste */}
       <View className="mt-3 flex-row flex-wrap items-center justify-between gap-1 px-1">
         <Text className="font-body text-[10px] text-muted">
-          Mifflin-St Jeor: {data.currentWeightKg} kg · {data.heightCm ?? 170} cm · {data.ageYears ?? 30} {language === "en" ? "years" : "anos"}
+          Mifflin-St Jeor: {data.currentWeightKg} kg · {data.heightCm ?? 170} cm
+          · {data.ageYears ?? 30} {language === "en" ? "years" : "anos"}
         </Text>
         <Pressable
           accessibilityRole="button"
