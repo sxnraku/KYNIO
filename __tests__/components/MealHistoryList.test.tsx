@@ -9,8 +9,11 @@ jest.mock('expo-router', () => {
   const React = require('react') as typeof import('react');
 
   return {
-    useFocusEffect: (callback: () => void | (() => void)) =>
-      React.useEffect(callback, [callback]),
+    useFocusEffect: (callback: () => void) => {
+      React.useEffect(() => {
+        callback();
+      }, []);
+    },
     useRouter: () => ({
       back: jest.fn(),
       push: jest.fn(),
@@ -56,7 +59,7 @@ describe('MealHistoryList - Visual Diary & List Toggle', () => {
   });
 
   it('renderiza inicialmente em modo lista com refeições', async () => {
-    render(<MealHistoryList />);
+    await render(<MealHistoryList />);
 
     await waitFor(() => {
       expect(screen.getByTestId('meal-list-view')).toBeTruthy();
@@ -66,7 +69,7 @@ describe('MealHistoryList - Visual Diary & List Toggle', () => {
   });
 
   it('alterna para o modo Diário Visual (grelha) ao clicar no botão de grelha', async () => {
-    render(<MealHistoryList />);
+    await render(<MealHistoryList />);
 
     await waitFor(() => {
       expect(screen.getByTestId('meal-view-mode-gallery')).toBeTruthy();

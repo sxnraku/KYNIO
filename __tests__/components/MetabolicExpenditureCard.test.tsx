@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react-native";
+import { render, screen, waitFor } from "@testing-library/react-native";
 import React from "react";
 
 import { MetabolicExpenditureCard } from "@/components/ui/metabolic-expenditure-card";
@@ -9,14 +9,14 @@ jest.mock("@/services/metabolicTdeeService", () => ({
   getMetabolicExpenditureSnapshot: jest.fn(),
 }));
 
-jest.mock("expo-router", () => {
-  const ReactModule = require("react");
-  return {
-    useFocusEffect: (callback: () => void | (() => void)) => {
-      ReactModule.useEffect(callback, [callback]);
-    },
-  };
-});
+jest.mock("expo-router", () => ({
+  useFocusEffect: (callback: () => void) => {
+    const React = require("react");
+    React.useEffect(() => {
+      callback();
+    }, []);
+  },
+}));
 
 describe("MetabolicExpenditureCard", () => {
   beforeEach(() => {
@@ -26,11 +26,16 @@ describe("MetabolicExpenditureCard", () => {
 
   it("renderiza o TDEE e a decomposição metabólica quando os dados são carregados", async () => {
     (getMetabolicExpenditureSnapshot as jest.Mock).mockResolvedValue({
+      ageYears: 30,
       balanceStatus: "balanced",
+      biologicalSex: "male",
       bmrKcal: 1500,
       currentWeightKg: 72,
+      dailyRoutineBurnKcal: 300,
       dailyWorkoutBurnKcal: 250,
       daysLoggedCount: 5,
+      heightCm: 175,
+      isPartialIntake: false,
       recentDailyIntakeKcal: 2050,
       statusDescription: "Ingestão calórica alinhada com o gasto estimado.",
       statusLabel: "Balanço Equilibrado",
@@ -39,12 +44,14 @@ describe("MetabolicExpenditureCard", () => {
 
     await render(<MetabolicExpenditureCard />);
 
-    expect(screen.getByText("Despesa Metabólica Dinâmica")).toBeTruthy();
-    expect(screen.getByText("Gasto Diário Estimado")).toBeTruthy();
-    expect(screen.getByText("~2050")).toBeTruthy();
-    expect(screen.getByText("1500 kcal")).toBeTruthy();
-    expect(screen.getByText("+250 kcal")).toBeTruthy();
-    expect(screen.getByText("2050 kcal")).toBeTruthy();
-    expect(screen.getByText("Balanço Equilibrado")).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText("Despesa Metabólica Dinâmica")).toBeTruthy();
+      expect(screen.getByText("Gasto Diário Estimado")).toBeTruthy();
+      expect(screen.getByText("~2050")).toBeTruthy();
+      expect(screen.getByText("1500 kcal")).toBeTruthy();
+      expect(screen.getByText("+250 kcal")).toBeTruthy();
+      expect(screen.getByText("2050 kcal")).toBeTruthy();
+      expect(screen.getByText("Balanço Equilibrado")).toBeTruthy();
+    });
   });
 });

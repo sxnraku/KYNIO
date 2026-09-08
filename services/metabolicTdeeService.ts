@@ -11,9 +11,11 @@ export interface UserMetabolicDemographics {
 
 export interface MetabolicExpenditureData {
   bmrKcal: number;
+  dailyRoutineBurnKcal: number;
   tdeeKcal: number;
   dailyWorkoutBurnKcal: number;
   recentDailyIntakeKcal: number | null;
+  isPartialIntake: boolean;
   daysLoggedCount: number;
   currentWeightKg: number;
   heightCm: number;
@@ -89,18 +91,21 @@ export function computeMetabolicExpenditure(
   }, 0);
   const dailyWorkoutBurnKcal = Math.round(totalWorkoutKcal / 14);
 
-  // 4. Gasto Diário Total Estimado (TDEE): Basal x 1.2 (NEAT básico) + Treinos diários
-  const tdeeKcal = Math.round(bmrKcal * 1.2 + dailyWorkoutBurnKcal);
+  // 4. Gasto de rotina diária (NEAT sedentário base + termogénese alimentar: ~20% do BMR)
+  const dailyRoutineBurnKcal = Math.round(bmrKcal * 0.2);
 
-  // 5. Média diária de ingestão recente (últimos 14 dias)
+  // 5. Gasto Diário Total Estimado (TDEE): Basal + Rotina (NEAT) + Treinos diários
+  const tdeeKcal = bmrKcal + dailyRoutineBurnKcal + dailyWorkoutBurnKcal;
+
+  // 6. Média diária de ingestão recente (últimos 14 dias)
   const recentMeals = meals.filter(
     (m) => m.timestamp >= fourteenDaysAgo && m.estimatedCalories && m.estimatedCalories > 0,
   );
 
-  // Agrupar calorias por dia de calendário
+  // Agrupar calorias por dia de calendário em fuso horário local
   const caloriesByDay = new Map<string, number>();
   for (const meal of recentMeals) {
-    const dayKey = new Date(meal.timestamp).toISOString().slice(0, 10);
+    const dayKey = new Date(meal.timestamp).toLocaleDateString("en-CA");
     const prev = caloriesByDay.get(dayKey) || 0;
     caloriesByDay.set(dayKey, prev + (meal.estimatedCalories || 0));
   }
@@ -115,7 +120,13 @@ export function computeMetabolicExpenditure(
     recentDailyIntakeKcal = Math.round(totalIntake / daysLoggedCount);
   }
 
-  // 6. Estado de balanço energético descritivo
+  // Se a média for inferior a 800 kcal (ou menos de 50% do BMR) ou apenas 1 dia registado,
+  // trata-se de um registo pontual/em curso e não de um consumo diário representativo.
+  const isPartialIntake =
+    recentDailyIntakeKcal !== null &&
+    (recentDailyIntakeKcal < Math.min(800, Math.round(bmrKcal * 0.5)) || daysLoggedCount < 2);
+
+  // 7. Estado de balanço energético descritivo
   let balanceStatus: "surplus" | "deficit" | "balanced" | "insufficient_data" =
     "insufficient_data";
   let statusLabel =
@@ -125,7 +136,14 @@ export function computeMetabolicExpenditure(
       ? "Log your meals and weight across 3+ days for personal metabolic balance insights."
       : "Regista refeições e peso durante 3+ dias para calcular o teu balanço metabólico pessoal.";
 
-  if (recentDailyIntakeKcal !== null && daysLoggedCount >= 2) {
+  if (recentDailyIntakeKcal !== null && isPartialIntake) {
+    balanceStatus = "insufficient_data";
+    statusLabel = language === "en" ? "Logging in Progress" : "Registo em Curso";
+    statusDescription =
+      language === "en"
+        ? `Logged ~${recentDailyIntakeKcal} kcal so far. Log all meals throughout the day for an accurate energy balance.`
+        : `Foram registadas ~${recentDailyIntakeKcal} kcal até agora. Regista todas as refeições do dia para calcular o balanço real.`;
+  } else if (recentDailyIntakeKcal !== null && daysLoggedCount >= 2 && !isPartialIntake) {
     const diff = recentDailyIntakeKcal - tdeeKcal;
     if (diff > 120) {
       balanceStatus = "surplus";
@@ -160,9 +178,11 @@ export function computeMetabolicExpenditure(
     biologicalSex,
     bmrKcal,
     currentWeightKg,
+    dailyRoutineBurnKcal,
     dailyWorkoutBurnKcal,
     daysLoggedCount,
     heightCm,
+    isPartialIntake,
     recentDailyIntakeKcal,
     statusDescription,
     statusLabel,

@@ -21,6 +21,7 @@ import {
   getXpReward,
 } from '@/services/gamificationService';
 import { requestCloudSync } from '@/services/cloudSyncScheduler';
+import { useUserDataSyncStore } from '@/store/user-data-sync-store';
 
 export interface SaveFastRecordInput {
   completed: boolean;
@@ -255,6 +256,7 @@ export async function saveMealRecord(
   });
 
   requestCloudSync();
+  useUserDataSyncStore.getState().notifyMealsChanged();
   return record;
 }
 
@@ -294,6 +296,7 @@ export async function deleteMealRecord(id: number): Promise<void> {
     .set({ deletedAt: Date.now() })
     .where(eq(meals.id, id));
   requestCloudSync();
+  useUserDataSyncStore.getState().notifyMealsChanged();
 }
 
 export async function saveWorkoutRecord(
@@ -331,6 +334,7 @@ export async function saveWorkoutRecord(
   });
 
   requestCloudSync();
+  useUserDataSyncStore.getState().notifyWorkoutsChanged();
   return record;
 }
 
@@ -396,6 +400,7 @@ export async function saveWeightEntry(
     .set({ profileUpdatedAt: Date.now(), weightUnit: input.unit })
     .where(eq(userProfile.id, 1));
   requestCloudSync();
+  useUserDataSyncStore.getState().notifyWeightChanged();
   return savedRecord;
 }
 
@@ -403,6 +408,7 @@ export async function deleteWeightEntry(id: number): Promise<void> {
   const database = await getInitializedDatabase();
   await database.delete(weightEntries).where(eq(weightEntries.id, id));
   requestCloudSync();
+  useUserDataSyncStore.getState().notifyWeightChanged();
 }
 
 export async function getUserProfile(): Promise<UserProfileRecord> {

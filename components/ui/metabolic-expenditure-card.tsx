@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -11,30 +11,46 @@ import {
 
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
+import { saveWeightEntry } from "@/services/dbService";
 import {
   getMetabolicExpenditureSnapshot,
   type MetabolicExpenditureData,
 } from "@/services/metabolicTdeeService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useUserDataSyncStore } from "@/store/user-data-sync-store";
 
 export function MetabolicExpenditureCard() {
   const language = useAppPreferencesStore((state) => state.language);
   const userHeightCm = useAppPreferencesStore((state) => state.userHeightCm);
   const userAgeYears = useAppPreferencesStore((state) => state.userAgeYears);
-  const userBiologicalSex = useAppPreferencesStore((state) => state.userBiologicalSex);
-  const setUserHeightCm = useAppPreferencesStore((state) => state.setUserHeightCm);
-  const setUserAgeYears = useAppPreferencesStore((state) => state.setUserAgeYears);
-  const setUserBiologicalSex = useAppPreferencesStore((state) => state.setUserBiologicalSex);
+  const userBiologicalSex = useAppPreferencesStore(
+    (state) => state.userBiologicalSex,
+  );
+  const setUserHeightCm = useAppPreferencesStore(
+    (state) => state.setUserHeightCm,
+  );
+  const setUserAgeYears = useAppPreferencesStore(
+    (state) => state.setUserAgeYears,
+  );
+  const setUserBiologicalSex = useAppPreferencesStore(
+    (state) => state.setUserBiologicalSex,
+  );
+
+  const dataVersion = useUserDataSyncStore((state) => state.dataVersion);
 
   const [data, setData] = useState<MetabolicExpenditureData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Form states for editing
+  // Form states for editing (incluindo peso corporal)
+  const [tempWeight, setTempWeight] = useState("70");
   const [tempHeight, setTempHeight] = useState(String(userHeightCm || 170));
   const [tempAge, setTempAge] = useState(String(userAgeYears || 30));
-  const [tempSex, setTempSex] = useState<"male" | "female" | "other">(userBiologicalSex || "other");
+  const [tempSex, setTempSex] = useState<"male" | "female" | "other">(
+    userBiologicalSex || "other",
+  );
 
   const loadData = useCallback(async () => {
     try {
@@ -45,6 +61,7 @@ export function MetabolicExpenditureCard() {
         heightCm: userHeightCm,
       });
       setData(snapshot);
+      setTempWeight(String(snapshot.currentWeightKg));
     } catch {
       // Ignora erro e mantém estado anterior
     } finally {
@@ -52,26 +69,54 @@ export function MetabolicExpenditureCard() {
     }
   }, [language, userAgeYears, userBiologicalSex, userHeightCm]);
 
+  // Atualização em foco de navegação
   useFocusEffect(
     useCallback(() => {
       void loadData();
     }, [loadData]),
   );
 
+  // Atualização reativa imediata quando qualquer registo de peso, refeição ou treino for guardado
+  useEffect(() => {
+    if (dataVersion > 0) {
+      void loadData();
+    }
+  }, [dataVersion, loadData]);
+
   const handleOpenEdit = () => {
+    if (data) {
+      setTempWeight(String(data.currentWeightKg));
+    }
     setTempHeight(String(userHeightCm || 170));
     setTempAge(String(userAgeYears || 30));
     setTempSex(userBiologicalSex || "other");
     setIsEditModalVisible(true);
   };
 
-  const handleSaveEdit = () => {
-    const parsedHeight = Math.max(100, Math.min(250, Number(tempHeight) || 170));
-    const parsedAge = Math.max(14, Math.min(100, Number(tempAge) || 30));
-    setUserHeightCm(parsedHeight);
-    setUserAgeYears(parsedAge);
-    setUserBiologicalSex(tempSex);
-    setIsEditModalVisible(false);
+  const handleSaveEdit = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      const parsedWeight = Number(tempWeight.trim().replace(",", "."));
+      const parsedHeight = Math.max(
+        100,
+        Math.min(250, Number(tempHeight) || 170),
+      );
+      const parsedAge = Math.max(14, Math.min(100, Number(tempAge) || 30));
+
+      setUserHeightCm(parsedHeight);
+      setUserAgeYears(parsedAge);
+      setUserBiologicalSex(tempSex);
+
+      if (Number.isFinite(parsedWeight) && parsedWeight > 0) {
+        await saveWeightEntry({ unit: "kg", weight: parsedWeight });
+      }
+
+      setIsEditModalVisible(false);
+      await loadData();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading && !data) {
@@ -125,6 +170,7 @@ export function MetabolicExpenditureCard() {
           </Text>
         </View>
         <Pressable
+          accessibilityLabel={language === "en" ? "Adjust metabolic profile" : "Ajustar perfil metabólico"}
           accessibilityRole="button"
           className="flex-row items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 active:opacity-70"
           onPress={handleOpenEdit}
@@ -149,11 +195,11 @@ export function MetabolicExpenditureCard() {
         <Text className="mt-0.5 font-body text-[11px] text-muted">
           {language === "en"
             ? "Total Daily Energy Expenditure (TDEE)"
-            : "Despesa Energética Diária Total"}
+            : "Despesa Energética Diária Total (TDEE)"}
         </Text>
       </View>
 
-      {/* Decomposição Metabólica */}
+      {/* Decomposição do Gasto Energético (Soma exata do TDEE) */}
       <View className="mt-3 flex-row gap-2">
         <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
           <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
@@ -166,28 +212,47 @@ export function MetabolicExpenditureCard() {
 
         <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
           <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+            {language === "en" ? "Routine / NEAT" : "Rotina Diária"}
+          </Text>
+          <Text className="mt-0.5 font-headline text-sm text-foreground">
+            +{data.dailyRoutineBurnKcal} kcal
+          </Text>
+        </View>
+
+        <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
+          <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
             {language === "en" ? "Workouts / Day" : "Treinos / Dia"}
           </Text>
           <Text className="mt-0.5 font-headline text-sm text-foreground">
             +{data.dailyWorkoutBurnKcal} kcal
           </Text>
         </View>
+      </View>
 
-        <View className="flex-1 rounded-xl border border-border/60 bg-background/50 p-2.5">
+      {/* Ingestão Nutricional Registada */}
+      <View className="mt-2.5 flex-row items-center justify-between rounded-xl border border-border/60 bg-background/50 px-3 py-2.5">
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons color={COLORS.xp} name="restaurant-outline" size={14} />
           <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
-            {language === "en" ? "Intake (Avg)" : "Ingestão Média"}
-          </Text>
-          <Text className="mt-0.5 font-headline text-sm text-foreground">
-            {data.recentDailyIntakeKcal !== null
-              ? `${data.recentDailyIntakeKcal} kcal`
-              : "—"}
+            {data.isPartialIntake
+              ? language === "en"
+                ? "Logged Intake (Today)"
+                : "Ingestão Registada (Hoje)"
+              : language === "en"
+              ? "Daily Average Intake"
+              : "Ingestão Média Diária"}
           </Text>
         </View>
+        <Text className="font-headline text-sm text-foreground">
+          {data.recentDailyIntakeKcal !== null
+            ? `${data.recentDailyIntakeKcal} kcal`
+            : "—"}
+        </Text>
       </View>
 
       {/* Cartão de Estado / Balanço Energético */}
       <View
-        className={`mt-4 rounded-xl border p-3.5 ${badgeColors.bg} ${badgeColors.border}`}
+        className={`mt-3 rounded-xl border p-3.5 ${badgeColors.bg} ${badgeColors.border}`}
       >
         <View className="flex-row items-center gap-1.5">
           <Ionicons color={badgeColors.text} name="analytics-outline" size={15} />
@@ -206,7 +271,7 @@ export function MetabolicExpenditureCard() {
       {/* Parâmetros biométricos rápidos com botão de ajuste */}
       <View className="mt-3 flex-row flex-wrap items-center justify-between gap-1 px-1">
         <Text className="font-body text-[10px] text-muted">
-          Mifflin-St Jeor: {data.heightCm ?? 170} cm · {data.ageYears ?? 30} {language === "en" ? "years" : "anos"}
+          Mifflin-St Jeor: {data.currentWeightKg} kg · {data.heightCm ?? 170} cm · {data.ageYears ?? 30} {language === "en" ? "years" : "anos"}
         </Text>
         <Pressable
           accessibilityRole="button"
@@ -214,13 +279,13 @@ export function MetabolicExpenditureCard() {
           onPress={handleOpenEdit}
         >
           <Ionicons color={COLORS.xp} name="create-outline" size={12} />
-          <Text className="font-label text-[10px] uppercase text-xp">
+          <Text className="font-label text-[10px] uppercase text-xp font-bold">
             {language === "en" ? "Adjust" : "Ajustar"}
           </Text>
         </Pressable>
       </View>
 
-      {/* Modal de Edição de Idade e Altura */}
+      {/* Modal de Edição de Peso, Idade e Altura */}
       <Modal
         animationType="fade"
         onRequestClose={() => setIsEditModalVisible(false)}
@@ -234,12 +299,28 @@ export function MetabolicExpenditureCard() {
             </Text>
             <Text className="mt-1 font-body text-xs text-muted">
               {language === "en"
-                ? "Height and age are used in the Mifflin-St Jeor formula for accurate BMR calculation."
-                : "A altura e idade são usadas na fórmula Mifflin-St Jeor para cálculo preciso da taxa basal."}
+                ? "Weight, height and age are used in the Mifflin-St Jeor equation for accurate BMR calculation."
+                : "O peso, altura e idade são usados na equação Mifflin-St Jeor para cálculo rigoroso da taxa basal."}
             </Text>
 
-            {/* Altura */}
+            {/* Peso Corporal (kg) */}
             <View className="mt-4">
+              <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+                {language === "en" ? "Body Weight (kg)" : "Peso Corporal (kg)"}
+              </Text>
+              <TextInput
+                className="mt-1 rounded-xl border border-border bg-background px-3 py-2 font-body text-sm text-foreground"
+                keyboardType="decimal-pad"
+                maxLength={6}
+                onChangeText={setTempWeight}
+                placeholder="70.0"
+                placeholderTextColor={COLORS.muted}
+                value={tempWeight}
+              />
+            </View>
+
+            {/* Altura */}
+            <View className="mt-3">
               <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
                 {language === "en" ? "Height (cm)" : "Altura (cm)"}
               </Text>
@@ -319,6 +400,7 @@ export function MetabolicExpenditureCard() {
               <Pressable
                 accessibilityRole="button"
                 className="flex-1 items-center justify-center rounded-xl border border-border py-2.5"
+                disabled={isSaving}
                 onPress={() => setIsEditModalVisible(false)}
               >
                 <Text className="font-label text-xs uppercase tracking-wider text-muted">
@@ -327,12 +409,17 @@ export function MetabolicExpenditureCard() {
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                className="flex-1 items-center justify-center rounded-xl bg-foreground py-2.5"
+                className="flex-1 items-center justify-center rounded-xl bg-foreground py-2.5 active:opacity-80"
+                disabled={isSaving}
                 onPress={handleSaveEdit}
               >
-                <Text className="font-label text-xs uppercase tracking-wider text-background">
-                  {language === "en" ? "Save" : "Guardar"}
-                </Text>
+                {isSaving ? (
+                  <ActivityIndicator color={COLORS.background} size="small" />
+                ) : (
+                  <Text className="font-label text-xs uppercase tracking-wider text-background font-bold">
+                    {language === "en" ? "Save" : "Guardar"}
+                  </Text>
+                )}
               </Pressable>
             </View>
           </View>

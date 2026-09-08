@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -33,9 +33,11 @@ import {
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useSubscriptionStore } from "@/store/use-subscription-store";
+import { useUserDataSyncStore } from "@/store/user-data-sync-store";
 
 export function WeightTrackingCard() {
   const language = useAppPreferencesStore((state) => state.language);
+  const weightVersion = useUserDataSyncStore((state) => state.weightVersion);
   const [entries, setEntries] = useState<WeightEntryRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +77,10 @@ export function WeightTrackingCard() {
       void reload();
     }, [reload]),
   );
+
+  useEffect(() => {
+    void reload();
+  }, [weightVersion, reload]);
 
   const filteredEntries = useMemo(
     () => filterWeightEntries(entries, timeRange),
