@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import type { EstimatedMetabolicPhase } from "@/services/fasting";
+import { triggerLightImpact } from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
@@ -37,6 +38,11 @@ export function MetabolicPhaseDetailModal({
 }: MetabolicPhaseDetailModalProps) {
   const language = useAppPreferencesStore((state) => state.language);
 
+  const handleClose = () => {
+    triggerLightImpact();
+    onClose();
+  };
+
   if (!phase) {
     return null;
   }
@@ -47,15 +53,15 @@ export function MetabolicPhaseDetailModal({
 
   return (
     <Modal
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="slide"
+      onRequestClose={handleClose}
       transparent
       visible={Boolean(phase)}
     >
       <View className="flex-1 justify-end bg-black/75">
         <Pressable
           accessibilityLabel={translateText("Fechar detalhes da fase", language)}
-          onPress={onClose}
+          onPress={handleClose}
           style={StyleSheet.absoluteFill}
         />
         <SafeAreaView edges={["bottom"]}>
@@ -63,7 +69,7 @@ export function MetabolicPhaseDetailModal({
             className="max-h-[90vh] rounded-t-[32px] border border-border bg-surface px-5 pb-6 pt-3"
             style={{ alignSelf: "center", maxWidth: 560, width: "100%" }}
           >
-            <View className="mb-4 h-1 w-10 self-center rounded-full bg-border" />
+            <View className="mb-4 h-1.5 w-12 self-center rounded-full bg-border/80" />
 
             <View className="mb-4 flex-row items-center justify-between">
               <View className="flex-row items-center">
@@ -86,8 +92,8 @@ export function MetabolicPhaseDetailModal({
 
               <Pressable
                 accessibilityLabel={translateText("Fechar", language)}
-                className="h-9 w-9 items-center justify-center rounded-full bg-background"
-                onPress={onClose}
+                className="h-9 w-9 items-center justify-center rounded-full bg-background active:opacity-60 active:scale-95"
+                onPress={handleClose}
               >
                 <Ionicons color={COLORS.muted} name="close" size={20} />
               </Pressable>

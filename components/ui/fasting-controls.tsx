@@ -7,12 +7,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FastingStartModal } from "@/components/ui/fasting-start-modal";
 import { PaywallModal } from "@/components/ui/paywall-modal";
 import { COLORS } from "@/constants/colors";
-import { triggerMediumImpact, triggerSuccessFeedback } from "@/services/hapticsService";
+import {
+  triggerLightImpact,
+  triggerMediumImpact,
+  triggerSuccessFeedback,
+} from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useSubscriptionStore } from "@/store/use-subscription-store";
 import {
-
   FASTING_GOALS,
   type FastingGoalId,
   PRO_FASTING_GOAL_IDS,
@@ -24,7 +27,7 @@ interface FastingControlsProps {
   isActive: boolean;
   isSaving: boolean;
   onOpenSchedule: () => void;
-  scheduleLabel: string | null;
+  scheduleLabel?: string | null;
 }
 
 export function FastingControls({
@@ -34,9 +37,9 @@ export function FastingControls({
   onOpenSchedule,
   scheduleLabel,
 }: FastingControlsProps) {
-  const endFasting = useFastingStore((state) => state.endFasting);
   const language = useAppPreferencesStore((state) => state.language);
   const setGoal = useFastingStore((state) => state.setGoal);
+  const endFasting = useFastingStore((state) => state.endFasting);
   const setStartedAt = useFastingStore((state) => state.setStartedAt);
   const startFasting = useFastingStore((state) => state.startFasting);
   const startedAt = useFastingStore((state) => state.startedAt);
@@ -50,6 +53,7 @@ export function FastingControls({
   >(null);
 
   const selectGoal = (goalId: FastingGoalId) => {
+    triggerLightImpact();
     if (!isPro && PRO_FASTING_GOAL_IDS.has(goalId)) {
       setIsGoalPickerOpen(false);
       setIsPaywallOpen(true);
@@ -68,13 +72,13 @@ export function FastingControls({
     <>
       <View className="mt-5">
         {!isActive ? (
-          <View className="flex-row gap-2">
+          <View className="flex-row items-center gap-2">
             {/* Início imediato */}
             <Pressable
-              accessibilityLabel={translateText("Iniciar Jejum agora", language)}
+              accessibilityLabel={translateText("Iniciar Jejum", language)}
               accessibilityRole="button"
               accessibilityState={{ disabled: isSaving }}
-              className="min-h-14 flex-1 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80"
+              className="min-h-14 flex-1 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80 active:scale-[0.98]"
               disabled={isSaving}
               onPress={() => {
                 triggerMediumImpact();
@@ -94,7 +98,7 @@ export function FastingControls({
               accessibilityLabel={translateText("Iniciar jejum a outra hora", language)}
               accessibilityRole="button"
               accessibilityState={{ disabled: isSaving }}
-              className="min-h-14 items-center justify-center rounded-full border border-success/60 bg-success/10 px-4 active:opacity-70"
+              className="min-h-14 items-center justify-center rounded-full border border-success/60 bg-success/10 px-4 active:opacity-70 active:scale-95"
               disabled={isSaving}
               onPress={() => {
                 triggerMediumImpact();
@@ -105,19 +109,17 @@ export function FastingControls({
               <Ionicons color={COLORS.success} name="time-outline" size={20} />
             </Pressable>
           </View>
-
         ) : (
           <Pressable
             accessibilityLabel={translateText("Terminar Jejum", language)}
             accessibilityRole="button"
             accessibilityState={{ disabled: isSaving }}
-            className="min-h-14 flex-row items-center justify-center rounded-full bg-foreground px-5 active:opacity-80"
+            className="min-h-14 flex-row items-center justify-center rounded-full bg-foreground px-5 active:opacity-80 active:scale-[0.98]"
             disabled={isSaving}
             onPress={() => {
               triggerSuccessFeedback();
               void endFasting();
             }}
-
             style={{ opacity: isSaving ? 0.45 : 1 }}
             testID="end-fasting-button"
           >
@@ -221,15 +223,21 @@ export function FastingControls({
       />
 
       <Modal
-        animationType="fade"
-        onRequestClose={() => setIsGoalPickerOpen(false)}
+        animationType="slide"
+        onRequestClose={() => {
+          triggerLightImpact();
+          setIsGoalPickerOpen(false);
+        }}
         transparent
         visible={isGoalPickerOpen}
       >
         <View className="flex-1 justify-end bg-black/70">
           <Pressable
             accessibilityLabel={translateText("Fechar seleção de objetivo", language)}
-            onPress={() => setIsGoalPickerOpen(false)}
+            onPress={() => {
+              triggerLightImpact();
+              setIsGoalPickerOpen(false);
+            }}
             style={StyleSheet.absoluteFill}
           />
           <SafeAreaView edges={["bottom"]}>
@@ -237,7 +245,7 @@ export function FastingControls({
               className="max-h-[85vh] rounded-t-[32px] border border-border bg-surface px-5 pb-5 pt-3"
               style={{ alignSelf: "center", maxWidth: 560, width: "100%" }}
             >
-              <View className="mb-4 h-1 w-10 self-center rounded-full bg-border" />
+              <View className="mb-4 h-1.5 w-12 self-center rounded-full bg-border/80" />
               <View className="mb-4 flex-row items-start justify-between">
                 <View className="flex-1 pr-4">
                   <Text className="font-headline text-2xl text-foreground">
@@ -251,8 +259,11 @@ export function FastingControls({
                 </View>
                 <Pressable
                   accessibilityLabel={translateText("Fechar", language)}
-                  className="h-9 w-9 items-center justify-center rounded-full bg-background"
-                  onPress={() => setIsGoalPickerOpen(false)}
+                  className="h-9 w-9 items-center justify-center rounded-full bg-background active:opacity-60 active:scale-95"
+                  onPress={() => {
+                    triggerLightImpact();
+                    setIsGoalPickerOpen(false);
+                  }}
                 >
                   <Ionicons color={COLORS.muted} name="close" size={20} />
                 </Pressable>

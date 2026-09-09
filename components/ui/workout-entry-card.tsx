@@ -8,6 +8,7 @@ import { TextInput } from "@/components/ui/text-input";
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
 import { getLatestWeightKg } from "@/services/dbService";
+import { triggerLightImpact } from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import {
@@ -115,11 +116,14 @@ export function WorkoutEntryCard({
               accessibilityState={{ selected }}
               className={
                 selected
-                  ? "min-w-[84px] items-center rounded-2xl bg-success px-3 py-4"
-                  : "min-w-[84px] items-center rounded-2xl border border-border bg-surface-raised px-3 py-4"
+                  ? "min-w-[84px] items-center rounded-2xl bg-success px-3 py-4 active:scale-95"
+                  : "min-w-[84px] items-center rounded-2xl border border-border bg-surface-raised px-3 py-4 active:opacity-80 active:scale-95"
               }
               key={option.id}
-              onPress={() => onChangeType(option.id)}
+              onPress={() => {
+                triggerLightImpact();
+                onChangeType(option.id);
+              }}
             >
               <Ionicons
                 color={selected ? "#FFFFFF" : COLORS.foreground}
@@ -429,7 +433,7 @@ export function WorkoutEntryCard({
         className={
           isSaving
             ? "mt-5 flex-row items-center justify-center rounded-2xl bg-success/50 py-4"
-            : "mt-5 flex-row items-center justify-center rounded-2xl bg-success py-4"
+            : "mt-5 flex-row items-center justify-center rounded-2xl bg-success py-4 active:opacity-90 active:scale-[0.98]"
         }
         disabled={isSaving}
         onPress={onSave}

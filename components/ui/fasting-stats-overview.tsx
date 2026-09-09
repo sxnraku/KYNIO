@@ -103,7 +103,7 @@ export function FastingStatsOverview() {
         <Text className="font-label text-xs text-muted">
           {labels.fasts}
         </Text>
-        <Text className="mt-2 font-headline text-2xl text-foreground">
+        <Text className="mt-2 font-headline text-2xl tracking-tight text-foreground">
           {summary.completedFasts}
         </Text>
       </View>
@@ -113,7 +113,7 @@ export function FastingStatsOverview() {
         <Text className="font-label text-xs text-muted">
           {labels.longestFast}
         </Text>
-        <Text className="mt-2 font-headline text-2xl text-foreground">
+        <Text className="mt-2 font-headline text-2xl tracking-tight text-foreground">
           {summary.longestFastFormatted}
         </Text>
       </View>
@@ -123,7 +123,7 @@ export function FastingStatsOverview() {
         <Text className="font-label text-xs text-muted">
           {labels.totalTime}
         </Text>
-        <Text className="mt-2 font-headline text-2xl text-foreground">
+        <Text className="mt-2 font-headline text-2xl tracking-tight text-foreground">
           {summary.totalTimeFormatted}
         </Text>
       </View>
@@ -133,7 +133,7 @@ export function FastingStatsOverview() {
         <Text className="font-label text-xs text-muted">
           {labels.fastingDays}
         </Text>
-        <Text className="mt-2 font-headline text-2xl text-foreground">
+        <Text className="mt-2 font-headline text-2xl tracking-tight text-foreground">
           {summary.fastingDaysCount}
         </Text>
       </View>

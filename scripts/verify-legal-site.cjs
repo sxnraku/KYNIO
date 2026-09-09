@@ -7,6 +7,8 @@ const htmlFiles = [
   'index.html',
   'privacy.html',
   'terms.html',
+  'eula.html',
+  'dmca.html',
   'account-deletion.html',
   'support.html',
 ];

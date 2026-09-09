@@ -23,6 +23,7 @@ import {
   formatFastingStartTimeEntry,
   parseFastingStartDateTime,
 } from '@/services/fastingStartService';
+import { triggerLightImpact, triggerSuccessFeedback } from '@/services/hapticsService';
 import { translateText } from '@/services/i18n';
 import { useAppPreferencesStore } from '@/store/app-preferences-store';
 
@@ -142,6 +143,7 @@ export function FastingEditModal({
         targetHours: fast.targetHours,
       });
 
+      triggerSuccessFeedback();
       onSaved();
       onClose();
     } catch (error) {
@@ -155,6 +157,11 @@ export function FastingEditModal({
     }
   };
 
+  const handleClose = () => {
+    triggerLightImpact();
+    onClose();
+  };
+
   const isTargetAchieved =
     parsedDuration !== null && fast.targetHours > 0
       ? parsedDuration >= fast.targetHours * 60 * 60 * 1000
@@ -162,8 +169,8 @@ export function FastingEditModal({
 
   return (
     <Modal
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="slide"
+      onRequestClose={handleClose}
       transparent
       visible={visible}
     >
@@ -173,7 +180,7 @@ export function FastingEditModal({
       >
         <Pressable
           accessibilityLabel={translateText('Fechar', language)}
-          onPress={onClose}
+          onPress={handleClose}
           style={StyleSheet.absoluteFill}
         />
         <SafeAreaView edges={['bottom']}>
@@ -182,7 +189,7 @@ export function FastingEditModal({
             style={{ alignSelf: 'center', maxWidth: 520, width: '100%' }}
           >
             {/* Pega / Handle */}
-            <View className="mb-3 h-1 w-10 self-center rounded-full bg-border" />
+            <View className="mb-3 h-1.5 w-12 self-center rounded-full bg-border/80" />
 
             {/* Cabeçalho */}
             <View className="flex-row items-center justify-between">
@@ -198,8 +205,8 @@ export function FastingEditModal({
               <Pressable
                 accessibilityLabel={translateText('Fechar', language)}
                 accessibilityRole="button"
-                className="h-8 w-8 items-center justify-center rounded-full bg-background active:opacity-60"
-                onPress={onClose}
+                className="h-8 w-8 items-center justify-center rounded-full bg-background active:opacity-60 active:scale-95"
+                onPress={handleClose}
               >
                 <Ionicons color={COLORS.muted} name="close" size={18} />
               </Pressable>

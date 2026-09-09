@@ -23,6 +23,7 @@ import {
   saveWeightEntry,
   type WeightUnit,
 } from "@/services/dbService";
+import { triggerLightImpact, triggerSuccessFeedback } from "@/services/hapticsService";
 import { deleteRemoteWeightEntry } from "@/services/cloudSyncService";
 import {
   createWeightChartData,
@@ -101,6 +102,7 @@ export function WeightTrackingCard() {
 
     try {
       await saveWeightEntry({ unit, weight: parsedWeight });
+      triggerSuccessFeedback();
       setWeight("");
       setIsModalVisible(false);
       await reload();
@@ -306,8 +308,9 @@ export function WeightTrackingCard() {
 
             <View className="mt-6 flex-row gap-3">
               <Pressable
-                className="flex-1 items-center rounded-2xl border border-border bg-background py-3.5 active:opacity-70"
+                className="flex-1 items-center rounded-2xl border border-border bg-background py-3.5 active:opacity-70 active:scale-[0.98]"
                 onPress={() => {
+                  triggerLightImpact();
                   setIsModalVisible(false);
                   setWeight("");
                 }}
@@ -318,7 +321,7 @@ export function WeightTrackingCard() {
               </Pressable>
 
               <Pressable
-                className="flex-1 items-center rounded-2xl bg-xp py-3.5 active:opacity-80"
+                className="flex-1 items-center rounded-2xl bg-xp py-3.5 active:opacity-80 active:scale-[0.98]"
                 disabled={isSaving}
                 onPress={() => void save()}
               >
@@ -338,20 +341,27 @@ export function WeightTrackingCard() {
       {/* Weight History Modal */}
       <Modal
         animationType="slide"
-        onRequestClose={() => setIsHistoryModalVisible(false)}
+        onRequestClose={() => {
+          triggerLightImpact();
+          setIsHistoryModalVisible(false);
+        }}
         statusBarTranslucent
         transparent
         visible={isHistoryModalVisible}
       >
         <View className="flex-1 justify-end bg-black/70">
-          <View className="max-h-[80%] rounded-t-3xl border-t border-border bg-surface p-6">
+          <View className="max-h-[80%] rounded-t-3xl border-t border-border bg-surface px-6 pb-6 pt-3">
+            <View className="mb-4 h-1.5 w-12 self-center rounded-full bg-border/80" />
             <View className="flex-row items-center justify-between">
               <Text className="font-headline text-xl text-foreground">
                 {language === "en" ? "Weight History" : "Histórico de Peso"}
               </Text>
               <Pressable
-                className="h-9 w-9 items-center justify-center rounded-full bg-background active:opacity-70"
-                onPress={() => setIsHistoryModalVisible(false)}
+                className="h-9 w-9 items-center justify-center rounded-full bg-background active:opacity-70 active:scale-95"
+                onPress={() => {
+                  triggerLightImpact();
+                  setIsHistoryModalVisible(false);
+                }}
               >
                 <Ionicons color={COLORS.muted} name="close" size={18} />
               </Pressable>

@@ -21,7 +21,7 @@ export function Screen({ children }: ScreenProps) {
         className="flex-1 bg-background"
         contentContainerStyle={{
           alignItems: "center",
-          paddingBottom: 40 + insets.bottom,
+          paddingBottom: 84 + insets.bottom,
           paddingHorizontal: 20,
           paddingTop: 20,
         }}

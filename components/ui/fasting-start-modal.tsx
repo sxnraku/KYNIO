@@ -5,7 +5,6 @@ import {
   Modal,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   TextInput,
   View,
@@ -14,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components/ui/text';
 import { COLORS } from '@/constants/colors';
+import { triggerLightImpact, triggerSuccessFeedback } from '@/services/hapticsService';
 import { translateText } from '@/services/i18n';
 import {
   formatFastingStartDate,
@@ -76,18 +76,26 @@ export function FastingStartModal({
 }: FastingStartModalProps) {
   const language = useAppPreferencesStore((state) => state.language);
   const [openedAt] = useState(() => Date.now());
-  const [initialTimestamp] = useState(() =>
-    getDefaultTimestamp({ initialStartedAt, mode, openedAt }),
-  );
+  const defaultTimestamp = getDefaultTimestamp({
+    initialStartedAt,
+    mode,
+    openedAt,
+  });
   const [dateInput, setDateInput] = useState(() =>
-    formatFastingStartDate(initialTimestamp),
+    formatFastingStartDate(defaultTimestamp),
+  );
+  const [timeInput, setTimeInput] = useState(() =>
+    formatFastingStartTime(defaultTimestamp),
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [timeInput, setTimeInput] = useState(() =>
-    formatFastingStartTime(initialTimestamp),
-  );
+
+  const handleClose = () => {
+    triggerLightImpact();
+    onClose();
+  };
 
   const applyPreset = (hoursAgo: number) => {
+    triggerLightImpact();
     const timestamp = openedAt - hoursAgo * 60 * 60 * 1000;
     setDateInput(formatFastingStartDate(timestamp));
     setTimeInput(formatFastingStartTime(timestamp));
@@ -98,11 +106,13 @@ export function FastingStartModal({
     const result = parseFastingStartDateTime(dateInput, timeInput);
 
     if (result.error) {
+      triggerLightImpact();
       setErrorMessage(ERROR_MESSAGES[result.error][language]);
       return;
     }
 
     if (!onConfirm(result.timestamp)) {
+      triggerLightImpact();
       setErrorMessage(
         language === 'en'
           ? 'Could not save this start time.'
@@ -111,13 +121,14 @@ export function FastingStartModal({
       return;
     }
 
+    triggerSuccessFeedback();
     onClose();
   };
 
   return (
     <Modal
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="slide"
+      onRequestClose={handleClose}
       transparent
       visible
     >
@@ -127,7 +138,7 @@ export function FastingStartModal({
       >
         <Pressable
           accessibilityLabel={translateText('Fechar seleção da hora de início', language)}
-          onPress={onClose}
+          onPress={handleClose}
           style={StyleSheet.absoluteFill}
         />
         <SafeAreaView edges={['bottom']}>
@@ -136,7 +147,7 @@ export function FastingStartModal({
             style={{ alignSelf: 'center', maxWidth: 520, width: '100%' }}
           >
             {/* Pega / Handle */}
-            <View className="mb-3 h-1 w-10 self-center rounded-full bg-border" />
+            <View className="mb-3 h-1.5 w-12 self-center rounded-full bg-border/80" />
 
             {/* Header */}
             <View className="flex-row items-center justify-between">
@@ -154,8 +165,8 @@ export function FastingStartModal({
               <Pressable
                 accessibilityLabel={translateText('Fechar', language)}
                 accessibilityRole="button"
-                className="h-8 w-8 items-center justify-center rounded-full bg-background active:opacity-60"
-                onPress={onClose}
+                className="h-8 w-8 items-center justify-center rounded-full bg-background active:opacity-60 active:scale-95"
+                onPress={handleClose}
               >
                 <Ionicons color={COLORS.muted} name="close" size={18} />
               </Pressable>

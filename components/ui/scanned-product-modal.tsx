@@ -18,6 +18,7 @@ import {
   calculatePortionNutrition,
   type ScannedFoodProduct,
 } from "@/services/barcodeFoodService";
+import { triggerLightImpact, triggerSuccessFeedback } from "@/services/hapticsService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 interface ScannedProductModalProps {
@@ -81,6 +82,7 @@ export function ScannedProductModal({
   };
 
   const handleSelectPreset = (grams: number) => {
+    triggerLightImpact();
     setPortionGrams(grams);
     setCustomInput(String(grams));
   };
@@ -112,6 +114,7 @@ export function ScannedProductModal({
         tags,
       });
 
+      triggerSuccessFeedback();
       onClose();
     } finally {
       setIsSaving(false);
@@ -137,8 +140,11 @@ export function ScannedProductModal({
           <Pressable
             accessibilityLabel="Fechar"
             accessibilityRole="button"
-            className="h-9 w-9 items-center justify-center rounded-full bg-surface active:opacity-70"
-            onPress={onClose}
+            className="h-9 w-9 items-center justify-center rounded-full bg-surface active:opacity-70 active:scale-95"
+            onPress={() => {
+              triggerLightImpact();
+              onClose();
+            }}
           >
             <Ionicons color={COLORS.foreground} name="close" size={20} />
           </Pressable>
@@ -352,7 +358,7 @@ export function ScannedProductModal({
           {/* Botão de Guardar Refeição */}
           <Pressable
             accessibilityRole="button"
-            className="mt-6 flex-row items-center justify-center gap-2 rounded-2xl bg-foreground py-4 active:opacity-90"
+            className="mt-6 flex-row items-center justify-center gap-2 rounded-2xl bg-foreground py-4 active:opacity-90 active:scale-[0.98]"
             disabled={isSaving}
             onPress={handleConfirmSave}
           >

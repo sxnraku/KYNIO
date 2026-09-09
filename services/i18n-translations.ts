@@ -42,6 +42,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Documentos e suporte": "Documents & Support",
   "Política de Privacidade": "Privacy Policy",
   "Termos de Utilização": "Terms of Use",
+  "Contrato de Licença (EULA)": "End User License Agreement (EULA)",
+  "Política DMCA e Copyright": "DMCA & Copyright Policy",
   "Eliminar conta pela web": "Delete account via web",
   "Ajuda e suporte": "Help & Support",
   "Definições": "Settings",

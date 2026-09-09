@@ -1,5 +1,19 @@
--- Execute este ficheiro uma vez no SQL Editor de um projeto Supabase alojado na UE.
--- Todas as tabelas exigem uma sessão autenticada e isolam os dados por auth.uid().
+-- ==============================================================================
+-- KYNIO · Supabase Schema & Row Level Security (RLS) Policies
+-- ==============================================================================
+-- INSTRUÇÕES DE APLICAÇÃO:
+-- 1. Acede ao painel do teu projeto Supabase (preferencialmente sediado na UE).
+-- 2. No menu lateral, abre "SQL Editor" -> "New query".
+-- 3. Cola todo o conteúdo deste ficheiro e clica em "Run".
+-- 
+-- SEGURANÇA E PRIVACIDADE (RGPD):
+-- - RLS (Row Level Security) ativado em TODAS as tabelas públicas e buckets.
+-- - Política "owner_all": apenas o utilizador autenticado cujo auth.uid() coincide
+--   com user_id tem permissão para ler (SELECT), criar (INSERT), editar (UPDATE)
+--   ou apagar (DELETE) os seus próprios dados.
+-- - Buckets de avatares privados com isolamento estrito por pasta (storage.foldername).
+-- - Tabela ai_rate_limits protegida e inacessível a utilizadores anon/authenticated.
+-- ==============================================================================
 
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,

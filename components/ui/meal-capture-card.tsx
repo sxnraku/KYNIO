@@ -5,6 +5,7 @@ import { TextInput } from "@/components/ui/text-input";
 
 import { Card } from "@/components/ui/card";
 import { COLORS } from "@/constants/colors";
+import { triggerLightImpact } from "@/services/hapticsService";
 import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import type { SelectedMealImage } from "@/types/meal";
@@ -36,8 +37,11 @@ function SourceButton({ accentColor, icon, label, onPress }: SourceButtonProps) 
   return (
     <Pressable
       accessibilityRole="button"
-      className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-2 py-3 active:opacity-70"
-      onPress={onPress}
+      className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-2 py-3 active:opacity-70 active:scale-95"
+      onPress={() => {
+        triggerLightImpact();
+        onPress?.();
+      }}
     >
       <Ionicons color={accentColor || COLORS.success} name={icon} size={18} />
       <Text className="font-headline text-xs text-foreground">{label}</Text>
@@ -170,11 +174,14 @@ export function MealCaptureCard({
         accessibilityState={{ disabled: !canAnalyze || isAnalyzing }}
         className={`mt-5 min-h-14 flex-row items-center justify-center gap-2 rounded-xl px-5 ${
           canAnalyze && !isAnalyzing
-            ? "bg-success active:opacity-80"
+            ? "bg-success active:opacity-80 active:scale-[0.98]"
             : "bg-border opacity-60"
         }`}
         disabled={!canAnalyze || isAnalyzing}
-        onPress={onAnalyze}
+        onPress={() => {
+          triggerLightImpact();
+          onAnalyze();
+        }}
       >
         {isAnalyzing ? (
           <ActivityIndicator color={COLORS.background} size="small" />

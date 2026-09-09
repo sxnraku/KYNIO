@@ -100,16 +100,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .btn {
   display: inline-flex; align-items: center; gap: 10px;
-  font-weight: 700; font-size: 15px; letter-spacing: .01em;
+  font-weight: 700; font-size: 15px; letter-spacing: -.01em;
   padding: 15px 26px; border-radius: 999px;
-  transition: transform .25s cubic-bezier(.2,.9,.3,1.4), background .2s, color .2s;
+  transition: transform .22s cubic-bezier(.16, 1, .3, 1), background .2s ease, color .2s ease, box-shadow .22s cubic-bezier(.16, 1, .3, 1);
   white-space: nowrap;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
-.btn:active { transform: scale(.97); }
-.btn-ink { background: var(--ink); color: var(--paper); }
-.btn-ink:hover { background: var(--rust); transform: translateY(-2px); }
-.btn-amber { background: var(--amber); color: var(--ink); }
-.btn-amber:hover { background: #ffca66; transform: translateY(-2px); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(26, 20, 12, .18); }
+.btn:active {
+  transform: scale(.96) translateY(0);
+  transition: transform 80ms cubic-bezier(.2, 0, 0, 1);
+  box-shadow: 0 4px 10px -4px rgba(26, 20, 12, .12);
+}
+.btn-ink { background: var(--ink); color: var(--paper); box-shadow: 0 8px 20px -6px rgba(26, 20, 12, .24); }
+.btn-ink:hover { background: #281f14; }
+.btn-amber { background: var(--amber); color: var(--ink); box-shadow: 0 8px 20px -6px rgba(217, 146, 46, .34); }
+.btn-amber:hover { background: #ffca66; }
 .btn-sm { padding: 11px 20px; font-size: 13.5px; }
 .btn-lg { padding: 19px 34px; font-size: 16.5px; }
 
@@ -153,13 +161,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   position: fixed; top: 0; left: 0; right: 0; z-index: 60;
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px var(--pad);
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color .3s;
+  background: rgba(244, 238, 224, .76);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(26, 20, 12, .08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .35) inset;
+  transition: background .3s cubic-bezier(.16, 1, .3, 1), border-color .3s cubic-bezier(.16, 1, .3, 1), box-shadow .3s cubic-bezier(.16, 1, .3, 1);
 }
-.nav.scrolled { border-bottom-color: var(--hairline); }
+.nav.scrolled {
+  background: rgba(244, 238, 224, .88);
+  border-bottom-color: rgba(26, 20, 12, .14);
+  box-shadow: 0 10px 30px -10px rgba(26, 20, 12, .08), 0 1px 0 rgba(255, 255, 255, .4) inset;
+}
 
 .nav-brand { display: flex; align-items: center; gap: 11px; }
 .nav-icon { width: 30px; height: 30px; border-radius: 8px; }
@@ -317,17 +330,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .dot.active { background: var(--amber); transform: scale(1.35); }
 
-/* floating chips — decoração de produto em redor do device */
+/* floating chips — decoração de produto com material translúcido Apple */
 .float-chip {
   position: absolute; z-index: 4;
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--paper);
+  background: rgba(244, 238, 224, .82);
   color: var(--ink);
   font-family: var(--font-mono);
   font-size: 12px; font-weight: 600; letter-spacing: .06em;
-  padding: 10px 14px; border-radius: 12px;
-  box-shadow: 0 14px 34px -10px rgba(26, 20, 12, .5);
+  padding: 10px 14px; border-radius: 14px;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, .65);
+  box-shadow: 0 16px 36px -10px rgba(26, 20, 12, .25), 0 1px 0 rgba(255, 255, 255, .8) inset;
   animation: bob 5.5s ease-in-out infinite;
+  transition: transform .3s cubic-bezier(.16, 1, .3, 1), box-shadow .3s;
+}
+.float-chip:hover {
+  box-shadow: 0 22px 44px -10px rgba(26, 20, 12, .32), 0 1px 0 rgba(255, 255, 255, .9) inset;
 }
 .float-chip svg { color: var(--amber-deep); }
 .chip-tl { top: 6%;  left: -4%;  transform: rotate(-6deg); animation-delay: 0s; }
@@ -447,13 +467,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: grid;
   grid-template-columns: 90px 1fr 60px;
   align-items: center; gap: 24px;
-  padding: 40px 8px;
+  padding: 40px 12px;
   border-top: 1px solid var(--hairline);
-  transition: background .3s, padding .3s;
+  transition: background .25s cubic-bezier(.16, 1, .3, 1), padding .25s cubic-bezier(.16, 1, .3, 1), transform .2s cubic-bezier(.16, 1, .3, 1);
   position: relative;
+  border-radius: 18px;
 }
 .feature-row:last-child { border-bottom: 1px solid var(--hairline); }
-.feature-row:hover { background: rgba(26, 20, 12, .035); padding-left: 22px; padding-right: 22px; }
+.feature-row:hover { background: rgba(26, 20, 12, .035); padding-left: 24px; padding-right: 24px; }
+.feature-row:active {
+  transform: scale(.99);
+  transition: transform 80ms cubic-bezier(.2, 0, 0, 1);
+}
 
 .feature-num {
   font-size: 14px; font-weight: 500; letter-spacing: .1em;
@@ -517,12 +542,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .shot { flex: none; width: clamp(220px, 24vw, 300px); }
 .shot-frame {
-  border-radius: 30px;
+  border-radius: 32px;
   overflow: hidden;
   background: var(--dark);
   border: 6px solid #0b0805;
-  box-shadow: 0 30px 60px -24px rgba(26, 20, 12, .5);
-  transition: transform .3s ease;
+  box-shadow: 0 30px 60px -24px rgba(26, 20, 12, .5), 0 0 0 1px rgba(255, 255, 255, .08) inset;
+  transition: transform .35s cubic-bezier(.16, 1, .3, 1), box-shadow .35s;
+}
+.shot:hover .shot-frame {
+  transform: translateY(-6px);
+  box-shadow: 0 42px 74px -20px rgba(26, 20, 12, .6), 0 0 0 1px rgba(255, 255, 255, .12) inset;
 }
 .shot-frame img { width: 100%; pointer-events: none; }
 .shot figcaption {
@@ -603,22 +632,27 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .modal[hidden] { display: none; }
 .modal-backdrop {
   position: absolute; inset: 0;
-  background: rgba(21, 16, 10, .6);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(21, 16, 10, .64);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   animation: fadeIn .25s ease;
 }
 .modal-card {
   position: relative;
   background: var(--paper);
-  border-radius: 28px;
-  padding: clamp(30px, 4vw, 48px);
+  border-radius: 32px;
+  padding: clamp(32px, 5vw, 48px);
   max-width: 520px; width: 100%;
-  box-shadow: 0 50px 100px -30px rgba(0, 0, 0, .5);
-  animation: popIn .35s cubic-bezier(.2,.9,.3,1.2);
+  box-shadow: 0 40px 90px -20px rgba(0, 0, 0, .55), 0 0 0 1px rgba(26, 20, 12, .08);
+  animation: modalSpringIn .42s cubic-bezier(.16, 1, .3, 1);
   max-height: 90svh; overflow-y: auto;
+  transform-origin: center center;
 }
 @keyframes fadeIn { from { opacity: 0; } }
-@keyframes popIn { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+@keyframes modalSpringIn {
+  from { opacity: 0; transform: scale(.94) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 .modal-close {
   position: absolute; top: 20px; right: 20px;
@@ -677,6 +711,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; transition-duration: .001s !important; }
   html { scroll-behavior: auto; }
+  .btn:hover, .btn:active, .feature-row:hover, .feature-row:active, .shot:hover .shot-frame {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav, .modal-backdrop, .float-chip {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .nav { background: var(--paper) !important; }
+  .modal-backdrop { background: rgba(21, 16, 10, .88) !important; }
 }
 
 </style>
@@ -937,6 +983,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <a href="app/" data-i18n="ft.app">Web App</a>
       <a href="privacy.html" data-i18n="ft.privacy">Política de Privacidade</a>
       <a href="terms.html" data-i18n="ft.terms">Termos de Utilização</a>
+      <a href="eula.html" data-i18n="ft.eula">Licença (EULA)</a>
+      <a href="dmca.html" data-i18n="ft.dmca">Política DMCA</a>
       <a href="account-deletion.html" data-i18n="ft.delete">Eliminar Conta</a>
       <a href="support.html" data-i18n="ft.support">Suporte & Contacto</a>
     </nav>
@@ -1023,6 +1071,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       "fin.ctaWeb": "Usar no iPhone / Navegador (Web App)",
       "ft.app": "Web App",
       "ft.privacy": "Política de Privacidade", "ft.terms": "Termos de Utilização",
+      "ft.eula": "Licença (EULA)", "ft.dmca": "Política DMCA",
       "ft.delete": "Eliminar Conta", "ft.support": "Suporte & Contacto",
       "ft.note": "KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.",
       "md.eyebrow": "Acesso à Beta do Android",
@@ -1072,6 +1121,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       "fin.ctaWeb": "Use on iPhone / Browser (Web App)",
       "ft.app": "Web App",
       "ft.privacy": "Privacy Policy", "ft.terms": "Terms of Use",
+      "ft.eula": "Licence (EULA)", "ft.dmca": "DMCA Policy",
       "ft.delete": "Delete Account", "ft.support": "Support & Contact",
       "ft.note": "KYNIO · Personal lifestyle and gamification tracking tool. Does not provide medical or nutritional advice.",
       "md.eyebrow": "Android Beta Access",
@@ -1267,62 +1317,102 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   }
 
   /* ---------------- carrossel com arraste + inércia ---------------- */
+  /* ---------------- carrossel fluido com física Apple (1:1 + rubberband + inércia + interrupção) ---------------- */
   const strip = document.getElementById("dragStrip");
   const bar = document.getElementById("dragBar");
   if (strip && bar) {
-    let x = 0, startX = 0, lastX = 0, vel = 0, dragging = false, raf = null;
+    let x = 0, startX = 0, lastX = 0, lastT = 0, vel = 0, dragging = false, raf = null;
 
     const maxScroll = () => Math.max(strip.scrollWidth - strip.parentElement.clientWidth, 0);
 
+    // Apple rubberband (WWDC 2018): resistência física elástica nas bordas
+    function rubberband(overshoot, dimension = 340, constant = 0.55) {
+      return (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot));
+    }
+
     function setX(nx) {
       const max = maxScroll();
-      // resistência nas bordas
-      if (nx > 0) nx = nx * .35;
-      if (nx < -max) nx = -max + (nx + max) * .35;
+      if (nx > 0) {
+        nx = rubberband(nx, 340);
+      } else if (nx < -max) {
+        const over = nx + max;
+        nx = -max + rubberband(over, 340);
+      }
       x = nx;
       strip.style.transform = `translate3d(${x}px,0,0)`;
       const p = max ? Math.min(Math.max(-x / max, 0), 1) : 0;
       bar.style.left = (p * 80) + "%";
     }
 
+    // Interrupção instantânea ao toque (Princípio 3 do Apple Design)
     strip.addEventListener("pointerdown", e => {
       dragging = true;
       strip.classList.add("dragging");
+      cancelAnimationFrame(raf);
       try { strip.setPointerCapture(e.pointerId); } catch (_) {}
       startX = e.clientX - x;
       lastX = e.clientX;
+      lastT = performance.now();
       vel = 0;
-      cancelAnimationFrame(raf);
     });
 
     strip.addEventListener("pointermove", e => {
       if (!dragging) return;
-      vel = e.clientX - lastX;
+      const now = performance.now();
+      const dt = Math.max(now - lastT, 1);
+      vel = ((e.clientX - lastX) / dt) * 16.67; // normalizado para 60fps
       lastX = e.clientX;
+      lastT = now;
       setX(e.clientX - startX);
     });
 
-    function snapBack() {
+    // Mola criticamente amortecida da Apple (damping 1.0, suave e sem ressalto descontrolado)
+    function springSnap(target, initialVelocity = 0) {
       cancelAnimationFrame(raf);
-      const target = Math.min(Math.max(x, -maxScroll()), 0);
-      const step = () => {
-        setX(x + (target - x) * .18);
-        if (Math.abs(target - x) > .5) raf = requestAnimationFrame(step);
-        else setX(target);
+      let currentVel = initialVelocity;
+      const settle = () => {
+        const force = (target - x) * 0.16; // resposta da mola
+        currentVel = (currentVel + force) * 0.76; // amortecimento crítico
+        setX(x + currentVel);
+        if (Math.abs(target - x) > 0.35 || Math.abs(currentVel) > 0.35) {
+          raf = requestAnimationFrame(settle);
+        } else {
+          setX(target);
+        }
       };
-      step();
+      settle();
     }
 
     function endDrag() {
       if (!dragging) return;
       dragging = false;
       strip.classList.remove("dragging");
-      // inércia
+      const max = maxScroll();
+
+      // Fora das bordas: mola elástica de regresso imediato
+      if (x > 0) {
+        springSnap(0, vel);
+        return;
+      }
+      if (x < -max) {
+        springSnap(-max, vel);
+        return;
+      }
+
+      // Projeção de momentum (Apple WWDC 2018)
       (function glide() {
-        vel *= .94;
-        if (Math.abs(vel) < .3 && x <= 0 && x >= -maxScroll()) { snapBack(); return; }
+        vel *= 0.94;
+        if (Math.abs(vel) < 0.3) {
+          if (x > 0 || x < -max) {
+            springSnap(x > 0 ? 0 : -max);
+          }
+          return;
+        }
         setX(x + vel);
-        if (x > 0 || x < -maxScroll()) { snapBack(); return; }
+        if (x > 0 || x < -max) {
+          springSnap(x > 0 ? 0 : -max, vel);
+          return;
+        }
         raf = requestAnimationFrame(glide);
       })();
     }

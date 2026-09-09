@@ -7,6 +7,7 @@ import {
   getWorkoutRecords,
   saveLoggedWorkoutRecord,
 } from '@/services/dbService';
+import { triggerLightImpact, triggerSuccessFeedback } from '@/services/hapticsService';
 import {
   MAX_DAILY_WORKOUT_MINUTES,
   MAX_WEEKLY_WORKOUT_MINUTES,
@@ -155,6 +156,7 @@ export function useWorkoutTracker() {
         timestamp: Date.now(),
         type: selectedType,
       });
+      triggerSuccessFeedback();
       const profile = await getUserProfile();
 
       setRecords((current) => [savedRecord, ...current]);

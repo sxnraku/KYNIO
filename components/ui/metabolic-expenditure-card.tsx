@@ -12,6 +12,7 @@ import {
 import { Text } from "@/components/ui/text";
 import { COLORS } from "@/constants/colors";
 import { saveWeightEntry } from "@/services/dbService";
+import { triggerLightImpact, triggerSuccessFeedback } from "@/services/hapticsService";
 import {
   getMetabolicExpenditureSnapshot,
   type MetabolicExpenditureData,
@@ -84,6 +85,7 @@ export function MetabolicExpenditureCard() {
   }, [dataVersion, loadData]);
 
   const handleOpenEdit = () => {
+    triggerLightImpact();
     if (data) {
       setTempWeight(String(data.currentWeightKg));
     }
@@ -112,6 +114,7 @@ export function MetabolicExpenditureCard() {
         await saveWeightEntry({ unit: "kg", weight: parsedWeight });
       }
 
+      triggerSuccessFeedback();
       setIsEditModalVisible(false);
       await loadData();
     } finally {
@@ -459,9 +462,12 @@ export function MetabolicExpenditureCard() {
             <View className="mt-5 flex-row gap-3">
               <Pressable
                 accessibilityRole="button"
-                className="flex-1 items-center justify-center rounded-xl border border-border py-2.5"
+                className="flex-1 items-center justify-center rounded-xl border border-border py-2.5 active:opacity-70 active:scale-[0.98]"
                 disabled={isSaving}
-                onPress={() => setIsEditModalVisible(false)}
+                onPress={() => {
+                  triggerLightImpact();
+                  setIsEditModalVisible(false);
+                }}
               >
                 <Text className="font-label text-xs uppercase tracking-wider text-muted">
                   {language === "en" ? "Cancel" : "Cancelar"}
@@ -469,7 +475,7 @@ export function MetabolicExpenditureCard() {
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                className="flex-1 items-center justify-center rounded-xl bg-foreground py-2.5 active:opacity-80"
+                className="flex-1 items-center justify-center rounded-xl bg-foreground py-2.5 active:opacity-80 active:scale-[0.98]"
                 disabled={isSaving}
                 onPress={handleSaveEdit}
               >

@@ -636,6 +636,16 @@ export default function SettingsScreen() {
                 ],
                 ["Termos de Utilização", "terms", "document-text-outline"],
                 [
+                  "Contrato de Licença (EULA)",
+                  "eula",
+                  "newspaper-outline",
+                ],
+                [
+                  "Política DMCA e Copyright",
+                  "dmca",
+                  "shield-outline",
+                ],
+                [
                   "Eliminar conta pela web",
                   "account-deletion",
                   "person-remove-outline",

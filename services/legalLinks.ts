@@ -1,4 +1,10 @@
-export type LegalDocument = 'account-deletion' | 'privacy' | 'support' | 'terms';
+export type LegalDocument =
+  | 'account-deletion'
+  | 'privacy'
+  | 'support'
+  | 'terms'
+  | 'eula'
+  | 'dmca';
 
 const DEFAULT_LEGAL_BASE_URL = 'https://sxnraku.github.io/KYNIO';
 
