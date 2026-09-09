@@ -83,3 +83,26 @@ AGENTS.md
 # Documentação interna de release e cloud
 docs/
 
+
+# Ativos de marketing, divulgacao e loja
+GUIA_DIVULGACAO_COMPLETO.md
+MARKETING_PLAYBOOK.md
+landing-page.html
+preview-icons.html
+preview_icons/
+promo-video.html
+promo-video.webp
+promo/
+design-proposta/
+store/google-play/
+scripts/*.py
+
+# Export web compilado (gerado pelo CI)
+legal-site/app/
+
+# Residuo de skills
+skills-lock.json
+
+# Testes E2E Maestro
+.maestro/
+
