@@ -113,3 +113,6 @@ eas.json
 # Capturas de ecra da app store
 assets/screenshots/
 
+
+.git-backup/
+
