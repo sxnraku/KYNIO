@@ -72,3 +72,10 @@ promo/
 # Projetos externos
 meurpg/
 
+
+# AI Agent & Skill files (apenas local)
+.agents/
+.claude/
+AGENTS.md
+.cursorrules
+
