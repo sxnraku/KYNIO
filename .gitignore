@@ -106,3 +106,10 @@ skills-lock.json
 # Testes E2E Maestro
 .maestro/
 
+
+# Configuracao de build Expo EAS (nuvem)
+eas.json
+
+# Capturas de ecra da app store
+assets/screenshots/
+
