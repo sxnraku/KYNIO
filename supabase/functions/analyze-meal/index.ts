@@ -237,12 +237,14 @@ async function hashRateLimitKey(
   salt: string,
   windowStart: number,
 ): Promise<string> {
+  const connectingIp = request.headers.get('cf-connecting-ip')?.trim();
+  const realIp = request.headers.get('x-real-ip')?.trim();
   const forwardedAddress = request.headers
     .get('x-forwarded-for')
-    ?.split(',')[0]
-    ?.trim();
-  const address =
-    forwardedAddress || request.headers.get('cf-connecting-ip') || 'unknown';
+    ?.split(',')
+    .map((ip) => ip.trim())
+    .filter(Boolean)[0];
+  const address = connectingIp || realIp || forwardedAddress || 'unknown';
   const bytes = new TextEncoder().encode(`${salt}:${address}:${windowStart}`);
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return Array.from(new Uint8Array(digest), (byte) =>
