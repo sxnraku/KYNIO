@@ -53,6 +53,14 @@ const THETA_RIGHT = -PHI;
 const ARC_PATH = `M ${CX - HALF_CHORD} ${BASE_Y} A ${RADIUS} ${RADIUS} 0 0 1 ${CX + HALF_CHORD} ${BASE_Y}`;
 const ARC_LENGTH = RADIUS * (THETA_RIGHT - THETA_LEFT);
 
+// Margens para que o halo luminoso do sol (raio 30) nunca seja cortado nas extremidades nem na base
+const PAD_X = 20; // x=-20 até x=340 cobre com folga o halo (-10 a 330)
+const PAD_BOTTOM = 24; // y=174 cobre com folga a base do halo (y=166)
+const VB_X = -PAD_X;
+const VB_Y = 0;
+const VB_W = VIEW_W + PAD_X * 2; // 360
+const VB_H = VIEW_H + PAD_BOTTOM; // 174
+
 function arcPointAt(p: number): { x: number; y: number } {
   const theta = THETA_LEFT + p * (THETA_RIGHT - THETA_LEFT);
   return {
@@ -82,7 +90,7 @@ export function FastingTimer({
   const language = useAppPreferencesStore((state) => state.language);
   const { width } = useWindowDimensions();
   const dialWidth = Math.min(Math.max(width - 64, 260), 340);
-  const dialHeight = (dialWidth * VIEW_H) / VIEW_W;
+  const dialHeight = (dialWidth * VB_H) / VB_W;
 
   const isOpenGoal = goalLabel.toLowerCase().includes("livre");
   const elapsedHours = elapsedMs / (60 * 60 * 1000);
@@ -124,7 +132,12 @@ export function FastingTimer({
         style={{ width: dialWidth }}
         testID="fasting-timer"
       >
-        <Svg height={dialHeight} width={dialWidth} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}>
+        <Svg
+          height={dialHeight}
+          style={{ overflow: "visible" }}
+          viewBox={`${VB_X} ${VB_Y} ${VB_W} ${VB_H}`}
+          width={dialWidth}
+        >
           <Defs>
             <RadialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
               <Stop offset="0%" stopColor="#F4C95D" stopOpacity="0.95" />
@@ -195,7 +208,7 @@ export function FastingTimer({
         </Svg>
 
         {/* relógio de matriz de pontos */}
-        <View className="mt-2 items-center">
+        <View className="-mt-3 items-center">
           <DotClock cellSize={7} dotRadius={2.5} value={clockValue} />
         </View>
 
