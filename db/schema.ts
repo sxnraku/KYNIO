@@ -12,7 +12,10 @@ export const fasts = sqliteTable(
     targetHours: integer('target_hours').notNull(),
     xpEarned: integer('xp_earned').notNull().default(0),
   },
-  (table) => [index('fasts_start_time_idx').on(table.startTime)],
+  (table) => [
+    index('fasts_start_time_idx').on(table.startTime),
+    index('fasts_deleted_start_time_idx').on(table.deletedAt, table.startTime),
+  ],
 );
 
 export const meals = sqliteTable(
@@ -32,7 +35,10 @@ export const meals = sqliteTable(
     timestamp: integer('timestamp').notNull(),
     xpEarned: integer('xp_earned').notNull().default(0),
   },
-  (table) => [index('meals_timestamp_idx').on(table.timestamp)],
+  (table) => [
+    index('meals_timestamp_idx').on(table.timestamp),
+    index('meals_deleted_timestamp_idx').on(table.deletedAt, table.timestamp),
+  ],
 );
 
 export const workouts = sqliteTable(
@@ -47,7 +53,10 @@ export const workouts = sqliteTable(
     type: text('type').notNull(),
     xpEarned: integer('xp_earned').notNull().default(0),
   },
-  (table) => [index('workouts_timestamp_idx').on(table.timestamp)],
+  (table) => [
+    index('workouts_timestamp_idx').on(table.timestamp),
+    index('workouts_deleted_timestamp_idx').on(table.deletedAt, table.timestamp),
+  ],
 );
 
 export const userProfile = sqliteTable('user_profile', {
@@ -80,7 +89,10 @@ export const weightEntries = sqliteTable(
     timestamp: integer('timestamp').notNull(),
     weightGrams: integer('weight_grams').notNull(),
   },
-  (table) => [index('weight_entries_timestamp_idx').on(table.timestamp)],
+  (table) => [
+    index('weight_entries_timestamp_idx').on(table.timestamp),
+    index('weight_entries_deleted_timestamp_idx').on(table.deletedAt, table.timestamp),
+  ],
 );
 
 export const fastingSymptoms = sqliteTable(
@@ -95,7 +107,11 @@ export const fastingSymptoms = sqliteTable(
     symptomKey: text('symptom_key').notNull(),
     timestamp: integer('timestamp').notNull(),
   },
-  (table) => [index('fasting_symptoms_timestamp_idx').on(table.timestamp)],
+  (table) => [
+    index('fasting_symptoms_timestamp_idx').on(table.timestamp),
+    index('fasting_symptoms_deleted_timestamp_idx').on(table.deletedAt, table.timestamp),
+    index('fasting_symptoms_fast_id_idx').on(table.fastId),
+  ],
 );
 
 export type FastRecord = typeof fasts.$inferSelect;
