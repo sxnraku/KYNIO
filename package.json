@@ -102,7 +102,8 @@
     "version:bump": "node scripts/bump-version.cjs",
     "release:check": "npm run version:check && npm run typecheck && npm run lint && npm test && npm run test:ai-contract && npm run test:legal-site && npx expo-doctor && npx expo export --platform android --output-dir .expo-export-check",
     "submit:android": "npx eas-cli submit --platform android --profile production",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "arch:view": "npx understand-anything-viewer"
   },
   "private": true
 }

@@ -78,7 +78,9 @@ meurpg/
 .claude/
 AGENTS.md
 .cursorrules
-.ua/
+.ua/intermediate/
+.ua/tmp/
+.ua/.trash-*
 .understand-anything/
 
 

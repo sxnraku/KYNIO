@@ -1,0 +1,1447 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "KYNIO",
+    "languages": [
+      "TypeScript",
+      "TSX",
+      "SQL"
+    ],
+    "frameworks": [
+      "React Native",
+      "Expo SDK 57",
+      "Expo Router",
+      "Drizzle ORM",
+      "NativeWind 4",
+      "Zustand 5",
+      "Supabase",
+      "Health Connect"
+    ],
+    "description": "Aplicação mobile gamificada de tracking circadiano de jejum, refeições, água, peso e treinos, com arquitetura local-first (Expo SQLite + Drizzle ORM).",
+    "analyzedAt": "2026-09-10T00:16:05.732Z",
+    "gitCommitHash": "c01eec8"
+  },
+  "nodes": [
+    {
+      "id": "app-root-layout",
+      "type": "file",
+      "name": "app/_layout.tsx",
+      "filePath": "app/_layout.tsx",
+      "lineRange": [
+        1,
+        102
+      ],
+      "summary": "Layout raiz do Expo Router: carrega fontes (Hanken Grotesk, JetBrains Mono), inicializa DB Drizzle e gere tema Circadiano.",
+      "tags": [
+        "expo-router",
+        "layout",
+        "fonts",
+        "theme",
+        "root"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "app-tabs-layout",
+      "type": "file",
+      "name": "app/(tabs)/_layout.tsx",
+      "filePath": "app/(tabs)/_layout.tsx",
+      "lineRange": [
+        1,
+        162
+      ],
+      "summary": "Estrutura de tabs do Expo Router: 5 abas principais (Jejum, Refeições, Progresso, Treinos, Perfil) com HapticTab e cores de tema.",
+      "tags": [
+        "expo-router",
+        "tabs",
+        "navigation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "app-tabs-index",
+      "type": "file",
+      "name": "app/(tabs)/index.tsx",
+      "filePath": "app/(tabs)/index.tsx",
+      "lineRange": [
+        1,
+        155
+      ],
+      "summary": "Ecrã principal do Jejum: mostrador solar circadiano, dot-clock 5x7, controlo de início/fim de jejum e hidratação rápida.",
+      "tags": [
+        "screen",
+        "fasting",
+        "timer",
+        "circadian",
+        "water"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "app-tabs-meals",
+      "type": "file",
+      "name": "app/(tabs)/meals.tsx",
+      "filePath": "app/(tabs)/meals.tsx",
+      "lineRange": [
+        1,
+        410
+      ],
+      "summary": "Ecrã de Refeições: registo manual ou por câmara com IA Gemini, lista de macronutrientes e tracking da janela alimentar.",
+      "tags": [
+        "screen",
+        "meals",
+        "ai",
+        "nutrition"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "app-tabs-progress",
+      "type": "file",
+      "name": "app/(tabs)/progress.tsx",
+      "filePath": "app/(tabs)/progress.tsx",
+      "lineRange": [
+        1,
+        218
+      ],
+      "summary": "Ecrã de Progresso: evolução de peso, histórico de jejuns, consistência semanal e estatísticas de adesão.",
+      "tags": [
+        "screen",
+        "progress",
+        "weight",
+        "charts"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "app-tabs-workouts",
+      "type": "file",
+      "name": "app/(tabs)/workouts.tsx",
+      "filePath": "app/(tabs)/workouts.tsx",
+      "lineRange": [
+        1,
+        115
+      ],
+      "summary": "Ecrã de Treinos: registo de sessões de exercício, calorias ativas e sincronização com Health Connect Android.",
+      "tags": [
+        "screen",
+        "workouts",
+        "fitness",
+        "health-connect"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "app-tabs-profile",
+      "type": "file",
+      "name": "app/(tabs)/profile.tsx",
+      "filePath": "app/(tabs)/profile.tsx",
+      "lineRange": [
+        1,
+        121
+      ],
+      "summary": "Ecrã de Perfil: nível, XP total, streaks, desafios semanais, insígnias de conquistas e atalho para definições.",
+      "tags": [
+        "screen",
+        "profile",
+        "gamification",
+        "xp",
+        "streak"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "app-settings",
+      "type": "file",
+      "name": "app/settings.tsx",
+      "filePath": "app/settings.tsx",
+      "lineRange": [
+        1,
+        679
+      ],
+      "summary": "Ecrã de Definições: alternância de tema Circadiano/Noite, idioma PT/EN, backup Google Drive/Supabase, exportação e eliminação RGPD.",
+      "tags": [
+        "screen",
+        "settings",
+        "rgpd",
+        "privacy",
+        "sync"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "ui-fasting-timer",
+      "type": "file",
+      "name": "components/ui/fasting-timer.tsx",
+      "filePath": "components/ui/fasting-timer.tsx",
+      "lineRange": [
+        1,
+        284
+      ],
+      "summary": "Arco solar circadiano em SVG com ticks de fase (anabólica, catabólica, queima de gordura, cetose, autofagia) e rail animado.",
+      "tags": [
+        "svg",
+        "circadian",
+        "fasting-timer",
+        "signature-ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "ui-dot-clock",
+      "type": "file",
+      "name": "components/ui/dot-clock.tsx",
+      "filePath": "components/ui/dot-clock.tsx",
+      "lineRange": [
+        1,
+        95
+      ],
+      "summary": "Relógio retro em matriz de pontos 5x7 em SVG, desenhado para a identidade minimalista Circadiana.",
+      "tags": [
+        "svg",
+        "dot-matrix",
+        "clock",
+        "signature-ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "ui-water-tracker",
+      "type": "file",
+      "name": "components/ui/water-tracker.tsx",
+      "filePath": "components/ui/water-tracker.tsx",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Widget de registo de hidratação rápida (+250ml) com feedback hático e cálculo de meta diária determinística.",
+      "tags": [
+        "water",
+        "hydration",
+        "widget",
+        "haptics"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "ui-weekly-challenges",
+      "type": "file",
+      "name": "components/ui/weekly-challenges.tsx",
+      "filePath": "components/ui/weekly-challenges.tsx",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Cartão de desafios semanais: 3 missões com cálculo determinístico de progresso, botão de resgate de XP e feedback de conclusão.",
+      "tags": [
+        "gamification",
+        "challenges",
+        "xp",
+        "card"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "ui-paywall-modal",
+      "type": "file",
+      "name": "components/ui/paywall-modal.tsx",
+      "filePath": "components/ui/paywall-modal.tsx",
+      "lineRange": [
+        1,
+        905
+      ],
+      "summary": "Modal de assinatura KYNIO Pro: benefícios de sincronização na nuvem e IA ilimitada, integração com Google Play Billing.",
+      "tags": [
+        "billing",
+        "iap",
+        "paywall",
+        "pro"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "ui-legal-consent-modal",
+      "type": "file",
+      "name": "components/ui/legal-consent-modal.tsx",
+      "filePath": "components/ui/legal-consent-modal.tsx",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Modal de consentimento legal no 1º arranque: bloqueia navegação até aceitação explícita dos Termos e Política de Privacidade.",
+      "tags": [
+        "rgpd",
+        "compliance",
+        "legal",
+        "consent"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "store-fasting",
+      "type": "file",
+      "name": "store/useFastingStore.ts",
+      "filePath": "store/useFastingStore.ts",
+      "lineRange": [
+        1,
+        280
+      ],
+      "summary": "Zustand Store de Jejum: gere estado do jejum ativo, protocolo selecionado (16:8, 18:6, 20:4, OMAD), timestamps e histórico local.",
+      "tags": [
+        "zustand",
+        "state",
+        "fasting",
+        "protocol"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "store-water",
+      "type": "file",
+      "name": "store/useWaterStore.ts",
+      "filePath": "store/useWaterStore.ts",
+      "lineRange": [
+        1,
+        136
+      ],
+      "summary": "Zustand Store de Água: rastreia copos bebidos no dia corrente, resets à meia-noite e cálculo de XP de hidratação.",
+      "tags": [
+        "zustand",
+        "state",
+        "water",
+        "hydration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "store-progress",
+      "type": "file",
+      "name": "store/user-progress-store.ts",
+      "filePath": "store/user-progress-store.ts",
+      "lineRange": [
+        1,
+        52
+      ],
+      "summary": "Zustand Store de Progresso: nível do utilizador, XP total, streaks diários e conquistas desbloqueadas.",
+      "tags": [
+        "zustand",
+        "gamification",
+        "xp",
+        "level",
+        "streak"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "store-weekly-challenges",
+      "type": "file",
+      "name": "store/use-weekly-challenges-store.ts",
+      "filePath": "store/use-weekly-challenges-store.ts",
+      "lineRange": [
+        1,
+        38
+      ],
+      "summary": "Zustand Store de Desafios Semanais: guarda desafios da semana atual e estado persistido de resgates (claimed challenges).",
+      "tags": [
+        "zustand",
+        "challenges",
+        "gamification"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "store-preferences",
+      "type": "file",
+      "name": "store/app-preferences-store.ts",
+      "filePath": "store/app-preferences-store.ts",
+      "lineRange": [
+        1,
+        106
+      ],
+      "summary": "Zustand Store de Preferências: tema ativo (Circadiano claro / Noite escuro), idioma (PT / EN) e configurações de notificações.",
+      "tags": [
+        "zustand",
+        "preferences",
+        "theme",
+        "i18n"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "store-consent",
+      "type": "file",
+      "name": "store/legal-consent-store.ts",
+      "filePath": "store/legal-consent-store.ts",
+      "lineRange": [
+        1,
+        86
+      ],
+      "summary": "Zustand Store de Consentimento Legal: persiste a confirmação de leitura e aceitação dos termos de utilização (RGPD).",
+      "tags": [
+        "zustand",
+        "legal",
+        "consent",
+        "rgpd"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "service-db",
+      "type": "service",
+      "name": "services/dbService.ts",
+      "filePath": "services/dbService.ts",
+      "lineRange": [
+        1,
+        675
+      ],
+      "summary": "Camada de persistência local SQLite + Drizzle: CRUD com soft-delete de jejuns, refeições, treinos, peso e sintomas com índices compostos.",
+      "tags": [
+        "database",
+        "sqlite",
+        "drizzle",
+        "crud",
+        "soft-delete"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "service-gamification",
+      "type": "service",
+      "name": "services/gamificationService.ts",
+      "filePath": "services/gamificationService.ts",
+      "lineRange": [
+        1,
+        317
+      ],
+      "summary": "Motor de Gamificação: tabela determinística de níveis, atribuição de XP por jejum concluído, treino e consistência.",
+      "tags": [
+        "gamification",
+        "xp",
+        "level",
+        "logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-fasting",
+      "type": "service",
+      "name": "services/fastingService.ts",
+      "filePath": "services/fastingService.ts",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Serviço de cálculo de jejum: horas decorridas, percentagem do objetivo, validação de transições de estado e cálculo de streaks.",
+      "tags": [
+        "fasting",
+        "calculations",
+        "core-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-fasting-stage",
+      "type": "service",
+      "name": "services/fastingStageService.ts",
+      "filePath": "services/fastingStageService.ts",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Serviço de Fases Metabólicas: mapeia horas de jejum para fases científicas descritivas (Glicogénio, Queima de Gordura, Cetose, Autofagia).",
+      "tags": [
+        "fasting",
+        "metabolic-stages",
+        "science",
+        "neutral-ui"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "service-ai-meal",
+      "type": "service",
+      "name": "services/aiMealService.ts",
+      "filePath": "services/aiMealService.ts",
+      "lineRange": [
+        1,
+        212
+      ],
+      "summary": "Cliente de IA para análise nutricional de refeições: chama a Supabase Edge Function analyze-meal e valida resposta JSON estrita.",
+      "tags": [
+        "ai",
+        "gemini",
+        "nutrition",
+        "vision",
+        "edge-function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-water-xp",
+      "type": "service",
+      "name": "services/waterXpService.ts",
+      "filePath": "services/waterXpService.ts",
+      "lineRange": [
+        1,
+        45
+      ],
+      "summary": "Serviço de XP de Hidratação: cálculo determinístico de pontos de água sem duplicação de recompensas diárias.",
+      "tags": [
+        "water",
+        "xp",
+        "gamification",
+        "deterministic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "service-weekly-challenges",
+      "type": "service",
+      "name": "services/weeklyChallengesService.ts",
+      "filePath": "services/weeklyChallengesService.ts",
+      "lineRange": [
+        1,
+        52
+      ],
+      "summary": "Motor de Desafios Semanais: geração determinística de 3 desafios baseados na seed da semana ISO (segunda a domingo).",
+      "tags": [
+        "challenges",
+        "iso-week",
+        "gamification",
+        "missions"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-privacy",
+      "type": "service",
+      "name": "services/dataPrivacyService.ts",
+      "filePath": "services/dataPrivacyService.ts",
+      "lineRange": [
+        1,
+        238
+      ],
+      "summary": "Serviço de Privacidade RGPD: exportação completa de dados locais em formato JSON estruturado e eliminação total (hard-delete local).",
+      "tags": [
+        "privacy",
+        "rgpd",
+        "export",
+        "delete",
+        "compliance"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-cloud-sync",
+      "type": "service",
+      "name": "services/cloudSyncService.ts",
+      "filePath": "services/cloudSyncService.ts",
+      "lineRange": [
+        1,
+        596
+      ],
+      "summary": "Motor de Sincronização Cloud opcional com Supabase: resolução de conflitos por updated_at (LWW) e propagação de soft-deletes.",
+      "tags": [
+        "sync",
+        "supabase",
+        "cloud",
+        "lww",
+        "conflict-resolution"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "service-cloud-auth",
+      "type": "service",
+      "name": "services/cloudAuthService.ts",
+      "filePath": "services/cloudAuthService.ts",
+      "lineRange": [
+        1,
+        233
+      ],
+      "summary": "Autenticação Google / Supabase: início de sessão voluntário para backup na nuvem.",
+      "tags": [
+        "auth",
+        "google",
+        "oauth",
+        "supabase"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-iap",
+      "type": "service",
+      "name": "services/inAppPurchaseService.ts",
+      "filePath": "services/inAppPurchaseService.ts",
+      "lineRange": [
+        1,
+        399
+      ],
+      "summary": "Gestor de Compras na App (Google Play Billing): subscrição KYNIO Pro e recuperação de compras existentes.",
+      "tags": [
+        "billing",
+        "iap",
+        "google-play",
+        "subscriptions"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-purchase-verification",
+      "type": "service",
+      "name": "services/purchaseVerificationService.ts",
+      "filePath": "services/purchaseVerificationService.ts",
+      "lineRange": [
+        1,
+        95
+      ],
+      "summary": "Verificação server-side de recibos de compra via Edge Function verify-purchase para impedir spoofing local.",
+      "tags": [
+        "security",
+        "verification",
+        "receipts",
+        "edge-function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-health-connect",
+      "type": "service",
+      "name": "services/healthConnectService.ts",
+      "filePath": "services/healthConnectService.ts",
+      "lineRange": [
+        1,
+        118
+      ],
+      "summary": "Integração Android Health Connect: leitura opcional de treinos e calorias ativas com consentimento explícito.",
+      "tags": [
+        "android",
+        "health-connect",
+        "fitness",
+        "sensors"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "service-i18n",
+      "type": "service",
+      "name": "services/i18n.ts",
+      "filePath": "services/i18n.ts",
+      "lineRange": [
+        1,
+        157
+      ],
+      "summary": "Sistema de Internacionalização: dicionário bidirecional de termos e strings UI de Português (pt-PT) para Inglês (en-US).",
+      "tags": [
+        "i18n",
+        "translation",
+        "portuguese",
+        "english"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "db-schema",
+      "type": "file",
+      "name": "db/schema.ts",
+      "filePath": "db/schema.ts",
+      "lineRange": [
+        1,
+        128
+      ],
+      "summary": "Schema Drizzle ORM: tabelas fasts, meals, workouts, weight_entries, user_progress, water_logs com campos de soft-delete e índices compostos.",
+      "tags": [
+        "drizzle",
+        "sqlite",
+        "schema",
+        "composite-indexes"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "db-client",
+      "type": "file",
+      "name": "db/client.ts",
+      "filePath": "db/client.ts",
+      "lineRange": [
+        1,
+        225
+      ],
+      "summary": "Instanciação e migração do SQLite local: inicializa a base de dados Expo SQLite e aplica migrações Drizzle no arranque.",
+      "tags": [
+        "sqlite",
+        "expo-sqlite",
+        "client",
+        "migrations"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "table-fasts",
+      "type": "table",
+      "name": "table: fasts",
+      "filePath": "db/schema.ts",
+      "lineRange": [
+        1,
+        128
+      ],
+      "summary": "Tabela de registos de jejum: id, protocol, start_time, end_time, target_duration, rating, notes, deleted_at, sync_id.",
+      "tags": [
+        "table",
+        "sqlite",
+        "fasting"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table-meals",
+      "type": "table",
+      "name": "table: meals",
+      "filePath": "db/schema.ts",
+      "lineRange": [
+        1,
+        128
+      ],
+      "summary": "Tabela de refeições: id, timestamp, name, calories, protein, carbs, fat, image_url, ai_analyzed, deleted_at.",
+      "tags": [
+        "table",
+        "sqlite",
+        "meals"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table-workouts",
+      "type": "table",
+      "name": "table: workouts",
+      "filePath": "db/schema.ts",
+      "lineRange": [
+        1,
+        128
+      ],
+      "summary": "Tabela de treinos: id, timestamp, type, duration_minutes, calories_burned, source (manual/health-connect), deleted_at.",
+      "tags": [
+        "table",
+        "sqlite",
+        "workouts"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "table-weight",
+      "type": "table",
+      "name": "table: weight_entries",
+      "filePath": "db/schema.ts",
+      "lineRange": [
+        1,
+        128
+      ],
+      "summary": "Tabela de peso: id, timestamp, weight_kg, notes, deleted_at.",
+      "tags": [
+        "table",
+        "sqlite",
+        "weight"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "edge-analyze-meal",
+      "type": "endpoint",
+      "name": "supabase/functions/analyze-meal/index.ts",
+      "filePath": "supabase/functions/analyze-meal/index.ts",
+      "lineRange": [
+        1,
+        429
+      ],
+      "summary": "Edge Function Deno: recebe imagem de refeição codificada em base64, envia ao Gemini com JSON Schema estrito e devolve macronutrientes.",
+      "tags": [
+        "edge-function",
+        "deno",
+        "gemini-api",
+        "ai-vision",
+        "strict-json"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "edge-verify-purchase",
+      "type": "endpoint",
+      "name": "supabase/functions/verify-purchase/index.ts",
+      "filePath": "supabase/functions/verify-purchase/index.ts",
+      "lineRange": [
+        1,
+        243
+      ],
+      "summary": "Edge Function Deno: valida token de compra com a Google Play Developer API e atribui licença Pro no Supabase Auth.",
+      "tags": [
+        "edge-function",
+        "deno",
+        "google-play-api",
+        "security",
+        "billing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "edge-delete-account",
+      "type": "endpoint",
+      "name": "supabase/functions/delete-account/index.ts",
+      "filePath": "supabase/functions/delete-account/index.ts",
+      "lineRange": [
+        1,
+        69
+      ],
+      "summary": "Edge Function Deno: elimina utilizador e dados na nuvem a pedido do utilizador (RGPD Artigo 17 - Direito ao Esquecimento).",
+      "tags": [
+        "edge-function",
+        "deno",
+        "rgpd",
+        "compliance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "cloud-schema",
+      "type": "file",
+      "name": "supabase/schema.sql",
+      "filePath": "supabase/schema.sql",
+      "lineRange": [
+        1,
+        188
+      ],
+      "summary": "Schema PostgreSQL na cloud com Row Level Security (RLS) estrito: tabelas para sync opcional acessíveis apenas pelo auth.uid().",
+      "tags": [
+        "supabase",
+        "postgres",
+        "rls",
+        "security",
+        "schema"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "constants-colors",
+      "type": "file",
+      "name": "constants/colors.ts",
+      "filePath": "constants/colors.ts",
+      "lineRange": [
+        1,
+        206
+      ],
+      "summary": "Design System \"Circadiano\": paleta de papel quente (#EDE6D3), tinta carvão (#3A3A38) e acento solar (#D9922E), tema Noite e helper de opacidade.",
+      "tags": [
+        "colors",
+        "theme",
+        "design-system",
+        "circadian"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "constants-protocols",
+      "type": "file",
+      "name": "constants/fastingProtocols.ts",
+      "filePath": "constants/fastingProtocols.ts",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Definição dos protocolos de jejum suportados: 12:12, 14:10, 16:8 (Circadiano), 18:6, 20:4 (Guerreiro) e 24h (OMAD).",
+      "tags": [
+        "constants",
+        "fasting",
+        "protocols"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "types-database",
+      "type": "file",
+      "name": "types/database.ts",
+      "filePath": "types/database.ts",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Tipos TypeScript derivados do schema Drizzle: FastRecord, MealRecord, WorkoutRecord, WeightRecord e payloads de sync.",
+      "tags": [
+        "typescript",
+        "types",
+        "database"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "types-gamification",
+      "type": "file",
+      "name": "types/gamification.ts",
+      "filePath": "types/gamification.ts",
+      "lineRange": [
+        1,
+        1
+      ],
+      "summary": "Tipos TypeScript para gamificação: LevelInfo, XpReward, StreakState, WeeklyChallenge, ChallengeProgress.",
+      "tags": [
+        "typescript",
+        "types",
+        "gamification"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "app-root-layout",
+      "target": "app-tabs-layout",
+      "type": "routes",
+      "direction": "forward",
+      "description": "Root layout monta as abas principais",
+      "weight": 0.9
+    },
+    {
+      "source": "app-root-layout",
+      "target": "app-settings",
+      "type": "routes",
+      "direction": "forward",
+      "description": "Navegação modal para definições da app",
+      "weight": 0.8
+    },
+    {
+      "source": "app-tabs-layout",
+      "target": "app-tabs-index",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Aba 1: Jejum Circadiano",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-layout",
+      "target": "app-tabs-meals",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Aba 2: Refeições & Nutrição",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-layout",
+      "target": "app-tabs-progress",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Aba 3: Progresso & Peso",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-layout",
+      "target": "app-tabs-workouts",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Aba 4: Treinos & Exercício",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-layout",
+      "target": "app-tabs-profile",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Aba 5: Perfil & Gamificação",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-index",
+      "target": "ui-fasting-timer",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Renderiza o mostrador do arco solar",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-index",
+      "target": "ui-dot-clock",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Renderiza o relógio retro em matriz 5x7",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-index",
+      "target": "ui-water-tracker",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Renderiza o botão de registo de água rápida",
+      "weight": 0.8
+    },
+    {
+      "source": "app-tabs-profile",
+      "target": "ui-weekly-challenges",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Exibe os 3 desafios da semana no perfil",
+      "weight": 0.8
+    },
+    {
+      "source": "app-settings",
+      "target": "ui-paywall-modal",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Abre paywall para ativação do KYNIO Pro",
+      "weight": 0.7
+    },
+    {
+      "source": "app-root-layout",
+      "target": "ui-legal-consent-modal",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Bloqueia até consentimento legal no 1º arranque",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-index",
+      "target": "store-fasting",
+      "type": "subscribes",
+      "direction": "bidirectional",
+      "description": "Lê e atualiza o estado do temporizador",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-index",
+      "target": "store-water",
+      "type": "subscribes",
+      "direction": "bidirectional",
+      "description": "Regista copos de água consumidos",
+      "weight": 0.8
+    },
+    {
+      "source": "app-tabs-profile",
+      "target": "store-progress",
+      "type": "subscribes",
+      "direction": "forward",
+      "description": "Lê nível, XP e streaks do utilizador",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-profile",
+      "target": "store-weekly-challenges",
+      "type": "subscribes",
+      "direction": "forward",
+      "description": "Lê e resgata desafios completados",
+      "weight": 0.8
+    },
+    {
+      "source": "app-root-layout",
+      "target": "store-preferences",
+      "type": "subscribes",
+      "direction": "forward",
+      "description": "Aplica tema claro/escuro e idioma ativo",
+      "weight": 0.8
+    },
+    {
+      "source": "store-fasting",
+      "target": "service-fasting",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Usa lógica de cálculo de duração e percentagem",
+      "weight": 0.9
+    },
+    {
+      "source": "store-fasting",
+      "target": "service-fasting-stage",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Determina a fase metabólica atual do jejum",
+      "weight": 0.8
+    },
+    {
+      "source": "store-fasting",
+      "target": "service-db",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "Persiste início e fim do jejum no SQLite local",
+      "weight": 0.9
+    },
+    {
+      "source": "store-water",
+      "target": "service-water-xp",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Calcula XP ganho pelo consumo de água",
+      "weight": 0.7
+    },
+    {
+      "source": "store-progress",
+      "target": "service-gamification",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Calcula progressão de nível e badges",
+      "weight": 0.9
+    },
+    {
+      "source": "store-weekly-challenges",
+      "target": "service-weekly-challenges",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Gera e valida metas semanais ISO",
+      "weight": 0.8
+    },
+    {
+      "source": "app-tabs-meals",
+      "target": "service-ai-meal",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Envia foto para inferência nutricional",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-meals",
+      "target": "service-db",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "Guarda refeições e macros na base de dados",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-workouts",
+      "target": "service-health-connect",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Lê treinos sincronizados do Health Connect",
+      "weight": 0.8
+    },
+    {
+      "source": "app-tabs-workouts",
+      "target": "service-db",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "Persiste registos de treino no SQLite",
+      "weight": 0.9
+    },
+    {
+      "source": "app-tabs-progress",
+      "target": "service-db",
+      "type": "reads_from",
+      "direction": "forward",
+      "description": "Lê histórico de peso e jejuns concluídos",
+      "weight": 0.9
+    },
+    {
+      "source": "app-settings",
+      "target": "service-privacy",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Executa exportação JSON e hard-delete RGPD",
+      "weight": 0.9
+    },
+    {
+      "source": "app-settings",
+      "target": "service-cloud-sync",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Dispara sincronização manual com a cloud",
+      "weight": 0.8
+    },
+    {
+      "source": "service-ai-meal",
+      "target": "edge-analyze-meal",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Chama Edge Function Gemini via HTTPS",
+      "weight": 0.9
+    },
+    {
+      "source": "service-iap",
+      "target": "service-purchase-verification",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Envia recibo de compra para validação",
+      "weight": 0.8
+    },
+    {
+      "source": "service-purchase-verification",
+      "target": "edge-verify-purchase",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Chama Edge Function de validação de recibos",
+      "weight": 0.9
+    },
+    {
+      "source": "service-privacy",
+      "target": "edge-delete-account",
+      "type": "calls",
+      "direction": "forward",
+      "description": "Elimina registo na cloud se conta estiver ligada",
+      "weight": 0.8
+    },
+    {
+      "source": "service-cloud-sync",
+      "target": "service-cloud-auth",
+      "type": "depends_on",
+      "direction": "forward",
+      "description": "Verifica token JWT do utilizador autenticado",
+      "weight": 0.9
+    },
+    {
+      "source": "service-cloud-sync",
+      "target": "cloud-schema",
+      "type": "writes_to",
+      "direction": "bidirectional",
+      "description": "Sincroniza tabelas locais com PostgreSQL Cloud",
+      "weight": 0.9
+    },
+    {
+      "source": "service-db",
+      "target": "db-client",
+      "type": "imports",
+      "direction": "forward",
+      "description": "Obtém instância inicializada da base de dados",
+      "weight": 0.9
+    },
+    {
+      "source": "service-db",
+      "target": "db-schema",
+      "type": "defines_schema",
+      "direction": "forward",
+      "description": "Manipula entidades segundo o schema Drizzle",
+      "weight": 0.9
+    },
+    {
+      "source": "db-schema",
+      "target": "table-fasts",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Define schema da tabela fasts",
+      "weight": 0.9
+    },
+    {
+      "source": "db-schema",
+      "target": "table-meals",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Define schema da tabela meals",
+      "weight": 0.9
+    },
+    {
+      "source": "db-schema",
+      "target": "table-workouts",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Define schema da tabela workouts",
+      "weight": 0.9
+    },
+    {
+      "source": "db-schema",
+      "target": "table-weight",
+      "type": "contains",
+      "direction": "forward",
+      "description": "Define schema da tabela weight_entries",
+      "weight": 0.9
+    },
+    {
+      "source": "app-root-layout",
+      "target": "constants-colors",
+      "type": "imports",
+      "direction": "forward",
+      "description": "Injeta tokens de cores do tema Circadiano",
+      "weight": 0.9
+    },
+    {
+      "source": "ui-fasting-timer",
+      "target": "constants-colors",
+      "type": "imports",
+      "direction": "forward",
+      "description": "Usa acento âmbar solar (#D9922E)",
+      "weight": 0.9
+    },
+    {
+      "source": "service-fasting",
+      "target": "constants-protocols",
+      "type": "imports",
+      "direction": "forward",
+      "description": "Lê durações dos protocolos padrão",
+      "weight": 0.8
+    },
+    {
+      "source": "service-db",
+      "target": "types-database",
+      "type": "implements",
+      "direction": "forward",
+      "description": "Tipa retornos com as interfaces do banco",
+      "weight": 0.8
+    },
+    {
+      "source": "service-gamification",
+      "target": "types-gamification",
+      "type": "implements",
+      "direction": "forward",
+      "description": "Tipa cálculo de níveis e recompensas",
+      "weight": 0.8
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer-ui",
+      "name": "Interface & Ecrãs (UI)",
+      "description": "Ecrãs das abas e componentes visuais de assinatura (arco solar, dot-clock, badges, modais).",
+      "nodeIds": [
+        "app-tabs-index",
+        "app-tabs-meals",
+        "app-tabs-progress",
+        "app-tabs-workouts",
+        "app-tabs-profile",
+        "app-settings",
+        "ui-fasting-timer",
+        "ui-dot-clock",
+        "ui-water-tracker",
+        "ui-weekly-challenges",
+        "ui-paywall-modal",
+        "ui-legal-consent-modal"
+      ]
+    },
+    {
+      "id": "layer-navigation",
+      "name": "Navegação (Expo Router)",
+      "description": "Rotas tipadas, layouts aninhados e transições de ecrã do Expo Router.",
+      "nodeIds": [
+        "app-root-layout",
+        "app-tabs-layout"
+      ]
+    },
+    {
+      "id": "layer-state",
+      "name": "Estado Reativo (Zustand Stores)",
+      "description": "Gestão de estado global leve e desacoplada para jejum, água, progresso, desafios e preferências.",
+      "nodeIds": [
+        "store-fasting",
+        "store-water",
+        "store-progress",
+        "store-weekly-challenges",
+        "store-preferences",
+        "store-consent"
+      ]
+    },
+    {
+      "id": "layer-services",
+      "name": "Serviços de Negócio (Services)",
+      "description": "Lógica determinística: gamificação, fases metabólicas, nutrição por IA, sync cloud e privacidade RGPD.",
+      "nodeIds": [
+        "service-db",
+        "service-gamification",
+        "service-fasting",
+        "service-fasting-stage",
+        "service-ai-meal",
+        "service-water-xp",
+        "service-weekly-challenges",
+        "service-privacy",
+        "service-cloud-sync",
+        "service-cloud-auth",
+        "service-iap",
+        "service-purchase-verification",
+        "service-health-connect",
+        "service-i18n"
+      ]
+    },
+    {
+      "id": "layer-database",
+      "name": "Persistência Local (SQLite + Drizzle ORM)",
+      "description": "Armazenamento local no dispositivo com suporte a índices compostos, migrações atómicas e soft delete.",
+      "nodeIds": [
+        "db-schema",
+        "db-client",
+        "table-fasts",
+        "table-meals",
+        "table-workouts",
+        "table-weight"
+      ]
+    },
+    {
+      "id": "layer-cloud",
+      "name": "Cloud & Edge Functions (Supabase)",
+      "description": "Serviços de apoio na nuvem (IA Gemini, validação de compras, sync voluntário e RLS).",
+      "nodeIds": [
+        "edge-analyze-meal",
+        "edge-verify-purchase",
+        "edge-delete-account",
+        "cloud-schema"
+      ]
+    },
+    {
+      "id": "layer-foundation",
+      "name": "Fundação & Design Tokens",
+      "description": "Sistema de cores Circadiano, protocolos de jejum e tipagem TypeScript partilhada.",
+      "nodeIds": [
+        "constants-colors",
+        "constants-protocols",
+        "types-database",
+        "types-gamification"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Arquitetura Local-First & Privacidade (RGPD)",
+      "description": "Como o KYNIO armazena 100% dos dados de saúde no dispositivo SQLite local, aplicando índices compostos e garantindo exportação/eliminação sem retenção externa.",
+      "nodeIds": [
+        "db-schema",
+        "db-client",
+        "service-db",
+        "service-privacy",
+        "app-settings"
+      ],
+      "languageLesson": "Princípio Local-First: a app funciona 100% offline. Apenas com autorização explícita os dados são cifrados e sincronizados com a cloud."
+    },
+    {
+      "order": 2,
+      "title": "O Motor de Jejum & Mostrador Circadiano",
+      "description": "O fluxo central de contagem do jejum: o mostrador com arco solar SVG, o relógio dot-matrix 5x7 e o cálculo das 5 fases metabólicas.",
+      "nodeIds": [
+        "app-tabs-index",
+        "ui-fasting-timer",
+        "ui-dot-clock",
+        "store-fasting",
+        "service-fasting",
+        "service-fasting-stage"
+      ],
+      "languageLesson": "Design Circadiano: UI minimalista e quente que acompanha o ciclo biológico natural sem alarmismo."
+    },
+    {
+      "order": 3,
+      "title": "Gamificação Determinística (XP, Níveis & Desafios)",
+      "description": "Sistema anti-inflacionário de XP: missões semanais geradas por semente de calendário ISO, streaks e progressão sem aleatoriedade.",
+      "nodeIds": [
+        "app-tabs-profile",
+        "ui-weekly-challenges",
+        "store-weekly-challenges",
+        "store-progress",
+        "service-gamification",
+        "service-weekly-challenges"
+      ],
+      "languageLesson": "Gamificação Ética: recompensar a consistência e o equilíbrio biológico em vez da dopamina artificial."
+    },
+    {
+      "order": 4,
+      "title": "Refeições com Visão Computacional (Gemini Edge)",
+      "description": "Como uma foto de prato é convertida em estimativa nutricional por IA sem expor a chave Gemini nem armazenar imagens no servidor.",
+      "nodeIds": [
+        "app-tabs-meals",
+        "service-ai-meal",
+        "edge-analyze-meal",
+        "service-db",
+        "table-meals"
+      ],
+      "languageLesson": "Zero AI Slop: a resposta da Edge Function é em JSON estrito com tipagem validada antes de chegar à interface."
+    },
+    {
+      "order": 5,
+      "title": "Sincronização Opcional na Cloud (Supabase)",
+      "description": "O mecanismo opcional de backup na nuvem com autenticação Google OAuth, verificação de compras na Play Store e políticas RLS seguras.",
+      "nodeIds": [
+        "service-cloud-auth",
+        "service-cloud-sync",
+        "cloud-schema",
+        "service-purchase-verification",
+        "edge-verify-purchase"
+      ],
+      "languageLesson": "Segurança Server-Side: verificação de compras diretamente com a Google Play Developer API."
+    }
+  ]
+}
