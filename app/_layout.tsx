@@ -23,6 +23,7 @@ import { ProfileOnboardingModal } from "@/components/ui/profile-onboarding-modal
 import { getColorPalette } from "@/constants/colors";
 import { handleStripeReturnIfPresent } from "@/services/stripeSubscriptionService";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
+import { useUserProgressStore } from "@/store/user-progress-store";
 
 import { setupTabCoordination } from "@/services/webTabCoordinator";
 
@@ -40,6 +41,7 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
+    void useUserProgressStore.getState().initializeProgress();
     handleStripeReturnIfPresent();
     if (Platform.OS === "web" && typeof window !== "undefined") {
       setupTabCoordination();

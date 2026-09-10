@@ -2,7 +2,8 @@ import { memo } from "react";
 import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
-import { COLORS } from "@/constants/colors";
+import { getColorPalette } from "@/constants/colors";
+import { useAppPreferencesStore } from "@/store/app-preferences-store";
 
 /**
  * Relógio de matriz de pontos ("Circadiano"): dígitos desenhados como
@@ -33,6 +34,10 @@ interface DotClockProps {
   cellSize?: number;
   /** Raio de cada ponto em px. */
   dotRadius?: number;
+  /** Cor personalizada para os pontos numéricos */
+  dotColor?: string;
+  /** Cor personalizada para os dois pontos ":" */
+  colonColor?: string;
 }
 
 interface DotSpec {
@@ -44,8 +49,20 @@ interface DotSpec {
 export const DotClock = memo(function DotClock({
   value,
   cellSize = 7,
-  dotRadius = 2.5,
+  dotRadius = 2.8,
+  dotColor,
+  colonColor,
 }: DotClockProps) {
+  const themeMode = useAppPreferencesStore((state) => state.themeMode);
+  const palette = getColorPalette(themeMode);
+
+  // No tema claro, usamos tinta carvão profunda (#1E1D1B) e âmbar contrastante
+  // para compensar o fator de preenchimento dos círculos e garantir legibilidade perfeita
+  const activeDotColor =
+    dotColor ?? (themeMode === "light" ? "#1E1D1B" : palette.foreground);
+  const activeColonColor =
+    colonColor ?? (themeMode === "light" ? "#B45309" : palette.success);
+
   const dots: DotSpec[] = [];
   let cursorX = dotRadius;
 
@@ -83,7 +100,7 @@ export const DotClock = memo(function DotClock({
           <Circle
             cx={dot.cx}
             cy={dot.cy}
-            fill={dot.isColon ? COLORS.success : COLORS.foreground}
+            fill={dot.isColon ? activeColonColor : activeDotColor}
             key={`${dot.cx}-${dot.cy}-${index}`}
             r={dotRadius}
           />
@@ -92,3 +109,4 @@ export const DotClock = memo(function DotClock({
     </View>
   );
 });
+

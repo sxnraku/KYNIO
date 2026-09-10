@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useUserProgressStore } from '@/store/user-progress-store';
 import type { UserProgress } from '@/types/progress';
 
@@ -9,5 +11,10 @@ export function useUserProgress(): UserProgress {
   const targetXp = useUserProgressStore((state) => state.targetXp);
   const totalXp = useUserProgressStore((state) => state.totalXp);
 
+  useEffect(() => {
+    void useUserProgressStore.getState().initializeProgress();
+  }, []);
+
   return { currentXp, level, levelTitle, progress, targetXp, totalXp };
 }
+

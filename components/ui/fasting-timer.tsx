@@ -11,7 +11,7 @@ import Svg, {
 } from "react-native-svg";
 
 import { DotClock } from "@/components/ui/dot-clock";
-import { COLORS } from "@/constants/colors";
+import { getColorPalette } from "@/constants/colors";
 import { translateText } from "@/services/i18n";
 import {
   ESTIMATED_METABOLIC_PHASES,
@@ -88,6 +88,10 @@ export function FastingTimer({
   targetDurationMs,
 }: FastingTimerProps) {
   const language = useAppPreferencesStore((state) => state.language);
+  const themeMode = useAppPreferencesStore((state) => state.themeMode);
+  const colors = getColorPalette(themeMode);
+  const isLight = themeMode === "light";
+
   const { width } = useWindowDimensions();
   const dialWidth = Math.min(Math.max(width - 64, 260), 340);
   const dialHeight = (dialWidth * VB_H) / VB_W;
@@ -140,19 +144,19 @@ export function FastingTimer({
         >
           <Defs>
             <RadialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-              <Stop offset="0%" stopColor="#F4C95D" stopOpacity="0.95" />
-              <Stop offset="55%" stopColor="#F4C95D" stopOpacity="0.35" />
-              <Stop offset="100%" stopColor="#F4C95D" stopOpacity="0" />
+              <Stop offset="0%" stopColor={colors.success} stopOpacity={isLight ? "0.65" : "0.95"} />
+              <Stop offset="55%" stopColor={colors.success} stopOpacity={isLight ? "0.22" : "0.35"} />
+              <Stop offset="100%" stopColor={colors.success} stopOpacity="0" />
             </RadialGradient>
           </Defs>
 
           {/* arco base */}
-          <Path d={ARC_PATH} fill="none" stroke={COLORS.border} strokeWidth={1.4} />
+          <Path d={ARC_PATH} fill="none" stroke={colors.border} strokeWidth={1.4} />
           {/* arco decorrido */}
           <Path
             d={ARC_PATH}
             fill="none"
-            stroke={COLORS.success}
+            stroke={colors.success}
             strokeDasharray={`${effectiveProgress * ARC_LENGTH} ${ARC_LENGTH}`}
             strokeLinecap="round"
             strokeWidth={2.4}
@@ -176,14 +180,14 @@ export function FastingTimer({
                 <Circle
                   cx={point.x}
                   cy={point.y}
-                  fill={isCurrent ? COLORS.success : COLORS.muted}
+                  fill={isCurrent ? colors.success : (isLight ? "#9E957F" : colors.muted)}
                   r={isCurrent ? 3.2 : 2.6}
                 />
                 <SvgText
-                  fill={isCurrent ? COLORS.foreground : COLORS.muted}
+                  fill={isCurrent ? colors.foreground : (isLight ? "#545045" : colors.muted)}
                   fontFamily="JetBrainsMono_500Medium"
-                  fontSize={7}
-                  fontWeight={isCurrent ? "700" : "400"}
+                  fontSize={7.5}
+                  fontWeight={isCurrent ? "700" : "500"}
                   letterSpacing={0.4}
                   textAnchor={anchor}
                   x={point.x}
@@ -199,9 +203,9 @@ export function FastingTimer({
           <G x={sun.x} y={sun.y}>
             <Circle r={30} fill="url(#sunGlow)" />
             <Circle
-              fill={COLORS.success}
+              fill={colors.success}
               r={8.5}
-              stroke={COLORS.warning}
+              stroke={colors.warning}
               strokeWidth={1.2}
             />
           </G>
@@ -209,7 +213,13 @@ export function FastingTimer({
 
         {/* relógio de matriz de pontos */}
         <View className="-mt-3 items-center">
-          <DotClock cellSize={7} dotRadius={2.5} value={clockValue} />
+          <DotClock
+            cellSize={7}
+            colonColor={isLight ? "#B45309" : colors.success}
+            dotColor={isLight ? "#1E1D1B" : colors.foreground}
+            dotRadius={2.8}
+            value={clockValue}
+          />
         </View>
 
         {/* trilho de fases: segmentos preenchidos até à fase atual */}
@@ -232,7 +242,7 @@ export function FastingTimer({
                 key={phase.id}
                 style={{
                   backgroundColor:
-                    state === "todo" ? COLORS.border : COLORS.success,
+                    state === "todo" ? colors.border : colors.success,
                   opacity: state === "done" ? 0.45 : 1,
                 }}
               />
@@ -243,8 +253,12 @@ export function FastingTimer({
 
       {/* legenda mono: decorrido / restante */}
       <Text
-        className="mt-4 text-center font-label text-[10px] uppercase text-muted"
-        style={{ letterSpacing: 1.8 }}
+        className="mt-4 text-center font-label text-[11px] uppercase"
+        style={{
+          letterSpacing: 1.8,
+          color: isLight ? "#45433E" : colors.muted,
+          fontWeight: "600",
+        }}
         translate={false}
       >
         {isActive
@@ -262,17 +276,17 @@ export function FastingTimer({
 
       <View
         className="mt-3 flex-row items-center rounded-full border px-3 py-1.5"
-        style={{ borderColor: isActive ? COLORS.success : COLORS.border }}
+        style={{ borderColor: isActive ? colors.success : (isLight ? "#C7BC9F" : colors.border) }}
       >
         <View
           className="mr-2 h-1.5 w-1.5 rounded-full"
           style={{
-            backgroundColor: isActive ? COLORS.success : COLORS.muted,
+            backgroundColor: isActive ? colors.success : (isLight ? "#7A7463" : colors.muted),
           }}
         />
         <Text
           className="font-label text-[10px]"
-          style={{ color: isActive ? COLORS.success : COLORS.muted }}
+          style={{ color: isActive ? colors.success : (isLight ? "#45433E" : colors.muted) }}
         >
           {isActive ? "JEJUM ATIVO" : "JEJUM INATIVO"}
         </Text>
@@ -280,7 +294,8 @@ export function FastingTimer({
 
       {isActive ? (
         <Text
-          className="mt-2 text-center font-body text-xs text-muted"
+          className="mt-2 text-center font-body text-xs"
+          style={{ color: isLight ? "#4A4740" : colors.muted }}
           translate={false}
         >
           {isOpenGoal
@@ -294,3 +309,4 @@ export function FastingTimer({
     </View>
   );
 }
+
