@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import type { ComponentProps } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withRepeat,
   withSequence,
@@ -54,26 +56,35 @@ export function MetabolicPhases({
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number>(0);
   const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
 
-  // Pulse animation for active card
+  // Pulse animation for active card (respects reduced motion)
+  const reducedMotion = useReducedMotion();
   const pulseAnim = useSharedValue(1);
 
   useEffect(() => {
-    if (isActive) {
-      pulseAnim.value = withRepeat(
-        withSequence(
-          withTiming(1.04, { duration: 1200 }),
-          withTiming(1, { duration: 1200 }),
+    if (isActive && !reducedMotion) {
+      pulseAnim.set(
+        withRepeat(
+          withSequence(
+            withTiming(1.04, {
+              duration: 1200,
+              easing: Easing.bezier(0.77, 0, 0.175, 1),
+            }),
+            withTiming(1, {
+              duration: 1200,
+              easing: Easing.bezier(0.77, 0, 0.175, 1),
+            }),
+          ),
+          -1,
+          false,
         ),
-        -1,
-        true,
       );
     } else {
-      pulseAnim.value = 1;
+      pulseAnim.set(1);
     }
-  }, [isActive, pulseAnim]);
+  }, [isActive, pulseAnim, reducedMotion]);
 
   const activePulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseAnim.value }],
+    transform: [{ scale: pulseAnim.get() }],
   }));
 
   const openPhaseDetail = (

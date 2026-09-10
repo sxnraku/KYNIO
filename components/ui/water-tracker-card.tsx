@@ -1,8 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
+import { PressableScale } from "@/components/ui/pressable-scale";
 import { Text } from "@/components/ui/text";
 import { COLORS, successWithAlpha } from "@/constants/colors";
 import { triggerLightImpact } from "@/services/hapticsService";
@@ -80,10 +81,10 @@ export function WaterTrackerCard() {
 
       {/* Quick Add Buttons */}
       <View className="mt-5 flex-row items-center gap-2">
-        <Pressable
+        <PressableScale
           accessibilityLabel={translateText("Adicionar 250ml de água", language)}
           accessibilityRole="button"
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-85"
           onPress={() => {
             triggerLightImpact();
             void addWater(250);
@@ -92,17 +93,18 @@ export function WaterTrackerCard() {
             backgroundColor: successWithAlpha(0.15),
             borderColor: successWithAlpha(0.4),
           }}
+          targetScale={0.97}
         >
           <Ionicons color={COLORS.success} name="add" size={17} />
           <Text className="font-headline text-xs text-success">
             +250 ml <Text className="font-body text-[11px] text-muted">{language === "en" ? "(Glass)" : "(Copo)"}</Text>
           </Text>
-        </Pressable>
+        </PressableScale>
 
-        <Pressable
+        <PressableScale
           accessibilityLabel={translateText("Adicionar 500ml de água", language)}
           accessibilityRole="button"
-          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-75"
+          className="flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border py-3 active:opacity-85"
           onPress={() => {
             triggerLightImpact();
             void addWater(500);
@@ -111,25 +113,28 @@ export function WaterTrackerCard() {
             backgroundColor: successWithAlpha(0.15),
             borderColor: successWithAlpha(0.4),
           }}
+          targetScale={0.97}
         >
           <Ionicons color={COLORS.success} name="add" size={17} />
           <Text className="font-headline text-xs text-success">
             +500 ml <Text className="font-body text-[11px] text-muted">{language === "en" ? "(Bottle)" : "(Garrafa)"}</Text>
           </Text>
-        </Pressable>
+        </PressableScale>
 
         {currentMl > 0 ? (
-          <Pressable
+          <PressableScale
             accessibilityLabel={translateText("Remover 250ml de água", language)}
             accessibilityRole="button"
-            className="h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface active:opacity-60"
+            className="h-11 w-11 items-center justify-center rounded-xl border border-border bg-surface active:opacity-75"
+            hitSlop={8}
             onPress={() => {
               triggerLightImpact();
               void removeWater(250);
             }}
+            targetScale={0.93}
           >
             <Ionicons color={COLORS.muted} name="remove" size={16} />
-          </Pressable>
+          </PressableScale>
         ) : null}
       </View>
 

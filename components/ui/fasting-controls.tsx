@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FastingStartModal } from "@/components/ui/fasting-start-modal";
 import { PaywallModal } from "@/components/ui/paywall-modal";
+import { PressableScale } from "@/components/ui/pressable-scale";
 import { COLORS } from "@/constants/colors";
 import {
   triggerLightImpact,
@@ -74,53 +75,57 @@ export function FastingControls({
         {!isActive ? (
           <View className="flex-row items-center gap-2">
             {/* Início imediato */}
-            <Pressable
+            <PressableScale
               accessibilityLabel={translateText("Iniciar Jejum", language)}
               accessibilityRole="button"
               accessibilityState={{ disabled: isSaving }}
-              className="min-h-14 flex-1 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-80 active:scale-[0.98]"
+              className="min-h-14 flex-1 flex-row items-center justify-center rounded-full bg-success px-5 active:opacity-90"
               disabled={isSaving}
               onPress={() => {
                 triggerMediumImpact();
                 startFasting();
               }}
               style={{ opacity: isSaving ? 0.45 : 1 }}
+              targetScale={0.97}
               testID="start-fasting-button"
             >
               <Ionicons color="#3A2200" name="play" size={18} />
               <Text className="ml-2 font-headline text-base text-[#3A2200]">
                 {translateText("Iniciar Jejum", language)}
               </Text>
-            </Pressable>
+            </PressableScale>
 
             {/* Hora personalizada */}
-            <Pressable
+            <PressableScale
               accessibilityLabel={translateText("Iniciar jejum a outra hora", language)}
               accessibilityRole="button"
               accessibilityState={{ disabled: isSaving }}
-              className="min-h-14 items-center justify-center rounded-full border border-success/60 bg-success/10 px-4 active:opacity-70 active:scale-95"
+              className="min-h-14 items-center justify-center rounded-full border border-success/60 bg-success/10 px-4 active:opacity-85"
               disabled={isSaving}
+              hitSlop={8}
               onPress={() => {
                 triggerMediumImpact();
                 setStartModalMode("start");
               }}
+              targetScale={0.95}
               testID="start-fasting-custom-time-button"
             >
               <Ionicons color={COLORS.success} name="time-outline" size={20} />
-            </Pressable>
+            </PressableScale>
           </View>
         ) : (
-          <Pressable
+          <PressableScale
             accessibilityLabel={translateText("Terminar Jejum", language)}
             accessibilityRole="button"
             accessibilityState={{ disabled: isSaving }}
-            className="min-h-14 flex-row items-center justify-center rounded-full bg-foreground px-5 active:opacity-80 active:scale-[0.98]"
+            className="min-h-14 flex-row items-center justify-center rounded-full bg-foreground px-5 active:opacity-90"
             disabled={isSaving}
             onPress={() => {
               triggerSuccessFeedback();
               void endFasting();
             }}
             style={{ opacity: isSaving ? 0.45 : 1 }}
+            targetScale={0.97}
             testID="end-fasting-button"
           >
             <Ionicons color={COLORS.background} name="stop" size={17} />
@@ -129,7 +134,7 @@ export function FastingControls({
                 ? translateText("A guardar…", language)
                 : translateText("Terminar Jejum", language)}
             </Text>
-          </Pressable>
+          </PressableScale>
         )}
 
         {/* ações secundárias em mono, sem caixas */}

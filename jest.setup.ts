@@ -1,5 +1,33 @@
+import 'react-native-gesture-handler/jestSetup';
+
 jest.setTimeout(45000);
 
+jest.mock('react-native-reanimated', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: {
+      View,
+      createAnimatedComponent: (Comp: unknown) => Comp,
+    },
+    useSharedValue: (init: unknown) => ({
+      value: init,
+      get: () => init,
+      set: jest.fn(),
+    }),
+    useAnimatedStyle: (fn: () => unknown) => fn(),
+    useReducedMotion: () => false,
+    withTiming: (val: unknown) => val,
+    withSpring: (val: unknown) => val,
+    withSequence: (...args: unknown[]) => args[0],
+    withRepeat: (anim: unknown) => anim,
+    Easing: {
+      bezier: () => (t: number) => t,
+      inOut: () => (t: number) => t,
+      ease: (t: number) => t,
+    },
+  };
+});
 jest.mock('expo-sqlite');
 jest.mock('zustand');
 jest.mock('@react-native-async-storage/async-storage', () =>

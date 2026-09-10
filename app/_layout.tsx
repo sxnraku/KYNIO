@@ -12,6 +12,8 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { AppThemeProvider } from "@/components/app-theme-provider";
 import { BiometricLockGuard } from "@/components/biometric-lock-guard";
 import { CloudSyncBootstrap } from "@/components/cloud-sync-bootstrap";
@@ -82,22 +84,24 @@ export default function RootLayout() {
   }
 
   return (
-    <AppThemeProvider>
-      <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          contentStyle: { backgroundColor: colors.background },
-          headerShown: false,
-        }}
-      />
-      <CloudSyncBootstrap />
-      <HydrationRemindersBootstrap />
-      <BiometricLockGuard />
-      <LegalOnboardingModal />
-      <ProfileOnboardingModal />
-      <GuidedTutorialModal />
-      <ForceUpdateModal />
-    </AppThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppThemeProvider>
+        <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
+        <Stack
+          screenOptions={{
+            contentStyle: { backgroundColor: colors.background },
+            headerShown: false,
+          }}
+        />
+        <CloudSyncBootstrap />
+        <HydrationRemindersBootstrap />
+        <BiometricLockGuard />
+        <LegalOnboardingModal />
+        <ProfileOnboardingModal />
+        <GuidedTutorialModal />
+        <ForceUpdateModal />
+      </AppThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 
