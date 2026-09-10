@@ -23,6 +23,8 @@ import {
   buyConsumableProductSku,
   restoreActivePurchases,
   confirmPurchaseTransaction,
+  formatCurrencyAmount,
+  parsePriceAmount,
   IAP_SKUS,
   type FormattedOfferings,
 } from "@/services/inAppPurchaseService";
@@ -49,6 +51,36 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
   const addEmergencyShield = useSubscriptionStore((state) => state.addEmergencyShield);
 
   const hasTrialAvailable = !trialStartedAt;
+
+  const currency = offerings.annual?.currency || offerings.monthly?.currency || "EUR";
+
+  const annualAmount =
+    offerings.annual?.priceAmount ??
+    (parsePriceAmount(undefined, offerings.annual?.priceFormatted) || 42.99);
+
+  const monthlyAmount =
+    offerings.monthly?.priceAmount ??
+    (parsePriceAmount(undefined, offerings.monthly?.priceFormatted) || 5.99);
+
+  const lifetimeAmount =
+    offerings.lifetime?.priceAmount ??
+    (parsePriceAmount(undefined, offerings.lifetime?.priceFormatted) || 84.99);
+
+  const annualMonthlyEquivalent =
+    offerings.annual?.monthlyEquivalentFormatted ||
+    formatCurrencyAmount(annualAmount / 12, currency, language);
+
+  const annualDailyEquivalent =
+    offerings.annual?.dailyEquivalentFormatted ||
+    formatCurrencyAmount(annualAmount / 365, currency, language);
+
+  const fullYearMonthly = monthlyAmount * 12;
+  const savingsPercent =
+    fullYearMonthly > annualAmount
+      ? Math.round(((fullYearMonthly - annualAmount) / fullYearMonthly) * 100)
+      : 40;
+
+  const zeroFormatted = formatCurrencyAmount(0, currency, language).replace(/[,.]00/, "");
 
   useEffect(() => {
     if (visible && Platform.OS !== "web") {
@@ -406,7 +438,9 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             >
               <View style={styles.popularBadge}>
                 <AppText style={styles.popularBadgeText}>
-                  {language === "en" ? "SAVE 42% · MOST POPULAR" : "POUPA 42% · MAIS POPULAR"}
+                  {language === "en"
+                    ? `SAVE ${savingsPercent}% · MOST POPULAR`
+                    : `POUPA ${savingsPercent}% · MAIS POPULAR`}
                 </AppText>
               </View>
               <View style={styles.planHeader}>
@@ -417,26 +451,30 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                   <AppText style={styles.planTrial}>
                     {hasTrialAvailable
                       ? language === "en"
-                        ? `7 Days Free · Then ${offerings.annual?.priceFormatted || "34.99 €"}/year`
-                        : `7 Dias Grátis · Depois ${offerings.annual?.priceFormatted || "34,99 €"}/ano`
+                        ? `7 Days Free · Then ${offerings.annual?.priceFormatted || formatCurrencyAmount(annualAmount, currency, language)}/year`
+                        : `7 Dias Grátis · Depois ${offerings.annual?.priceFormatted || formatCurrencyAmount(annualAmount, currency, language)}/ano`
                       : language === "en"
-                      ? `${offerings.annual?.priceFormatted || "34.99 €"} / year`
-                      : `${offerings.annual?.priceFormatted || "34,99 €"} / ano`}
+                      ? `${offerings.annual?.priceFormatted || formatCurrencyAmount(annualAmount, currency, language)} / year`
+                      : `${offerings.annual?.priceFormatted || formatCurrencyAmount(annualAmount, currency, language)} / ano`}
                   </AppText>
 
                   {/* Daily Anchor */}
                   <View style={styles.dailyAnchorContainer}>
                     <AppText style={styles.dailyAnchorPrice}>
-                      {translateText("Apenas 0,09 € / dia", language)}
+                      {language === "en"
+                        ? `Only ${annualDailyEquivalent} / day`
+                        : `Apenas ${annualDailyEquivalent} / dia`}
                     </AppText>
                     <AppText style={styles.dailyAnchorSub}>
-                      {translateText("Menos de 1 café por mês", language)}
+                      {language === "en"
+                        ? "Less than 1 coffee per week"
+                        : "Menos de 1 café por semana"}
                     </AppText>
                   </View>
                 </View>
                 <View style={styles.priceContainer}>
                   <AppText style={styles.monthlyEquivalent}>
-                    {offerings.annual?.monthlyEquivalentFormatted || (language === "en" ? "2.91 €" : "2,91 €")}
+                    {annualMonthlyEquivalent}
                   </AppText>
                   <AppText style={styles.perMonthText}>
                     {language === "en" ? "/mo" : "/mês"}
@@ -469,7 +507,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                 </View>
                 <View style={styles.priceContainer}>
                   <AppText style={styles.monthlyEquivalent}>
-                    {offerings.lifetime?.priceFormatted || (language === "en" ? "69.99 €" : "69,99 €")}
+                    {offerings.lifetime?.priceFormatted || formatCurrencyAmount(lifetimeAmount, currency, language)}
                   </AppText>
                   <AppText style={styles.perMonthText}>
                     {language === "en" ? "once" : "único"}
@@ -497,7 +535,7 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
                 </View>
                 <View style={styles.priceContainer}>
                   <AppText style={styles.monthlyEquivalent}>
-                    {offerings.monthly?.priceFormatted || (language === "en" ? "4.99 €" : "4,99 €")}
+                    {offerings.monthly?.priceFormatted || formatCurrencyAmount(monthlyAmount, currency, language)}
                   </AppText>
                   <AppText style={styles.perMonthText}>
                     {language === "en" ? "/mo" : "/mês"}
@@ -509,7 +547,9 @@ export function PaywallModal({ visible, onClose, featureTrigger }: PaywallModalP
             {/* Zero-Risk Guarantee Box */}
             <View style={styles.zeroRiskBox}>
               <AppText style={styles.zeroRiskTitle}>
-                {translateText("0 € cobrados hoje · 7 dias para testar grátis", language)}
+                {language === "en"
+                  ? `${zeroFormatted} charged today · 7 days free trial`
+                  : `${zeroFormatted} cobrados hoje · 7 dias para testar grátis`}
               </AppText>
               <AppText style={styles.zeroRiskSub}>
                 {translateText("Cancela em 1 toque na Google Play", language)}

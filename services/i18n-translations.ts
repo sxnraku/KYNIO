@@ -830,6 +830,7 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Todos os Temas 🎨": "All Themes 🎨",
   "Apenas 0,09 € / dia": "Only 0.09 € / day",
   "Menos de 1 café por mês": "Less than 1 coffee per month",
+  "Menos de 1 café por semana": "Less than 1 coffee per week",
   "OFERTA DE FUNDADOR (BETA)": "FOUNDER'S OFFER (BETA)",
   "ACESSO VITALÍCIO · SEMPRE TEU": "LIFETIME ACCESS · FOREVER YOURS",
   "0 € cobrados hoje · 7 dias para testar grátis": "0 € charged today · 7-day free trial",

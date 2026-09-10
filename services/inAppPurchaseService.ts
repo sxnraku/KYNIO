@@ -42,11 +42,79 @@ export interface FormattedPlanInfo {
   sku: string;
   title: string;
   priceFormatted: string;
+  priceAmount?: number;
   monthlyEquivalentFormatted?: string;
+  dailyEquivalentFormatted?: string;
   currency: string;
   hasFreeTrial: boolean;
   trialPeriodDays?: number;
   offerToken?: string;
+}
+
+/**
+ * Formata um valor monetário de acordo com o código ISO de moeda e idioma.
+ */
+export function formatCurrencyAmount(
+  amount: number,
+  currencyCode: string = "EUR",
+  locale: "pt" | "en" = "pt",
+): string {
+  try {
+    return new Intl.NumberFormat(locale === "en" ? "en-US" : "pt-PT", {
+      style: "currency",
+      currency: currencyCode || "EUR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    const symbol =
+      currencyCode === "EUR"
+        ? "€"
+        : currencyCode === "USD"
+        ? "$"
+        : currencyCode === "GBP"
+        ? "£"
+        : currencyCode;
+    const formattedNum =
+      locale === "en"
+        ? amount.toFixed(2)
+        : amount.toFixed(2).replace(".", ",");
+    return locale === "en"
+      ? `${symbol}${formattedNum}`
+      : `${formattedNum} ${symbol}`;
+  }
+}
+
+/**
+ * Extrai o valor numérico de um preço a partir de micros da Google Play ou string formatada.
+ */
+export function parsePriceAmount(
+  priceAmountMicros?: string | number,
+  formattedPrice?: string,
+): number {
+  if (priceAmountMicros !== undefined && priceAmountMicros !== null) {
+    const micros = Number(priceAmountMicros);
+    if (!isNaN(micros) && micros > 0) {
+      return Math.round((micros / 1_000_000) * 100) / 100;
+    }
+  }
+
+  if (formattedPrice) {
+    const cleaned = formattedPrice.replace(/[^\d.,]/g, "").trim();
+    if (cleaned.includes(",") && cleaned.includes(".")) {
+      if (cleaned.indexOf(",") < cleaned.indexOf(".")) {
+        return parseFloat(cleaned.replace(/,/g, "")) || 0;
+      } else {
+        return parseFloat(cleaned.replace(/\./g, "").replace(",", ".")) || 0;
+      }
+    } else if (cleaned.includes(",")) {
+      return parseFloat(cleaned.replace(",", ".")) || 0;
+    } else if (cleaned) {
+      return parseFloat(cleaned) || 0;
+    }
+  }
+
+  return 0;
 }
 
 let isInitialized = false;
@@ -142,10 +210,11 @@ export async function fetchStoreOfferings(): Promise<FormattedOfferings> {
           };
         }> }).subscriptionOfferDetails;
 
-        let formattedPrice = isAnnual ? "34,99 €" : "4,99 €";
+        let formattedPrice = isAnnual ? "42,99 €" : "5,99 €";
         let currency = "EUR";
         let offerToken: string | undefined = undefined;
         let hasFreeTrial = false;
+        let rawAmountMicros: number | undefined = undefined;
 
         if (offerDetails && offerDetails.length > 0) {
           // Prefere oferta com trial/intro (mais fases); fallback: primeira.
@@ -162,16 +231,26 @@ export async function fetchStoreOfferings(): Promise<FormattedOfferings> {
             hasFreeTrial = true;
             formattedPrice = phases[phases.length - 1].formattedPrice;
             currency = phases[phases.length - 1].priceCurrencyCode;
+            rawAmountMicros = Number(phases[phases.length - 1].priceAmountMicros);
           } else if (phases.length === 1) {
             formattedPrice = phases[0].formattedPrice;
             currency = phases[0].priceCurrencyCode;
+            rawAmountMicros = Number(phases[0].priceAmountMicros);
           }
         }
+
+        const priceAmount =
+          parsePriceAmount(rawAmountMicros, formattedPrice) || (isAnnual ? 42.99 : 5.99);
+        const monthlyEquivalentAmount = isAnnual ? priceAmount / 12 : priceAmount;
+        const dailyEquivalentAmount = isAnnual ? priceAmount / 365 : priceAmount / 30;
 
         const planInfo: FormattedPlanInfo = {
           sku: sub.productId,
           title: sub.title || (isAnnual ? "Plano Anual" : "Plano Mensal"),
           priceFormatted: formattedPrice,
+          priceAmount,
+          monthlyEquivalentFormatted: formatCurrencyAmount(monthlyEquivalentAmount, currency, "pt"),
+          dailyEquivalentFormatted: formatCurrencyAmount(dailyEquivalentAmount, currency, "pt"),
           currency,
           hasFreeTrial,
           trialPeriodDays: hasFreeTrial ? 7 : undefined,
@@ -189,10 +268,13 @@ export async function fetchStoreOfferings(): Promise<FormattedOfferings> {
     // Parse Products (Lifetime and Consumables)
     for (const prod of products) {
       if (prod.productId === IAP_SKUS.LIFETIME_PRODUCT) {
+        const rawMicros = (prod as unknown as { priceAmountMicros?: string | number }).priceAmountMicros;
+        const priceAmount = parsePriceAmount(rawMicros, prod.localizedPrice) || 84.99;
         result.lifetime = {
           sku: prod.productId,
           title: prod.title || "Acesso Vitalício",
-          priceFormatted: prod.localizedPrice || "69,99 €",
+          priceFormatted: prod.localizedPrice || "84,99 €",
+          priceAmount,
           currency: prod.currency || "EUR",
           hasFreeTrial: false,
         };
@@ -359,8 +441,10 @@ function getDefaultFallbacks(): FormattedOfferings {
     annual: {
       sku: IAP_SKUS.ANNUAL_SUBSCRIPTION,
       title: "Plano Anual",
-      priceFormatted: "34,99 €",
-      monthlyEquivalentFormatted: "2,91 €",
+      priceFormatted: "42,99 €",
+      priceAmount: 42.99,
+      monthlyEquivalentFormatted: "3,58 €",
+      dailyEquivalentFormatted: "0,12 €",
       currency: "EUR",
       hasFreeTrial: true,
       trialPeriodDays: 7,
@@ -368,15 +452,18 @@ function getDefaultFallbacks(): FormattedOfferings {
     monthly: {
       sku: IAP_SKUS.MONTHLY_SUBSCRIPTION,
       title: "Plano Mensal",
-      priceFormatted: "4,99 €",
-      monthlyEquivalentFormatted: "4,99 €",
+      priceFormatted: "5,99 €",
+      priceAmount: 5.99,
+      monthlyEquivalentFormatted: "5,99 €",
+      dailyEquivalentFormatted: "0,20 €",
       currency: "EUR",
       hasFreeTrial: false,
     },
     lifetime: {
       sku: IAP_SKUS.LIFETIME_PRODUCT,
       title: "Acesso Vitalício",
-      priceFormatted: "69,99 €",
+      priceFormatted: "84,99 €",
+      priceAmount: 84.99,
       currency: "EUR",
       hasFreeTrial: false,
     },
@@ -384,6 +471,7 @@ function getDefaultFallbacks(): FormattedOfferings {
       sku: IAP_SKUS.AI_PACK_20,
       title: "Pack 20 Análises IA",
       priceFormatted: "1,49 €",
+      priceAmount: 1.49,
       currency: "EUR",
       hasFreeTrial: false,
     },
@@ -391,6 +479,7 @@ function getDefaultFallbacks(): FormattedOfferings {
       sku: IAP_SKUS.STREAK_SHIELD_PACK,
       title: "Escudo de Emergência",
       priceFormatted: "0,99 €",
+      priceAmount: 0.99,
       currency: "EUR",
       hasFreeTrial: false,
     },
