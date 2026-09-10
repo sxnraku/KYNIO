@@ -120,3 +120,5 @@ assets/screenshots/
 
 .git-backup/
 
+# Relatórios de auditoria e scans Strix
+strix_runs/
