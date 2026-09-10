@@ -66,7 +66,7 @@ example
 
 preview_icons/
 
-# Vídeos e scripts de promoção
+# Vï¿½deos e scripts de promoï¿½ï¿½o
 promo/
 
 # Projetos externos
@@ -78,9 +78,11 @@ meurpg/
 .claude/
 AGENTS.md
 .cursorrules
+.ua/
+.understand-anything/
 
 
-# Documentação interna de release e cloud
+# Documentaï¿½ï¿½o interna de release e cloud
 docs/
 
 
