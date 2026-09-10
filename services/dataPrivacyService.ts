@@ -234,4 +234,8 @@ export async function deleteAllLocalData(): Promise<void> {
   for (const store of LOCAL_STORES) {
     store.setState(store.getInitialState(), true);
   }
+
+  useFastingStore.getState().setHydrated();
+  useGuidedTutorialStore.getState().setHydrated();
 }
+

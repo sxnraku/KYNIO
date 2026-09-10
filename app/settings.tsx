@@ -205,8 +205,10 @@ export default function SettingsScreen() {
     try {
       await deleteAllLocalData();
       useFastingStore.getState().resetFasting();
+      useFastingStore.getState().setHydrated();
       useUserProgressStore.getState().resetProgress();
       useGuidedTutorialStore.getState().resetTutorial();
+      useGuidedTutorialStore.getState().setHydrated();
       router.replace("/(tabs)");
       useLegalConsentStore.getState().resetConsent();
     } catch (error) {
@@ -319,9 +321,9 @@ export default function SettingsScreen() {
       >
         {/* Subscription / Pro Card */}
         <View className="mb-5 rounded-2xl border border-success/30 bg-success/5 p-5">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-2.5">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-success/15 border border-success/30">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-1 flex-row items-center gap-2.5">
+              <View className="h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/15 border border-success/30">
                 <Text
                   accessibilityElementsHidden
                   className="text-xl"
@@ -330,14 +332,17 @@ export default function SettingsScreen() {
                   👑
                 </Text>
               </View>
-              <View>
+              <View className="flex-1 pr-1">
                 <View className="flex-row items-center gap-1.5">
                   <Text className="font-headline text-base text-foreground">
                     KYNIO SOL PRO
                   </Text>
                   {isPro ? <ProBadge size="small" /> : null}
                 </View>
-                <Text className="font-body text-xs text-muted">
+                <Text
+                  className="mt-0.5 font-body text-xs text-muted"
+                  numberOfLines={2}
+                >
                   {isPro
                     ? language === "en"
                       ? `Active plan (${tier}) · Full access`
@@ -351,7 +356,7 @@ export default function SettingsScreen() {
 
             <Pressable
               onPress={() => setPaywallOpen(true)}
-              className="rounded-xl bg-success px-3.5 py-2 active:opacity-80"
+              className="shrink-0 rounded-xl bg-success px-3.5 py-2 active:opacity-80"
             >
               <Text className="font-label text-xs font-bold" style={{ color: "#3A2200" }}>
                 {isPro

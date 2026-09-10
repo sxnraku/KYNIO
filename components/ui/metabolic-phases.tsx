@@ -96,7 +96,7 @@ export function MetabolicPhases({
             className="font-label text-[11px] uppercase text-success"
             style={{ letterSpacing: 2.6 }}
           >
-            A tua jornada
+            {translateText("A tua jornada", language).toUpperCase()}
           </Text>
           {isActive ? (
             <Pressable
@@ -112,9 +112,12 @@ export function MetabolicPhases({
           ) : null}
         </View>
         <Text className="mt-1 font-body text-sm text-muted">
-          {isPro
-            ? "Fases metabólicas · Toca para ver o que acontece no corpo"
-            : "Fases metabólicas · Detalhe biológico no Sol Pro"}
+          {translateText(
+            isPro
+              ? "Fases metabólicas · Toca para ver o que acontece no corpo"
+              : "Fases metabólicas · Detalhe biológico no Sol Pro",
+            language,
+          )}
         </Text>
       </View>
 
@@ -159,12 +162,12 @@ export function MetabolicPhases({
                   >
                     <View className="mr-1.5 h-1.5 w-1.5 rounded-full bg-success" />
                     <Text className="font-label text-[9px] text-success">
-                      ATUAL
+                      {language === "en" ? "CURRENT" : "ATUAL"}
                     </Text>
                   </Animated.View>
                 ) : isCompleted ? (
                   <Text className="font-label text-[9px] text-success">
-                    CONCLUÍDO
+                    {language === "en" ? "DONE" : "CONCLUÍDO"}
                   </Text>
                 ) : (
                   <Ionicons color={COLORS.muted} name="information-circle-outline" size={16} />
@@ -178,13 +181,13 @@ export function MetabolicPhases({
                 className="mt-0.5 font-headline text-[15px] leading-5 text-foreground"
                 numberOfLines={2}
               >
-                {phase.title}
+                {translateText(phase.title, language)}
               </Text>
 
               <View className="mt-3 flex-row items-center">
                 {isPro ? (
                   <Text className="font-body text-[11px] text-success">
-                    Ver biologia & dicas →
+                    {translateText("Ver biologia & dicas →", language)}
                   </Text>
                 ) : (
                   <>

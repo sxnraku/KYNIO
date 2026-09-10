@@ -21,6 +21,7 @@ import {
   updateFastingOngoingNotification,
 } from "@/services/fastingNotificationService";
 import { syncWidgetFastingState } from "@/services/fastingWidgetService";
+import { translateText } from "@/services/i18n";
 import { useAppPreferencesStore } from "@/store/app-preferences-store";
 import { useFastingStore } from "@/store/useFastingStore";
 
@@ -54,6 +55,16 @@ export default function HomeScreen() {
     ESTIMATED_METABOLIC_PHASES[currentPhaseIndex] ??
     ESTIMATED_METABOLIC_PHASES[0];
 
+  // Salvaguarda contra bloqueio infinito caso o store tenha sido reposto em tempo de execução
+  React.useEffect(() => {
+    if (!hasHydrated) {
+      const fallbackTimer = setTimeout(() => {
+        useFastingStore.getState().setHydrated();
+      }, 1500);
+      return () => clearTimeout(fallbackTimer);
+    }
+  }, [hasHydrated]);
+
   React.useEffect(() => {
     // Aguardar hidratação do store — antes disso os valores podem ser undefined
     if (!hasHydrated) return;
@@ -81,7 +92,7 @@ export default function HomeScreen() {
         <View className="flex-1 items-center justify-center py-24">
           <ActivityIndicator color={COLORS.success} size="large" />
           <Text className="mt-4 font-body text-sm text-muted">
-            A recuperar o jejum em curso…
+            {translateText("A recuperar o jejum em curso…", language)}
           </Text>
         </View>
       </Screen>
@@ -96,7 +107,7 @@ export default function HomeScreen() {
           className="font-label text-[11px] uppercase text-success"
           style={{ letterSpacing: 2.6 }}
         >
-          Hoje
+          {translateText("Hoje", language).toUpperCase()}
         </Text>
         <Text className="font-body text-sm text-muted" translate={false}>
           {getTodayLabel(language)}
@@ -140,7 +151,10 @@ export default function HomeScreen() {
           style={{ marginTop: 1 }}
         />
         <Text className="ml-2.5 flex-1 font-body text-xs leading-5 text-muted">
-          Fases metabólicas estimadas com base em literatura científica de jejum. Varia de pessoa para pessoa. Toca nas fases para ver todos os detalhes biológicos.
+          {translateText(
+            "Fases metabólicas estimadas com base em literatura científica de jejum. Varia de pessoa para pessoa. Toca nas fases para ver todos os detalhes biológicos.",
+            language,
+          )}
         </Text>
       </View>
 
@@ -152,3 +166,4 @@ export default function HomeScreen() {
     </Screen>
   );
 }
+

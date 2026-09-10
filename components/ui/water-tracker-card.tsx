@@ -95,7 +95,7 @@ export function WaterTrackerCard() {
         >
           <Ionicons color={COLORS.success} name="add" size={17} />
           <Text className="font-headline text-xs text-success">
-            +250 ml <Text className="font-body text-[11px] text-muted">(Copo)</Text>
+            +250 ml <Text className="font-body text-[11px] text-muted">{language === "en" ? "(Glass)" : "(Copo)"}</Text>
           </Text>
         </Pressable>
 
@@ -114,7 +114,7 @@ export function WaterTrackerCard() {
         >
           <Ionicons color={COLORS.success} name="add" size={17} />
           <Text className="font-headline text-xs text-success">
-            +500 ml <Text className="font-body text-[11px] text-muted">(Garrafa)</Text>
+            +500 ml <Text className="font-body text-[11px] text-muted">{language === "en" ? "(Bottle)" : "(Garrafa)"}</Text>
           </Text>
         </Pressable>
 

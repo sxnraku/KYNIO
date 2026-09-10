@@ -925,6 +925,12 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Aguardar mais registos": "Awaiting more logs",
   "Verificar Jejum com IA": "Check Fast with AI",
   "Estimativa IA": "AI Estimate",
+  "Mestre do Fogo": "Fire Master",
+  "Sol Invictus": "Sol Invictus",
+  "Guardião": "Guardian",
+  "Jejum Ativo": "Active Fast",
+  "Jejum Inativo": "Inactive Fast",
+  "Como te sentes?": "How do you feel?",
 };
 
 

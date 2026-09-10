@@ -213,6 +213,7 @@ export const useFastingStore = create<FastingState>()(
         void cancelFastingNotifications();
         set({
           goal: DEFAULT_GOAL,
+          hasHydrated: true,
           isActive: false,
           isSaving: false,
           lastCompletedFast: null,

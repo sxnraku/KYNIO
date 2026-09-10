@@ -288,7 +288,7 @@ export function FastingTimer({
           className="font-label text-[10px]"
           style={{ color: isActive ? colors.success : (isLight ? "#45433E" : colors.muted) }}
         >
-          {isActive ? "JEJUM ATIVO" : "JEJUM INATIVO"}
+          {translateText(isActive ? "JEJUM ATIVO" : "JEJUM INATIVO", language)}
         </Text>
       </View>
 
