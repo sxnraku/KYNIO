@@ -189,7 +189,7 @@ function getAllowedOrigins(): string[] {
     'https://sxnraku.github.io,http://localhost:8081,http://127.0.0.1:8081'
   )
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin: string) => origin.trim())
     .filter(Boolean);
 }
 
@@ -311,7 +311,7 @@ function buildGeminiParts(
   return parts;
 }
 
-Deno.serve(async (request) => {
+Deno.serve(async (request: Request) => {
   const corsHeaders = getCorsHeaders(request);
 
   if (!corsHeaders) {

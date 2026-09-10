@@ -187,7 +187,7 @@ async function verifyWithGoogle(
   return isRecord(payload) && payload.purchaseState === 0;
 }
 
-Deno.serve(async (request) => {
+Deno.serve(async (request: Request) => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
