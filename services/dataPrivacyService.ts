@@ -12,6 +12,8 @@ import {
 import migrations from '@/drizzle/migrations';
 import { deleteCloudAccountAndData } from '@/services/cloudAuthService';
 import {
+  fastingSymptoms,
+  type FastingSymptomRecord,
   fasts,
   meals,
   type FastRecord,
@@ -35,7 +37,10 @@ import {
   GUIDED_TUTORIAL_STORAGE_KEY,
   useGuidedTutorialStore,
 } from '@/store/guided-tutorial-store';
-import { useLegalConsentStore } from '@/store/legal-consent-store';
+import {
+  LEGAL_CONSENT_STORAGE_KEY,
+  useLegalConsentStore,
+} from '@/store/legal-consent-store';
 import { useFastingScheduleStore } from '@/store/use-fasting-schedule-store';
 import { useSubscriptionStore } from '@/store/use-subscription-store';
 import { useWeeklyChallengesStore } from '@/store/use-weekly-challenges-store';
@@ -57,9 +62,11 @@ const PERSISTED_STORAGE_KEYS = [
   GUIDED_TUTORIAL_STORAGE_KEY,
   WATER_STORAGE_KEY,
   WEEKLY_CHALLENGES_STORAGE_KEY,
+  LEGAL_CONSENT_STORAGE_KEY,
   'kynio-app-preferences-v1',
   'kynio-fasting-schedule-v1',
   'kynio-subscription-v1',
+  'kynio-user-progress-v1',
 ];
 
 // Stores cujo estado em memória é reposto após a limpeza (RGPD).
@@ -89,10 +96,16 @@ export interface LocalDataExport {
     heightCm: number;
   };
   exportedAt: string;
+  fastingSymptoms: FastingSymptomRecord[];
   fasts: FastRecord[];
   meals: MealRecord[];
   profile: UserProfileRecord | null;
   schemaVersion: number;
+  water: {
+    currentMl: number;
+    dailyGoalMl: number;
+    history: Record<string, number>;
+  };
   weightEntries: WeightEntryRecord[];
   workouts: WorkoutRecord[];
 }
@@ -126,15 +139,25 @@ async function getWeightEntriesForExport(): Promise<WeightEntryRecord[]> {
     .where(isNull(weightEntries.deletedAt));
 }
 
+async function getFastingSymptomsForExport(): Promise<FastingSymptomRecord[]> {
+  const database = await getInitializedDatabase();
+  return database
+    .select()
+    .from(fastingSymptoms)
+    .where(isNull(fastingSymptoms.deletedAt));
+}
+
 export async function collectLocalData(): Promise<LocalDataExport> {
   const [
     fastRecords,
+    fastingSymptomRecords,
     mealRecords,
     profile,
     weightRecords,
     workoutRecords,
   ] = await Promise.all([
     getFastsForExport(),
+    getFastingSymptomsForExport(),
     getMealsForExport(),
     getProfileForExport(),
     getWeightEntriesForExport(),
@@ -142,6 +165,7 @@ export async function collectLocalData(): Promise<LocalDataExport> {
   ]);
   const fastingState = useFastingStore.getState();
   const preferencesState = useAppPreferencesStore.getState();
+  const waterState = useWaterStore.getState();
 
   return {
     activeFasting: {
@@ -157,10 +181,16 @@ export async function collectLocalData(): Promise<LocalDataExport> {
       heightCm: preferencesState.userHeightCm ?? 170,
     },
     exportedAt: new Date().toISOString(),
+    fastingSymptoms: fastingSymptomRecords,
     fasts: fastRecords,
     meals: mealRecords,
     profile,
     schemaVersion: LOCAL_SCHEMA_VERSION,
+    water: {
+      currentMl: waterState.currentMl,
+      dailyGoalMl: waterState.dailyGoalMl,
+      history: { ...waterState.history },
+    },
     weightEntries: weightRecords,
     workouts: workoutRecords,
   };

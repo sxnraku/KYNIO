@@ -122,3 +122,7 @@ assets/screenshots/
 
 # Relatórios de auditoria e scans Strix
 strix_runs/
+
+# Pastas temporárias de inspeção de vídeo
+inspect_*/
+

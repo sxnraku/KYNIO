@@ -134,7 +134,7 @@ export function FastingSymptomModal({
                   >
                     <Ionicons
                       color={isSelected ? COLORS.success : COLORS.muted}
-                      name={sym.icon as any}
+                      name={sym.icon}
                       size={15}
                     />
                     <Text

@@ -48,26 +48,17 @@ export default function RootLayout() {
     if (Platform.OS === "web" && typeof window !== "undefined") {
       setupTabCoordination();
       if ("serviceWorker" in navigator) {
+        const hadController = Boolean(navigator.serviceWorker.controller);
         navigator.serviceWorker
           .register("/KYNIO/app/sw.js", { scope: "/KYNIO/app/" })
           .then((reg) => {
             void reg.update();
-            reg.addEventListener("updatefound", () => {
-              const newWorker = reg.installing;
-              if (newWorker) {
-                newWorker.addEventListener("statechange", () => {
-                  if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                    window.location.reload();
-                  }
-                });
-              }
-            });
           })
           .catch(() => undefined);
 
         let refreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
-          if (!refreshing) {
+          if (!refreshing && hadController) {
             refreshing = true;
             window.location.reload();
           }

@@ -520,7 +520,7 @@
       "filePath": "services/dataPrivacyService.ts",
       "lineRange": [
         1,
-        238
+        268
       ],
       "summary": "Serviço de Privacidade RGPD: exportação completa de dados locais em formato JSON estruturado e eliminação total (hard-delete local).",
       "tags": [

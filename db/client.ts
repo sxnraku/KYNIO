@@ -127,7 +127,12 @@ function isInvalidWebVfsState(error: unknown): boolean {
     msg.includes('nomodificationallowederror') ||
     msg.includes('createsyncaccesshandle') ||
     msg.includes('access handle') ||
-    msg.includes('locked')
+    msg.includes('locked') ||
+    msg.includes('securityerror') ||
+    msg.includes('notsupportederror') ||
+    msg.includes('operation not permitted') ||
+    msg.includes('quota') ||
+    msg.includes('failed to initialize')
   );
 }
 
@@ -158,7 +163,7 @@ async function createDatabaseWithWebRecovery(): Promise<LocalDatabase> {
 
   if (isInvalidWebVfsState(lastError)) {
     throw new Error(
-      'A sincronizar armazenamento local... Clica em "Tentar novamente".',
+      'A sincronizar armazenamento local... Toca em "Tentar novamente".',
     );
   }
 

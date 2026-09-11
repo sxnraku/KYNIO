@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { getInitializedDatabase } from '@/db/client';
 import migrations from '@/drizzle/migrations';
 import {
+  collectLocalData,
   deleteAllLocalData,
   LOCAL_SCHEMA_VERSION,
 } from '@/services/dataPrivacyService';
@@ -30,12 +32,25 @@ jest.mock('@/services/supabaseClient', () => ({
 const multiRemoveMock = jest.mocked(AsyncStorage.multiRemove);
 
 describe('dataPrivacyService', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    const mockDb = {
+      select: jest.fn(() => ({
+        from: jest.fn(() => ({
+          limit: jest.fn(async () => []),
+          where: jest.fn(async () => []),
+        })),
+      })),
+    };
+    (getInitializedDatabase as unknown as jest.Mock).mockResolvedValue(mockDb);
+  });
+
   it('deriva o schemaVersion do journal de migrações (sem hardcode)', () => {
     expect(LOCAL_SCHEMA_VERSION).toBe(migrations.journal.entries.length);
     expect(LOCAL_SCHEMA_VERSION).toBeGreaterThanOrEqual(7);
   });
 
-  it('deleteAllLocalData remove todas as chaves AsyncStorage dos stores persistidos', async () => {
+  it('deleteAllLocalData remove todas as chaves AsyncStorage dos stores persistidos incluindo user progress', async () => {
     await deleteAllLocalData();
 
     expect(multiRemoveMock).toHaveBeenCalledTimes(1);
@@ -50,6 +65,8 @@ describe('dataPrivacyService', () => {
         'kynio-app-preferences-v1',
         'kynio-fasting-schedule-v1',
         'kynio-weekly-challenges-v1',
+        'kynio-user-progress-v1',
+        'kynio_legal_consent_v1',
       ]),
     );
   });
@@ -70,5 +87,28 @@ describe('dataPrivacyService', () => {
     expect(useWaterStore.getState().history).toEqual({});
     expect(useGuidedTutorialStore.getState().hasCompletedTutorial).toBe(false);
     expect(useUserProgressStore.getState().totalXp).toBe(0);
+  });
+
+  it('collectLocalData exporta todos os dados locais incluindo fastingSymptoms e water', async () => {
+    useWaterStore.setState({
+      currentMl: 750,
+      dailyGoalMl: 2500,
+      history: { '2026-09-10': 750 },
+    });
+
+    const exportData = await collectLocalData();
+
+    expect(exportData.app).toBe('KYNIO');
+    expect(exportData.schemaVersion).toBe(LOCAL_SCHEMA_VERSION);
+    expect(exportData.fastingSymptoms).toEqual([]);
+    expect(exportData.water).toEqual({
+      currentMl: 750,
+      dailyGoalMl: 2500,
+      history: { '2026-09-10': 750 },
+    });
+    expect(Array.isArray(exportData.fasts)).toBe(true);
+    expect(Array.isArray(exportData.meals)).toBe(true);
+    expect(Array.isArray(exportData.workouts)).toBe(true);
+    expect(Array.isArray(exportData.weightEntries)).toBe(true);
   });
 });

@@ -2,6 +2,9 @@
 
 export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "1 refeição confirmada": "1 confirmed meal",
+  'A sincronizar armazenamento local... Toca em "Tentar novamente".': 'Syncing local storage... Tap "Try again".',
+  "Dica para iPhone: Se abriste este link dentro de outra app (WhatsApp, Instagram, etc.), toca em Partilhar ou no menu e escolhe 'Abrir no Safari' ou 'Adicionar ao Ecrã Principal' para guardares o teu histórico com segurança.": "iPhone tip: If you opened this link inside another app (WhatsApp, Instagram, etc.), tap Share or the menu and choose 'Open in Safari' or 'Add to Home Screen' to save your history safely.",
+  "Dica: Se abriste este link dentro de outra app (WhatsApp, Instagram, etc.), toca no menu e escolhe 'Abrir no navegador' para guardares o teu histórico com segurança.": "Tip: If you opened this link inside another app (WhatsApp, Instagram, etc.), tap the menu and choose 'Open in browser' to save your history safely.",
   "Já comecei antes": "Started earlier",
   "Já comecei o jejum antes": "I started fasting earlier",
   "Ajustar rotina": "Adjust routine",

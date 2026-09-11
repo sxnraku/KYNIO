@@ -154,7 +154,7 @@ describe("barcodeFoodService", () => {
       globalThis.fetch = jest.fn().mockResolvedValue({
         json: async () => mockResponse,
         ok: true,
-      } as any);
+      } as unknown as Response);
 
       try {
         const product = await lookupBarcodeFood("5601000100010");

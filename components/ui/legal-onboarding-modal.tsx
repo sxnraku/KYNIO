@@ -40,7 +40,12 @@ export function LegalOnboardingModal() {
     }
   }, [hydrateConsent, isHydrated, isLoading]);
 
-  const isVisible = !isHydrated || !hasAcceptedTerms;
+  const isVisible = (!hasAcceptedTerms && isHydrated) || Boolean(errorMessage);
+  const isIosWeb =
+    Platform.OS === "web" &&
+    typeof navigator !== "undefined" &&
+    /iphone|ipad|ipod/i.test(navigator.userAgent || "");
+  const isOtherWeb = Platform.OS === "web" && !isIosWeb;
 
   return (
     <Modal
@@ -146,7 +151,7 @@ export function LegalOnboardingModal() {
                     className="rounded-xl border border-red-500/20 bg-red-500/10 p-3"
                   >
                     <Text className="font-body text-sm leading-5 text-red-500">
-                      {errorMessage}
+                      {translateText(errorMessage, language)}
                     </Text>
                   </View>
                   <Pressable
@@ -155,9 +160,40 @@ export function LegalOnboardingModal() {
                     onPress={() => void hydrateConsent()}
                   >
                     <Text className="font-headline text-sm text-foreground">
-                      Tentar novamente
+                      {translateText("Tentar novamente", language)}
                     </Text>
                   </Pressable>
+                  {isIosWeb ? (
+                    <View className="mt-3 flex-row items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+                      <Ionicons
+                        color="#D9922E"
+                        name="compass-outline"
+                        size={18}
+                        style={{ marginTop: 2 }}
+                      />
+                      <Text className="flex-1 font-body text-xs leading-5 text-foreground/90">
+                        {translateText(
+                          "Dica para iPhone: Se abriste este link dentro de outra app (WhatsApp, Instagram, etc.), toca em Partilhar ou no menu e escolhe 'Abrir no Safari' ou 'Adicionar ao Ecrã Principal' para guardares o teu histórico com segurança.",
+                          language,
+                        )}
+                      </Text>
+                    </View>
+                  ) : isOtherWeb ? (
+                    <View className="mt-3 flex-row items-start gap-2.5 rounded-xl border border-border bg-surface-raised p-3">
+                      <Ionicons
+                        color={COLORS.muted}
+                        name="globe-outline"
+                        size={18}
+                        style={{ marginTop: 2 }}
+                      />
+                      <Text className="flex-1 font-body text-xs leading-5 text-muted">
+                        {translateText(
+                          "Dica: Se abriste este link dentro de outra app (WhatsApp, Instagram, etc.), toca no menu e escolhe 'Abrir no navegador' para guardares o teu histórico com segurança.",
+                          language,
+                        )}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               ) : null}
 

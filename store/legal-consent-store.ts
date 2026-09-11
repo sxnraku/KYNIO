@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { acceptLegalTerms, getUserProfile } from '@/services/dbService';
 
@@ -13,6 +15,8 @@ interface LegalConsentState {
   resetConsent: () => void;
 }
 
+export const LEGAL_CONSENT_STORAGE_KEY = 'kynio_legal_consent_v1';
+
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     const msg = error.message.toLowerCase();
@@ -23,7 +27,12 @@ function getErrorMessage(error: unknown): string {
       msg.includes('nomodificationallowederror') ||
       msg.includes('createsyncaccesshandle') ||
       msg.includes('access handle') ||
-      msg.includes('locked')
+      msg.includes('locked') ||
+      msg.includes('securityerror') ||
+      msg.includes('notsupportederror') ||
+      msg.includes('operation not permitted') ||
+      msg.includes('quota') ||
+      msg.includes('failed to initialize')
     ) {
       return 'A sincronizar armazenamento local... Toca em "Tentar novamente".';
     }
@@ -36,50 +45,61 @@ function getErrorMessage(error: unknown): string {
   return 'Não foi possível preparar o armazenamento local. Tenta novamente.';
 }
 
-export const useLegalConsentStore = create<LegalConsentState>((set, get) => ({
-  acceptTerms: async () => {
-    if (get().isAccepting) {
-      return;
-    }
+export const useLegalConsentStore = create<LegalConsentState>()(
+  persist(
+    (set, get) => ({
+      acceptTerms: async () => {
+        if (get().isAccepting) {
+          return;
+        }
 
-    set({ errorMessage: null, isAccepting: true });
+        set({ errorMessage: null, isAccepting: true });
 
-    try {
-      await acceptLegalTerms();
-      set({ hasAcceptedTerms: true, isAccepting: false });
-    } catch (error) {
-      set({ errorMessage: getErrorMessage(error), isAccepting: false });
-    }
-  },
-  errorMessage: null,
-  hasAcceptedTerms: false,
-  hydrateConsent: async () => {
-    if (get().isLoading) {
-      return;
-    }
-
-    set({ errorMessage: null, isLoading: true });
-
-    try {
-      const profile = await getUserProfile();
-      set({
-        hasAcceptedTerms: profile.termsAcceptedAt !== null,
-        isHydrated: true,
-        isLoading: false,
-      });
-    } catch (error) {
-      set({ errorMessage: getErrorMessage(error), isHydrated: true, isLoading: false });
-    }
-  },
-  isAccepting: false,
-  isHydrated: false,
-  isLoading: false,
-  resetConsent: () =>
-    set({
+        try {
+          await acceptLegalTerms();
+          set({ hasAcceptedTerms: true, isAccepting: false });
+        } catch (error) {
+          set({ errorMessage: getErrorMessage(error), isAccepting: false });
+        }
+      },
       errorMessage: null,
       hasAcceptedTerms: false,
+      hydrateConsent: async () => {
+        if (get().isLoading) {
+          return;
+        }
+
+        set({ errorMessage: null, isLoading: true });
+
+        try {
+          const profile = await getUserProfile();
+          set({
+            hasAcceptedTerms: profile.termsAcceptedAt !== null,
+            isHydrated: true,
+            isLoading: false,
+          });
+        } catch (error) {
+          set({ errorMessage: getErrorMessage(error), isHydrated: true, isLoading: false });
+        }
+      },
       isAccepting: false,
-      isHydrated: true,
+      isHydrated: false,
       isLoading: false,
+      resetConsent: () =>
+        set({
+          errorMessage: null,
+          hasAcceptedTerms: false,
+          isAccepting: false,
+          isHydrated: true,
+          isLoading: false,
+        }),
     }),
-}));
+    {
+      name: LEGAL_CONSENT_STORAGE_KEY,
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        hasAcceptedTerms: state.hasAcceptedTerms,
+      }),
+    },
+  ),
+);
