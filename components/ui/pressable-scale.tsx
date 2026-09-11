@@ -1,5 +1,7 @@
+import { cssInterop } from "nativewind";
 import React from "react";
 import {
+  Platform,
   Pressable,
   type GestureResponderEvent,
   type Insets,
@@ -29,13 +31,14 @@ export interface PressableScaleProps extends Omit<PressableProps, "style"> {
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+cssInterop(AnimatedPressable, { className: "style" });
 
 /**
  * Componente base de toque com física tátil (expo-animation Recipe #88):
  * - Escala física (0.97) em 100ms e retorno suave em 140ms
  * - Tolerância de toque (hitSlop) e amortecimento de arrasto (pressRetentionOffset)
  * - Suporte automático a redução de movimento (useReducedMotion)
- * - 100% no UI runtime do Reanimated (sem re-renders no JS)
+ * - 100% no UI runtime do Reanimated no mobile e Pressable nativo na web
  */
 export function PressableScale({
   children,
@@ -47,6 +50,7 @@ export function PressableScale({
   hitSlop = 8,
   pressRetentionOffset = 16,
   disabled,
+  onPress,
   onPressIn,
   onPressOut,
   ...props
@@ -72,18 +76,41 @@ export function PressableScale({
     transform: [{ scale: scale.get() }],
   }));
 
+  if (Platform.OS === "web") {
+    return (
+      <Pressable
+        className={className}
+        disabled={disabled}
+        hitSlop={hitSlop}
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        style={({ pressed }) => [
+          style,
+          pressed && !disabled && { transform: [{ scale: targetScale }] },
+        ]}
+        {...props}
+      >
+        {children}
+      </Pressable>
+    );
+  }
+
   return (
     <AnimatedPressable
       className={className}
       disabled={disabled}
       hitSlop={hitSlop}
+      onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       pressRetentionOffset={pressRetentionOffset}
-      style={[animatedStyle, style]}
+      style={[style, animatedStyle]}
       {...props}
     >
       {children}
     </AnimatedPressable>
   );
 }
+
+cssInterop(PressableScale, { className: "style" });
