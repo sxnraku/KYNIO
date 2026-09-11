@@ -28,6 +28,8 @@ export const ENGLISH_BY_PORTUGUESE: Record<string, string> = {
   "Gera um documento visual em PDF com médias de jejum, evolução do peso e macronutrientes para partilha com médicos ou nutricionistas.": "Generate a visual PDF report with fasting averages, weight trends, and macronutrients for healthcare professionals.",
   "Exportar os meus Dados (JSON)": "Export My Data (JSON)",
   "Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.": "Creates a JSON file with your full local SQLite history and opens system share options.",
+  "Importar Backup (JSON)": "Import Backup (JSON)",
+  "Restaura um ficheiro de backup JSON do KYNIO previamente exportado, unificando todo o histórico local.": "Restores a previously exported KYNIO JSON backup file, merging your local history.",
   "Eliminar Todos os Dados": "Delete All Data",
   "Remove a base SQLite, fotografias privadas e, quando ligada, a conta e os dados sincronizados.": "Removes the SQLite database, private photos and, when connected, the account and synced data.",
   "Restaurar compras": "Restore Purchases",

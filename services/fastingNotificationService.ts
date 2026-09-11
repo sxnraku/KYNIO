@@ -53,6 +53,17 @@ if (Platform.OS !== 'web') {
 
 export async function requestNotificationPermission(): Promise<boolean> {
   if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      try {
+        if (Notification.permission === 'granted') {
+          return true;
+        }
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+      } catch {
+        return false;
+      }
+    }
     return false;
   }
 

@@ -127,6 +127,41 @@ self.addEventListener('fetch', (event) => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow('/KYNIO/app/');
+      }
+    })
+  );
+});
+
+self.addEventListener('push', (event) => {
+  let payload = { title: 'KYNIO', body: 'Lembrete de hidratação ou jejum.' };
+  try {
+    if (event.data) {
+      payload = event.data.json();
+    }
+  } catch (e) {
+    if (event.data) payload.body = event.data.text();
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title || 'KYNIO', {
+      body: payload.body,
+      icon: '/KYNIO/app/icon-192.png',
+      badge: '/KYNIO/app/favicon.png',
+      data: payload.data || { url: '/KYNIO/app/' },
+    })
+  );
+});
 `;
 fs.writeFileSync(swPath, swContent, 'utf8');
 

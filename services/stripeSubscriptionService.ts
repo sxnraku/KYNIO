@@ -9,6 +9,6 @@ export function openStripeCheckout(_tier: SubscriptionTier): boolean {
   return false;
 }
 
-export function handleStripeReturnIfPresent(): boolean {
+export async function handleStripeReturnIfPresent(): Promise<boolean> {
   return false;
 }

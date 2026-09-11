@@ -9,6 +9,7 @@ interface SettingsActionCardProps {
   destructive?: boolean;
   disabled?: boolean;
   icon:
+    | "cloud-upload-outline"
     | "compass-outline"
     | "document-text-outline"
     | "download-outline"

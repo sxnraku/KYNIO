@@ -127,3 +127,18 @@ jest.mock('react-native-view-shot', () => ({
   captureRef: jest.fn().mockResolvedValue('file://mock-card-capture.png'),
   releaseCapture: jest.fn(),
 }));
+
+jest.mock('expo-document-picker', () => ({
+  getDocumentAsync: jest.fn().mockResolvedValue({
+    canceled: false,
+    assets: [
+      {
+        uri: 'file://mock-backup.json',
+        name: 'kynio-backup.json',
+        size: 1234,
+        mimeType: 'application/json',
+      },
+    ],
+  }),
+}));
+

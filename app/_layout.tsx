@@ -44,7 +44,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void useUserProgressStore.getState().initializeProgress();
-    handleStripeReturnIfPresent();
+    void handleStripeReturnIfPresent();
     if (Platform.OS === "web" && typeof window !== "undefined") {
       setupTabCoordination();
       if ("serviceWorker" in navigator) {

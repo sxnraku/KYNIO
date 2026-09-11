@@ -1,9 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Linking, Pressable, ScrollView, Switch, View } from "react-native";
+import { Alert, Linking, Platform, Pressable, ScrollView, Switch, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import * as DocumentPicker from "expo-document-picker";
+import { File } from "expo-file-system";
 
 import { PrivacyNote } from "@/components/ui/privacy-note";
 import { CloudAccountCard } from "@/components/ui/cloud-account-card";
@@ -15,6 +18,7 @@ import { COLORS } from "@/constants/colors";
 import {
   deleteAllLocalData,
   exportAllLocalData,
+  importAllLocalData,
 } from "@/services/dataPrivacyService";
 import {
   cancelHydrationReminders,
@@ -69,6 +73,7 @@ export default function SettingsScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -193,8 +198,77 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleImport = async () => {
+    if (isImporting || isExporting || isDeleting || isGeneratingPdf) {
+      return;
+    }
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["application/json", "text/json", "*/*"],
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const asset = result.assets[0];
+      setIsImporting(true);
+
+      let jsonContent = "";
+      if (Platform.OS === "web") {
+        if (asset.file) {
+          jsonContent = await asset.file.text();
+        } else if (asset.uri) {
+          const response = await fetch(asset.uri);
+          jsonContent = await response.text();
+        }
+      } else {
+        const file = new File(asset.uri);
+        jsonContent = await file.text();
+      }
+
+      if (!jsonContent) {
+        throw new Error(
+          language === "en"
+            ? "Could not read the selected backup file."
+            : "Não foi possível ler o ficheiro de backup selecionado.",
+        );
+      }
+
+      const counts = await importAllLocalData(jsonContent);
+      const totalImported =
+        counts.importedFasts +
+        counts.importedMeals +
+        counts.importedWorkouts +
+        counts.importedWeightEntries +
+        counts.importedFastingSymptoms;
+
+      setSuccessMessage(
+        language === "en"
+          ? `Backup imported successfully (${totalImported} items restored).`
+          : `Backup importado com sucesso (${totalImported} registos restaurados).`,
+      );
+    } catch (error) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          language === "en"
+            ? "Failed to import backup data."
+            : "Falha ao importar os dados de backup.",
+        ),
+      );
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const handleDelete = async () => {
-    if (isDeleting || isExporting) {
+    if (isDeleting || isExporting || isImporting) {
       return;
     }
 
@@ -597,12 +671,24 @@ export default function SettingsScreen() {
         <View className="mt-4">
           <SettingsActionCard
             description={translateText("Cria um ficheiro JSON com todo o histórico da SQLite local e abre as opções do sistema para o guardar.", language)}
-            disabled={isDeleting || isGeneratingPdf}
+            disabled={isDeleting || isGeneratingPdf || isImporting}
             icon="download-outline"
             isLoading={isExporting}
             label={translateText("Exportar os meus Dados (JSON)", language)}
             onPress={() => void handleExport()}
             testID="export-data-button"
+          />
+        </View>
+
+        <View className="mt-4">
+          <SettingsActionCard
+            description={translateText("Restaura um ficheiro de backup JSON do KYNIO previamente exportado, unificando todo o histórico local.", language)}
+            disabled={isDeleting || isExporting || isGeneratingPdf}
+            icon="cloud-upload-outline"
+            isLoading={isImporting}
+            label={translateText("Importar Backup (JSON)", language)}
+            onPress={() => void handleImport()}
+            testID="import-data-button"
           />
         </View>
 

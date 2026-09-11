@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isNull } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import { File, Directory, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
@@ -11,6 +11,7 @@ import {
 } from '@/db/client';
 import migrations from '@/drizzle/migrations';
 import { deleteCloudAccountAndData } from '@/services/cloudAuthService';
+import { requestCloudSync } from '@/services/cloudSyncScheduler';
 import {
   fastingSymptoms,
   type FastingSymptomRecord,
@@ -32,7 +33,10 @@ import {
 import { isCloudSyncConfigured } from '@/services/supabaseClient';
 import { WATER_STORAGE_KEY } from '@/services/waterXpService';
 import { WEEKLY_CHALLENGES_STORAGE_KEY } from '@/services/weeklyChallengesService';
-import { useAppPreferencesStore } from '@/store/app-preferences-store';
+import {
+  type FastingPrimaryGoal,
+  useAppPreferencesStore,
+} from '@/store/app-preferences-store';
 import {
   GUIDED_TUTORIAL_STORAGE_KEY,
   useGuidedTutorialStore,
@@ -94,6 +98,7 @@ export interface LocalDataExport {
     ageYears: number;
     biologicalSex: 'male' | 'female' | 'other';
     heightCm: number;
+    primaryGoal?: FastingPrimaryGoal | null;
   };
   exportedAt: string;
   fastingSymptoms: FastingSymptomRecord[];
@@ -179,6 +184,7 @@ export async function collectLocalData(): Promise<LocalDataExport> {
       ageYears: preferencesState.userAgeYears ?? 30,
       biologicalSex: preferencesState.userBiologicalSex ?? 'other',
       heightCm: preferencesState.userHeightCm ?? 170,
+      primaryGoal: preferencesState.primaryGoal ?? null,
     },
     exportedAt: new Date().toISOString(),
     fastingSymptoms: fastingSymptomRecords,
@@ -248,6 +254,252 @@ export async function exportAllLocalData(): Promise<string> {
   return fileName;
 }
 
+export interface ImportDataResult {
+  importedFastingSymptoms: number;
+  importedFasts: number;
+  importedMeals: number;
+  importedWeightEntries: number;
+  importedWorkouts: number;
+}
+
+export async function importAllLocalData(
+  jsonString: string,
+): Promise<ImportDataResult> {
+  let data: unknown;
+  try {
+    data = JSON.parse(jsonString);
+  } catch {
+    throw new Error('Formato JSON inválido no ficheiro selecionado.');
+  }
+
+  if (!data || typeof data !== 'object') {
+    throw new Error('Ficheiro de dados inválido.');
+  }
+
+  const exportObj = data as Partial<LocalDataExport>;
+  if (exportObj.app !== 'KYNIO') {
+    throw new Error(
+      'Ficheiro não reconhecido. O ficheiro deve ser um backup oficial do KYNIO.',
+    );
+  }
+
+  const database = await getInitializedDatabase();
+  let importedFasts = 0;
+  let importedMeals = 0;
+  let importedWorkouts = 0;
+  let importedWeightEntries = 0;
+  let importedFastingSymptoms = 0;
+
+  // 1. Perfil
+  if (exportObj.profile) {
+    const existingProfiles = await database.select().from(userProfile).limit(1);
+    if (existingProfiles.length > 0) {
+      await database
+        .update(userProfile)
+        .set({
+          displayName:
+            exportObj.profile.displayName ?? existingProfiles[0].displayName,
+          bio: exportObj.profile.bio ?? existingProfiles[0].bio,
+          currentLevel: Math.max(
+            exportObj.profile.currentLevel ?? 1,
+            existingProfiles[0].currentLevel,
+          ),
+          totalXp: Math.max(
+            exportObj.profile.totalXp ?? 0,
+            existingProfiles[0].totalXp,
+          ),
+          weightUnit:
+            exportObj.profile.weightUnit ?? existingProfiles[0].weightUnit,
+        })
+        .where(eq(userProfile.id, existingProfiles[0].id));
+    }
+  }
+
+  // 2. Jejuns
+  if (Array.isArray(exportObj.fasts)) {
+    for (const f of exportObj.fasts) {
+      if (typeof f.startTime === 'number' && typeof f.endTime === 'number') {
+        const existing = await database
+          .select()
+          .from(fasts)
+          .where(eq(fasts.startTime, f.startTime))
+          .limit(1);
+
+        if (existing.length === 0) {
+          await database.insert(fasts).values({
+            completed: Boolean(f.completed),
+            endTime: f.endTime,
+            startTime: f.startTime,
+            targetHours: f.targetHours ?? 16,
+            xpEarned: f.xpEarned ?? 0,
+            deletedAt: f.deletedAt ?? null,
+          });
+          importedFasts++;
+        }
+      }
+    }
+  }
+
+  // 3. Refeições
+  if (Array.isArray(exportObj.meals)) {
+    for (const m of exportObj.meals) {
+      if (typeof m.timestamp === 'number') {
+        const existing = await database
+          .select()
+          .from(meals)
+          .where(eq(meals.timestamp, m.timestamp))
+          .limit(1);
+
+        if (existing.length === 0) {
+          await database.insert(meals).values({
+            carbsGrams: m.carbsGrams ?? null,
+            estimatedCalories: m.estimatedCalories ?? null,
+            fatGrams: m.fatGrams ?? null,
+            imageUrl: null,
+            proteinGrams: m.proteinGrams ?? null,
+            tags: Array.isArray(m.tags) ? m.tags : [],
+            timestamp: m.timestamp,
+            xpEarned: m.xpEarned ?? 0,
+            deletedAt: m.deletedAt ?? null,
+          });
+          importedMeals++;
+        }
+      }
+    }
+  }
+
+  // 4. Treinos
+  if (Array.isArray(exportObj.workouts)) {
+    for (const w of exportObj.workouts) {
+      if (
+        typeof w.timestamp === 'number' &&
+        typeof w.durationMinutes === 'number'
+      ) {
+        const existing = await database
+          .select()
+          .from(workouts)
+          .where(eq(workouts.timestamp, w.timestamp))
+          .limit(1);
+
+        if (existing.length === 0) {
+          const effort: 'light' | 'moderate' | 'intense' =
+            w.effort === 'light' || w.effort === 'intense'
+              ? w.effort
+              : 'moderate';
+          await database.insert(workouts).values({
+            durationMinutes: w.durationMinutes,
+            effort,
+            notes: w.notes ?? null,
+            timestamp: w.timestamp,
+            type: w.type ?? 'Treino',
+            xpEarned: w.xpEarned ?? 0,
+            deletedAt: w.deletedAt ?? null,
+          });
+          importedWorkouts++;
+        }
+      }
+    }
+  }
+
+  // 5. Pesagens
+  if (Array.isArray(exportObj.weightEntries)) {
+    for (const we of exportObj.weightEntries) {
+      if (
+        typeof we.timestamp === 'number' &&
+        typeof we.weightGrams === 'number'
+      ) {
+        const existing = await database
+          .select()
+          .from(weightEntries)
+          .where(eq(weightEntries.timestamp, we.timestamp))
+          .limit(1);
+
+        if (existing.length === 0) {
+          await database.insert(weightEntries).values({
+            timestamp: we.timestamp,
+            weightGrams: we.weightGrams,
+            deletedAt: we.deletedAt ?? null,
+          });
+          importedWeightEntries++;
+        }
+      }
+    }
+  }
+
+  // 6. Sintomas
+  if (Array.isArray(exportObj.fastingSymptoms)) {
+    for (const s of exportObj.fastingSymptoms) {
+      if (typeof s.timestamp === 'number' && typeof s.symptomKey === 'string') {
+        const existing = await database
+          .select()
+          .from(fastingSymptoms)
+          .where(eq(fastingSymptoms.timestamp, s.timestamp))
+          .limit(1);
+
+        if (existing.length === 0) {
+          await database.insert(fastingSymptoms).values({
+            fastId: s.fastId ?? null,
+            intensity: s.intensity ?? 1,
+            notes: s.notes ?? null,
+            phaseIndex: s.phaseIndex ?? 0,
+            symptomKey: s.symptomKey,
+            timestamp: s.timestamp,
+            deletedAt: s.deletedAt ?? null,
+          });
+          importedFastingSymptoms++;
+        }
+      }
+    }
+  }
+
+
+  // 7. Hidratação
+  if (exportObj.water && typeof exportObj.water === 'object') {
+    const waterStore = useWaterStore.getState();
+    const mergedHistory = {
+      ...waterStore.history,
+      ...(exportObj.water.history || {}),
+    };
+    useWaterStore.setState({
+      history: mergedHistory,
+      dailyGoalMl: exportObj.water.dailyGoalMl || waterStore.dailyGoalMl,
+      currentMl:
+        exportObj.water.currentMl !== undefined
+          ? exportObj.water.currentMl
+          : waterStore.currentMl,
+    });
+  }
+
+  // 8. Demografia
+  if (exportObj.demographics && typeof exportObj.demographics === 'object') {
+    const pref = useAppPreferencesStore.getState();
+    if (typeof exportObj.demographics.ageYears === 'number') {
+      pref.setUserAgeYears(exportObj.demographics.ageYears);
+    }
+    if (exportObj.demographics.biologicalSex) {
+      pref.setUserBiologicalSex(exportObj.demographics.biologicalSex);
+    }
+    if (typeof exportObj.demographics.heightCm === 'number') {
+      pref.setUserHeightCm(exportObj.demographics.heightCm);
+    }
+    if (exportObj.demographics.primaryGoal) {
+      pref.setPrimaryGoal(exportObj.demographics.primaryGoal);
+    }
+  }
+
+  // 9. Recomputar progresso e solicitar sync se configurado
+  await useUserProgressStore.getState().initializeProgress();
+  requestCloudSync();
+
+  return {
+    importedFastingSymptoms,
+    importedFasts,
+    importedMeals,
+    importedWeightEntries,
+    importedWorkouts,
+  };
+}
+
 export async function deleteAllLocalData(): Promise<void> {
   if (isCloudSyncConfigured) {
     await deleteCloudAccountAndData();
@@ -268,4 +520,5 @@ export async function deleteAllLocalData(): Promise<void> {
   useFastingStore.getState().setHydrated();
   useGuidedTutorialStore.getState().setHydrated();
 }
+
 

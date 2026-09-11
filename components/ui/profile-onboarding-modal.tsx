@@ -162,6 +162,7 @@ export function ProfileOnboardingModal() {
               ? "20:4"
               : "16:8";
       useFastingStore.getState().setGoal(matchingGoalId);
+      useAppPreferencesStore.getState().setPrimaryGoal(focusGoal);
 
       await completeProfileOnboarding({
         displayName: name,

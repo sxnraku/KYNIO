@@ -146,6 +146,7 @@ describe("ProfileOnboardingModal", () => {
       });
       expect(useGuidedTutorialStore.getState().profileOnboardingComplete).toBe(true);
       expect(useFastingScheduleStore.getState().targetHours).toBe(18);
+      expect(useAppPreferencesStore.getState().primaryGoal).toBe("autophagy");
     });
   });
 });

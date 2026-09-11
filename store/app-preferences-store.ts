@@ -34,15 +34,23 @@ export function getDefaultAppLanguage(): AppLanguage {
   return "en";
 }
 
+export type FastingPrimaryGoal =
+  | "fat_loss"
+  | "autophagy"
+  | "discipline"
+  | "circadian_health";
+
 interface AppPreferencesState {
   biometricLockEnabled: boolean;
   healthConnectEnabled: boolean;
   hydrationRemindersEnabled: boolean;
   language: AppLanguage;
+  primaryGoal: FastingPrimaryGoal | null;
   setBiometricLockEnabled: (enabled: boolean) => void;
   setHealthConnectEnabled: (enabled: boolean) => void;
   setHydrationRemindersEnabled: (enabled: boolean) => void;
   setLanguage: (language: AppLanguage) => void;
+  setPrimaryGoal: (primaryGoal: FastingPrimaryGoal | null) => void;
   setThemeMode: (themeMode: AppThemeMode) => void;
   setUserAgeYears: (userAgeYears: number) => void;
   setUserBiologicalSex: (userBiologicalSex: "male" | "female" | "other") => void;
@@ -60,6 +68,7 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
       healthConnectEnabled: false,
       hydrationRemindersEnabled: false,
       language: getDefaultAppLanguage(),
+      primaryGoal: null,
       setBiometricLockEnabled: (biometricLockEnabled) =>
         set({ biometricLockEnabled }),
       setHealthConnectEnabled: (healthConnectEnabled) =>
@@ -67,6 +76,7 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
       setHydrationRemindersEnabled: (hydrationRemindersEnabled) =>
         set({ hydrationRemindersEnabled }),
       setLanguage: (language) => set({ language }),
+      setPrimaryGoal: (primaryGoal) => set({ primaryGoal }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setUserAgeYears: (userAgeYears) => set({ userAgeYears }),
       setUserBiologicalSex: (userBiologicalSex) => set({ userBiologicalSex }),
@@ -84,6 +94,7 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
         healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
+        primaryGoal,
         themeMode,
         userAgeYears,
         userBiologicalSex,
@@ -93,6 +104,7 @@ export const useAppPreferencesStore = create<AppPreferencesState>()(
         healthConnectEnabled,
         hydrationRemindersEnabled,
         language,
+        primaryGoal,
         themeMode,
         userAgeYears,
         userBiologicalSex,
