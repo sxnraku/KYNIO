@@ -34,7 +34,7 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const themeMode = useAppPreferencesStore((state) => state.themeMode);
   const colors = getColorPalette(themeMode);
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     HankenGrotesk_400Regular,
     HankenGrotesk_600SemiBold,
     HankenGrotesk_700Bold,
@@ -65,12 +65,21 @@ export default function RootLayout() {
         });
       }
     }
-    if (fontsLoaded) {
+    if (fontsLoaded || fontError) {
       void SplashScreen.hideAsync();
+      if (Platform.OS === "web" && typeof document !== "undefined") {
+        const splash = document.getElementById("kynio-splash-screen");
+        if (splash) {
+          splash.classList.add("kynio-splash-hidden");
+          setTimeout(() => {
+            splash.remove();
+          }, 350);
+        }
+      }
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 

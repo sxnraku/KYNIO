@@ -37,6 +37,12 @@ function replaceInDir(dir) {
 const appDir = path.join(__dirname, '..', 'legal-site', 'app');
 replaceInDir(appDir);
 
+// Copiar splash-icon para a pasta do export web
+const splashIconSrc = path.join(__dirname, '..', 'assets', 'images', 'splash-icon.png');
+if (fs.existsSync(splashIconSrc)) {
+  fs.copyFileSync(splashIconSrc, path.join(appDir, 'splash-icon.png'));
+}
+
 // Ensure manifest.json has required fields for Android WebAPK installability
 const manifestPath = path.join(appDir, 'manifest.json');
 const manifestData = {
