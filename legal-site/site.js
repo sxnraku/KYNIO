@@ -9,12 +9,13 @@
     pt: {
       "nav.phases": "Fases", "nav.features": "Funcionalidades", "nav.screens": "Ecrãs",
       "nav.openApp": "Abrir Web App",
-      "nav.cta": "Beta Android",
-      "hero.badge": "Beta fechada · Google Play & Web PWA",
+      "nav.cta": "Google Play",
+      "hero.badge": "Disponível no Google Play & Web",
       "hero.t1": "Constrói o teu ritmo.", "hero.t2": "Sem pressão.",
       "hero.sub": "Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.",
       "hero.ctaWeb": "Abrir no Navegador / iPhone",
-      "hero.cta1": "Entrar na Beta do Android", "hero.cta2": "Ver como funciona",
+      "hero.ctaPlay": "Obter no Google Play",
+      "hero.cta1": "Obter no Google Play", "hero.cta2": "Ver como funciona",
       "hero.meta": "Privacidade local&nbsp;&nbsp;·&nbsp;&nbsp;Sem anúncios&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
       "chip.water": "2000 ml", "chip.level": "Nível 4 · Consistente",
       "phases.eyebrow": "O teu corpo, em tempo real",
@@ -38,32 +39,27 @@
       "scr.hint": "arrasta para explorar →",
       "cap.0": "Temporizador & Alvos", "cap.1": "Scanner de Prato", "cap.2": "Registo de Atividade",
       "cap.3": "Níveis de XP & Metas", "cap.4": "Badges & Partilha",
-      "fin.eyebrow": "Beta fechada no Google Play",
+      "fin.eyebrow": "Disponível no Google Play",
       "fin.title": "Pronto para o teu<br>primeiro jejum?",
-      "fin.sub": "Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.",
-      "fin.cta": "Aderir à Beta no Google Play",
+      "fin.sub": "Transfere a aplicação oficial na Google Play Store ou começa a usar diretamente no navegador.",
+      "fin.cta": "Obter no Google Play",
       "fin.ctaWeb": "Usar no iPhone / Navegador (Web App)",
       "ft.app": "Web App",
       "ft.privacy": "Política de Privacidade", "ft.terms": "Termos de Utilização",
       "ft.delete": "Eliminar Conta", "ft.support": "Suporte & Contacto",
       "ft.note": "KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.",
-      "md.eyebrow": "Acesso à Beta do Android",
-      "md.title": "Dois passos e estás dentro.",
-      "md.s1t": "Entrar no Grupo de Testers", "md.s1d": "Autoriza a tua conta Google para ter acesso à versão de teste na Play Store.",
-      "md.s1b": "Entrar no Grupo Google",
-      "md.s2t": "Descarregar na Google Play", "md.s2d": "Abre o link oficial e instala o KYNIO no teu Android.",
-      "md.s2b": "Abrir na Google Play Store",
       "phaseNames": ["Digestão", "Queima de Glicose", "Queima de Gordura", "Cetose", "Autofagia Celular"]
     },
     en: {
       "nav.phases": "Phases", "nav.features": "Features", "nav.screens": "Screens",
       "nav.openApp": "Open Web App",
-      "nav.cta": "Android Beta",
-      "hero.badge": "Closed Beta · Google Play & Web PWA",
+      "nav.cta": "Google Play",
+      "hero.badge": "Available on Google Play & Web",
       "hero.t1": "Build your rhythm.", "hero.t2": "Without pressure.",
       "hero.sub": "Track when your body transitions to fat burning, ketosis, and cellular autophagy. Snap a meal photo to review calorie and macro estimates. 100% private, in your phone's local SQLite.",
       "hero.ctaWeb": "Open in Browser / iPhone",
-      "hero.cta1": "Join the Android Beta", "hero.cta2": "See how it works",
+      "hero.ctaPlay": "Get it on Google Play",
+      "hero.cta1": "Get it on Google Play", "hero.cta2": "See how it works",
       "hero.meta": "Local privacy&nbsp;&nbsp;·&nbsp;&nbsp;Ad-free&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
       "chip.water": "2000 ml", "chip.level": "Level 4 · Consistent",
       "phases.eyebrow": "Your body, in real time",
@@ -87,21 +83,15 @@
       "scr.hint": "drag to explore →",
       "cap.0": "Timer & Protocols", "cap.1": "Meal Scanner", "cap.2": "Activity Logging",
       "cap.3": "XP Levels & Goals", "cap.4": "Badges & Sharing",
-      "fin.eyebrow": "Closed beta on Google Play",
+      "fin.eyebrow": "Available on Google Play",
       "fin.title": "Ready for your<br>first fast?",
-      "fin.sub": "Get access to the official closed beta on the Google Play Store. Two steps and you're in.",
-      "fin.cta": "Join Beta on Google Play",
+      "fin.sub": "Download the official app on Google Play Store or start directly in your browser.",
+      "fin.cta": "Get it on Google Play",
       "fin.ctaWeb": "Use on iPhone / Browser (Web App)",
       "ft.app": "Web App",
       "ft.privacy": "Privacy Policy", "ft.terms": "Terms of Use",
       "ft.delete": "Delete Account", "ft.support": "Support & Contact",
       "ft.note": "KYNIO · Personal lifestyle and gamification tracking tool. Does not provide medical or nutritional advice.",
-      "md.eyebrow": "Android Beta Access",
-      "md.title": "Two steps and you're in.",
-      "md.s1t": "Join the Testers Group", "md.s1d": "Authorise your Google account to get access to the test version on the Play Store.",
-      "md.s1b": "Join Google Group",
-      "md.s2t": "Download on Google Play", "md.s2d": "Open the official link and install KYNIO on your Android device.",
-      "md.s2b": "Open on Google Play Store",
       "phaseNames": ["Digestion", "Glucose Burning", "Fat Burning", "Ketosis", "Cellular Autophagy"]
     }
   };
@@ -353,17 +343,6 @@
     strip.addEventListener("pointercancel", endDrag);
     addEventListener("resize", () => setX(Math.min(Math.max(x, -maxScroll()), 0)));
     setX(0);
-  }
-
-  /* ---------------- modal beta ---------------- */
-  const modal = document.getElementById("betaModal");
-  if (modal) {
-    const openModal = () => { modal.hidden = false; document.body.style.overflow = "hidden"; };
-    const closeModal = () => { modal.hidden = true; document.body.style.overflow = ""; };
-
-    document.querySelectorAll("[data-open-beta]").forEach(b => b.addEventListener("click", openModal));
-    document.querySelectorAll("[data-close-beta]").forEach(b => b.addEventListener("click", closeModal));
-    addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
   }
 
   /* ---------------- suporte legal pages (data-language-button) ---------------- */

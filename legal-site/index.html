@@ -625,63 +625,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 /* ============================================================
-   MODAL
-   ============================================================ */
-
-.modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; }
-.modal[hidden] { display: none; }
-.modal-backdrop {
-  position: absolute; inset: 0;
-  background: rgba(21, 16, 10, .64);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  animation: fadeIn .25s ease;
-}
-.modal-card {
-  position: relative;
-  background: var(--paper);
-  border-radius: 32px;
-  padding: clamp(32px, 5vw, 48px);
-  max-width: 520px; width: 100%;
-  box-shadow: 0 40px 90px -20px rgba(0, 0, 0, .55), 0 0 0 1px rgba(26, 20, 12, .08);
-  animation: modalSpringIn .42s cubic-bezier(.16, 1, .3, 1);
-  max-height: 90svh; overflow-y: auto;
-  transform-origin: center center;
-}
-@keyframes fadeIn { from { opacity: 0; } }
-@keyframes modalSpringIn {
-  from { opacity: 0; transform: scale(.94) translateY(12px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.modal-close {
-  position: absolute; top: 20px; right: 20px;
-  width: 38px; height: 38px; border-radius: 50%;
-  display: grid; place-items: center;
-  border: 1px solid var(--hairline); color: var(--ink-soft);
-  transition: all .2s;
-}
-.modal-close:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-
-.modal .eyebrow { margin-bottom: 16px; }
-.modal-title { font-size: clamp(24px, 3vw, 30px); font-weight: 800; letter-spacing: -.02em; margin-bottom: 30px; }
-
-.modal-step {
-  display: flex; gap: 18px;
-  padding: 22px 0;
-  border-top: 1px solid var(--hairline);
-}
-.step-num {
-  flex: none;
-  width: 34px; height: 34px; border-radius: 50%;
-  background: var(--ink); color: var(--amber);
-  display: grid; place-items: center;
-  font-size: 14px; font-weight: 600;
-}
-.modal-step h4 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-.modal-step p { font-size: 14px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 16px; }
-
-/* ============================================================
    RESPONSIVO
    ============================================================ */
 
@@ -745,7 +688,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
       <span data-lang="pt" data-language="pt" class="lang-opt active">PT</span><span class="lang-sep">/</span><span data-lang="en" data-language="en" class="lang-opt">EN</span>
     </button>
     <a class="btn btn-amber btn-sm" href="app/" data-i18n="nav.openApp">Abrir Web App</a>
-    <button class="btn btn-ink btn-sm" data-open-beta data-i18n="nav.cta">Beta Android</button>
+    <a class="btn btn-ink btn-sm" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener" data-i18n="nav.cta">Google Play</a>
   </div>
 </header>
 
@@ -755,20 +698,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span><span data-i18n="hero.badge">Beta fechada · Google Play</span></p>
+      <p class="eyebrow"><span class="pulse-dot" aria-hidden="true"></span><span data-i18n="hero.badge">Disponível no Google Play &amp; Web</span></p>
       <h1 class="hero-title">
         <span data-i18n="hero.t1">Constrói o teu ritmo.</span><br>
         <em data-i18n="hero.t2">Sem pressão.</em>
       </h1>
       <p class="hero-sub" data-i18n="hero.sub">Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.</p>
       <div class="hero-ctas">
+        <a class="btn btn-ink" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style="margin-right:2px"><path d="m3.609 1.814 11.285 11.285-11.285 11.285A2.39 2.39 0 0 1 3 22.7V3.5a2.39 2.39 0 0 1 .609-1.686zM16.31 14.515l2.766-1.596a1.86 1.86 0 0 0 0-3.238l-2.766-1.596-2.124 2.124 2.124 2.306zM4.908.514 15.116 10.72 13.09 12.75 3.795 3.454C3.89 2.33 4.29 1.15 4.908.514zM15.116 15.48 4.908 25.686c-.618-.636-1.018-1.816-1.113-2.94l9.295-9.296 2.026 2.03z"/></svg>
+          <span data-i18n="hero.ctaPlay">Obter no Google Play</span>
+        </a>
         <a class="btn btn-amber" href="app/">
           <span data-i18n="hero.ctaWeb">Abrir no Navegador / iPhone</span>
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <button class="btn btn-ink" data-open-beta>
-          <span data-i18n="hero.cta1">Entrar na Beta do Android</span>
-        </button>
         <a class="link-quiet" href="#fases" data-i18n="hero.cta2">Ver como funciona</a>
       </div>
       <p class="hero-meta" data-i18n="hero.meta">Privacidade local&nbsp;&nbsp;·&nbsp;&nbsp;Sem anúncios&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store</p>
@@ -955,17 +899,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 <!-- ============ CTA FINAL ============ -->
 <section class="final">
   <div class="final-inner">
-    <p class="eyebrow eyebrow-amber" data-i18n="fin.eyebrow">Beta fechada no Google Play</p>
+    <p class="eyebrow eyebrow-amber" data-i18n="fin.eyebrow">Disponível no Google Play</p>
     <h2 class="final-title" data-i18n="fin.title">Pronto para o teu<br>primeiro jejum?</h2>
-    <p class="final-sub" data-i18n="fin.sub">Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.</p>
+    <p class="final-sub" data-i18n="fin.sub">Transfere a aplicação oficial na Google Play Store ou começa a usar diretamente no navegador.</p>
     <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
-      <a class="btn btn-amber btn-lg" href="app/">
+      <a class="btn btn-amber btn-lg" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" style="margin-right:2px"><path d="m3.609 1.814 11.285 11.285-11.285 11.285A2.39 2.39 0 0 1 3 22.7V3.5a2.39 2.39 0 0 1 .609-1.686zM16.31 14.515l2.766-1.596a1.86 1.86 0 0 0 0-3.238l-2.766-1.596-2.124 2.124 2.124 2.306zM4.908.514 15.116 10.72 13.09 12.75 3.795 3.454C3.89 2.33 4.29 1.15 4.908.514zM15.116 15.48 4.908 25.686c-.618-.636-1.018-1.816-1.113-2.94l9.295-9.296 2.026 2.03z"/></svg>
+        <span data-i18n="fin.cta">Obter no Google Play</span>
+      </a>
+      <a class="btn btn-ink btn-lg" href="app/" style="border:1px solid var(--hairline-d);">
         <span data-i18n="fin.ctaWeb">Usar no iPhone / Navegador (Web App)</span>
         <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <button class="btn btn-ink btn-lg" data-open-beta style="border:1px solid var(--hairline-d);">
-        <span data-i18n="fin.cta">Aderir à Beta no Google Play</span>
-      </button>
     </div>
   </div>
 </section>
@@ -992,472 +937,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   <p class="footer-note" data-i18n="ft.note">KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.</p>
 </footer>
 
-<!-- ============ MODAL BETA ============ -->
-<div class="modal" id="betaModal" role="dialog" aria-modal="true" aria-labelledby="betaTitle" hidden>
-  <div class="modal-backdrop" data-close-beta></div>
-  <div class="modal-card">
-    <button class="modal-close" data-close-beta aria-label="Fechar">
-      <svg viewBox="0 0 16 16" width="16" height="16"><path d="m3 3 10 10M13 3 3 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-    </button>
-    <p class="eyebrow" data-i18n="md.eyebrow">Acesso à Beta do Android</p>
-    <h3 class="modal-title" id="betaTitle" data-i18n="md.title">Dois passos e estás dentro.</h3>
-
-    <div class="modal-step">
-      <span class="step-num mono">1</span>
-      <div>
-        <h4 data-i18n="md.s1t">Entrar no Grupo de Testers</h4>
-        <p data-i18n="md.s1d">Autoriza a tua conta Google para ter acesso à versão de teste na Play Store.</p>
-        <a class="btn btn-ink btn-sm" href="https://groups.google.com/g/kynio-testers" target="_blank" rel="noopener"><span data-i18n="md.s1b">Entrar no Grupo Google</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 13 13 3M6 3h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      </div>
-    </div>
-
-    <div class="modal-step">
-      <span class="step-num mono">2</span>
-      <div>
-        <h4 data-i18n="md.s2t">Descarregar na Google Play</h4>
-        <p data-i18n="md.s2d">Abre o link oficial e instala o KYNIO no teu Android.</p>
-        <a class="btn btn-amber btn-sm" href="https://play.google.com/store/apps/details?id=com.kynio.app" target="_blank" rel="noopener"><span data-i18n="md.s2b">Abrir na Google Play Store</span><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3 13 13 3M6 3h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script src="site.js"></script>
-<script>
-/* ============================================================
-   KYNIO — interações
-   ============================================================ */
-(() => {
-  "use strict";
-
-  /* ---------------- i18n ---------------- */
-  const I18N = {
-    pt: {
-      "nav.phases": "Fases", "nav.features": "Funcionalidades", "nav.screens": "Ecrãs",
-      "nav.openApp": "Abrir Web App",
-      "nav.cta": "Beta Android",
-      "hero.badge": "Beta fechada · Google Play & Web PWA",
-      "hero.t1": "Constrói o teu ritmo.", "hero.t2": "Sem pressão.",
-      "hero.sub": "Acompanha quando o teu corpo entra em queima de gordura, cetose e autofagia celular. Fotografa o prato para rever estimativas de calorias e macronutrientes. 100% privado, na SQLite local do teu telemóvel.",
-      "hero.ctaWeb": "Abrir no Navegador / iPhone",
-      "hero.cta1": "Entrar na Beta do Android", "hero.cta2": "Ver como funciona",
-      "hero.meta": "Privacidade local&nbsp;&nbsp;·&nbsp;&nbsp;Sem anúncios&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
-      "chip.water": "2000 ml", "chip.level": "Nível 4 · Consistente",
-      "phases.eyebrow": "O teu corpo, em tempo real",
-      "phases.title": "Cinco fases. Um arco.",
-      "phases.sub": "O KYNIO traduz literatura biológica num temporizador vivo — sabe exatamente onde estás no jejum, sem adivinhar.",
-      "arc.elapsed": "decorridos", "arc.remain": "restantes",
-      "ph.0.t": "Digestão", "ph.0.d": "A glicose da última refeição ainda está em circulação. O corpo usa-a primeiro.",
-      "ph.1.t": "Queima de Glicose", "ph.1.d": "Os níveis de insulina descem. O glicogénio do fígado torna-se a fonte principal.",
-      "ph.2.t": "Queima de Gordura", "ph.2.d": "O interruptor metabólico: a gordura armazenada passa a ser o combustível.",
-      "ph.3.t": "Cetose", "ph.3.d": "Os corpos cetónicos alimentam o cérebro. Clareza mental e energia estável.",
-      "ph.4.t": "Autofagia Celular", "ph.4.d": "A limpeza celular profunda: reciclagem de componentes danificados.",
-      "feat.eyebrow": "Funcionalidades",
-      "feat.title": "Foco em hábitos e saúde.<br>Sem complicações.",
-      "feat.sub": "Uma ferramenta pessoal desenvolvida para manter a tua consistência diária de forma simples e intuitiva.",
-      "f.0.t": "Fases Metabólicas Reais", "f.0.d": "Acompanha a transição entre Digestão, Queima de Gordura, Cetose e Autofagia Celular com base em literatura biológica.",
-      "f.1.t": "Scanner de Refeições", "f.1.d": "Tira uma foto ao teu prato para estimar instantaneamente calorias e macronutrientes — proteína, hidratos e gorduras.",
-      "f.2.t": "Água & Eletrólitos", "f.2.d": "Controlo prático de hidratação diária com atalhos de copos e orientações saudáveis para o jejum.",
-      "f.3.t": "Privacidade Local", "f.3.d": "Os teus registos ficam guardados no teu dispositivo, numa SQLite privada. Sem anúncios e sem rastreio invasivo.",
-      "scr.eyebrow": "Ecrãs da app",
-      "scr.title": "Capturas autênticas.<br>Sem maquilhagem.",
-      "scr.hint": "arrasta para explorar →",
-      "cap.0": "Temporizador & Alvos", "cap.1": "Scanner de Prato", "cap.2": "Registo de Atividade",
-      "cap.3": "Níveis de XP & Metas", "cap.4": "Badges & Partilha",
-      "fin.eyebrow": "Beta fechada no Google Play",
-      "fin.title": "Pronto para o teu<br>primeiro jejum?",
-      "fin.sub": "Acede à versão oficial de teste fechado na Google Play Store. Dois passos e estás dentro.",
-      "fin.cta": "Aderir à Beta no Google Play",
-      "fin.ctaWeb": "Usar no iPhone / Navegador (Web App)",
-      "ft.app": "Web App",
-      "ft.privacy": "Política de Privacidade", "ft.terms": "Termos de Utilização",
-      "ft.eula": "Licença (EULA)", "ft.dmca": "Política DMCA",
-      "ft.delete": "Eliminar Conta", "ft.support": "Suporte & Contacto",
-      "ft.note": "KYNIO · Ferramenta pessoal de acompanhamento de estilo de vida e gamificação. Não presta aconselhamento médico ou nutricional.",
-      "md.eyebrow": "Acesso à Beta do Android",
-      "md.title": "Dois passos e estás dentro.",
-      "md.s1t": "Entrar no Grupo de Testers", "md.s1d": "Autoriza a tua conta Google para ter acesso à versão de teste na Play Store.",
-      "md.s1b": "Entrar no Grupo Google",
-      "md.s2t": "Descarregar na Google Play", "md.s2d": "Abre o link oficial e instala o KYNIO no teu Android.",
-      "md.s2b": "Abrir na Google Play Store",
-      "phaseNames": ["Digestão", "Queima de Glicose", "Queima de Gordura", "Cetose", "Autofagia Celular"]
-    },
-    en: {
-      "nav.phases": "Phases", "nav.features": "Features", "nav.screens": "Screens",
-      "nav.openApp": "Open Web App",
-      "nav.cta": "Android Beta",
-      "hero.badge": "Closed Beta · Google Play & Web PWA",
-      "hero.t1": "Build your rhythm.", "hero.t2": "Without pressure.",
-      "hero.sub": "Track when your body transitions to fat burning, ketosis, and cellular autophagy. Snap a meal photo to review calorie and macro estimates. 100% private, in your phone's local SQLite.",
-      "hero.ctaWeb": "Open in Browser / iPhone",
-      "hero.cta1": "Join the Android Beta", "hero.cta2": "See how it works",
-      "hero.meta": "Local privacy&nbsp;&nbsp;·&nbsp;&nbsp;Ad-free&nbsp;&nbsp;·&nbsp;&nbsp;Google Play Store",
-      "chip.water": "2000 ml", "chip.level": "Level 4 · Consistent",
-      "phases.eyebrow": "Your body, in real time",
-      "phases.title": "Five phases. One arc.",
-      "phases.sub": "KYNIO turns biological literature into a living timer — know exactly where you are in your fast, no guessing.",
-      "arc.elapsed": "elapsed", "arc.remain": "remaining",
-      "ph.0.t": "Digestion", "ph.0.d": "Glucose from your last meal is still circulating. The body uses it first.",
-      "ph.1.t": "Glucose Burning", "ph.1.d": "Insulin levels drop. Liver glycogen becomes the primary source.",
-      "ph.2.t": "Fat Burning", "ph.2.d": "The metabolic switch: stored fat becomes the fuel.",
-      "ph.3.t": "Ketosis", "ph.3.d": "Ketone bodies feed the brain. Mental clarity and steady energy.",
-      "ph.4.t": "Cellular Autophagy", "ph.4.d": "Deep cellular cleanup: recycling of damaged components.",
-      "feat.eyebrow": "Features",
-      "feat.title": "Focused on habits and health.<br>No friction.",
-      "feat.sub": "A personal tool built to keep your daily consistency simple, clean, and intuitive.",
-      "f.0.t": "Real Metabolic Phases", "f.0.d": "Track your progress through Digestion, Fat Burning, Ketosis and Cellular Autophagy grounded in biological literature.",
-      "f.1.t": "Meal Scanner", "f.1.d": "Snap a photo of your plate to instantly estimate calories and macronutrients — protein, carbs, and fat.",
-      "f.2.t": "Water & Electrolytes", "f.2.d": "Effortless daily hydration tracking with quick cup shortcuts and healthy fasting guidance.",
-      "f.3.t": "Local Privacy", "f.3.d": "Your records stay on your device in a private SQLite database. Zero ads, zero invasive tracking.",
-      "scr.eyebrow": "App screens",
-      "scr.title": "Authentic captures.<br>No makeup.",
-      "scr.hint": "drag to explore →",
-      "cap.0": "Timer & Protocols", "cap.1": "Meal Scanner", "cap.2": "Activity Logging",
-      "cap.3": "XP Levels & Goals", "cap.4": "Badges & Sharing",
-      "fin.eyebrow": "Closed beta on Google Play",
-      "fin.title": "Ready for your<br>first fast?",
-      "fin.sub": "Get access to the official closed beta on the Google Play Store. Two steps and you're in.",
-      "fin.cta": "Join Beta on Google Play",
-      "fin.ctaWeb": "Use on iPhone / Browser (Web App)",
-      "ft.app": "Web App",
-      "ft.privacy": "Privacy Policy", "ft.terms": "Terms of Use",
-      "ft.eula": "Licence (EULA)", "ft.dmca": "DMCA Policy",
-      "ft.delete": "Delete Account", "ft.support": "Support & Contact",
-      "ft.note": "KYNIO · Personal lifestyle and gamification tracking tool. Does not provide medical or nutritional advice.",
-      "md.eyebrow": "Android Beta Access",
-      "md.title": "Two steps and you're in.",
-      "md.s1t": "Join the Testers Group", "md.s1d": "Authorise your Google account to get access to the test version on the Play Store.",
-      "md.s1b": "Join Google Group",
-      "md.s2t": "Download on Google Play", "md.s2d": "Open the official link and install KYNIO on your Android device.",
-      "md.s2b": "Open on Google Play Store",
-      "phaseNames": ["Digestion", "Glucose Burning", "Fat Burning", "Ketosis", "Cellular Autophagy"]
-    }
-  };
-
-  let lang = localStorage.getItem("kynio-lang") || "pt";
-
-  const SCREENSHOTS = {
-    pt: [
-      { src: "assets/screenshots/00_jejum_tracker.png", alt: "Temporizador de jejum 16:8" },
-      { src: "assets/screenshots/01_refeicoes_nutricao_ia.png", alt: "Scanner de refeições com IA" },
-      { src: "assets/screenshots/02_treinos_movimento.png", alt: "Registo de treinos" },
-      { src: "assets/screenshots/03_progresso_gamificado.png", alt: "Progresso e níveis de XP" },
-      { src: "assets/screenshots/04_conquistas_partilha.png", alt: "Conquistas e partilha" },
-    ],
-    en: [
-      { src: "assets/screenshots/en/00_fasting_tracker.png", alt: "16:8 Fasting Timer" },
-      { src: "assets/screenshots/en/01_ai_meal_nutrition.png", alt: "AI Meal Scanner" },
-      { src: "assets/screenshots/en/02_workouts_movement.png", alt: "Workouts & Movement" },
-      { src: "assets/screenshots/en/03_gamified_progress.png", alt: "Gamified Progress & XP" },
-      { src: "assets/screenshots/en/04_achievements_share.png", alt: "Achievements & Sharing" },
-    ],
-  };
-
-  function updateScreenshots(l) {
-    const list = SCREENSHOTS[l] || SCREENSHOTS.pt;
-    const phoneImgs = document.querySelectorAll("#phoneScreen img");
-    const dragImgs = document.querySelectorAll("#dragStrip .shot-frame img");
-    list.forEach((item, idx) => {
-      if (phoneImgs[idx]) {
-        phoneImgs[idx].src = item.src;
-        phoneImgs[idx].alt = item.alt;
-      }
-      if (dragImgs[idx]) {
-        dragImgs[idx].src = item.src;
-        dragImgs[idx].alt = item.alt;
-      }
-    });
-  }
-
-  function applyLang(l) {
-    lang = l;
-    localStorage.setItem("kynio-lang", l);
-    document.documentElement.lang = l;
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const v = I18N[l]?.[el.dataset.i18n];
-      if (v !== undefined) el.innerHTML = v;
-    });
-    document.querySelectorAll(".lang-opt").forEach(el =>
-      el.classList.toggle("active", el.dataset.lang === l));
-    updateScreenshots(l);
-  }
-
-  const langToggle = document.getElementById("langToggle");
-  if (langToggle) {
-    langToggle.addEventListener("click", () =>
-      applyLang(lang === "pt" ? "en" : "pt"));
-  }
-
-  /* ---------------- nav scroll state ---------------- */
-  const nav = document.getElementById("nav");
-  if (nav) {
-    addEventListener("scroll", () =>
-      nav.classList.toggle("scrolled", scrollY > 12), { passive: true });
-  }
-
-  /* ---------------- phone scrollview + dots ---------------- */
-  const screen = document.getElementById("phoneScreen");
-  const dots = [...document.querySelectorAll("#phoneDots .dot")];
-  let dotTick = false;
-  if (screen && dots.length > 0) {
-    screen.addEventListener("scroll", () => {
-      if (dotTick) return;
-      dotTick = true;
-      requestAnimationFrame(() => {
-        const i = Math.round(screen.scrollTop / screen.clientHeight);
-        dots.forEach((d, k) => d.classList.toggle("active", k === i));
-        dotTick = false;
-      });
-    }, { passive: true });
-  }
-
-  /* ---------------- arco metabólico ao vivo ---------------- */
-  const PHASE_HOURS = [0, 4, 12, 16, 24];
-  const FAST_GOAL_H = 16;
-  // jejum simulado: começou há 8h23m41s em relação ao carregamento da página
-  const fastStart = Date.now() - (8 * 3600 + 23 * 60 + 41) * 1000;
-
-  const track = document.getElementById("arcTrack");
-  const fill = document.getElementById("arcFill");
-  const dot = document.getElementById("arcDot");
-  const glow = document.getElementById("arcGlow");
-  const nodesG = document.getElementById("arcNodes");
-  const timerEl = document.getElementById("arcTimer");
-  const phaseEl = document.getElementById("arcPhaseName");
-  const elapsedEl = document.getElementById("arcElapsed");
-  const remainEl = document.getElementById("arcRemain");
-  const phaseItems = [...document.querySelectorAll(".phase-item")];
-
-  let nodeEls = [];
-  if (track && fill && dot && glow && nodesG && timerEl && phaseEl) {
-    const L = track.getTotalLength();
-    fill.style.strokeDasharray = L;
-    fill.style.strokeDashoffset = L;
-
-    // nós das fases no arco (progresso 0→24h mapeado 0→1)
-    const SVGNS = "http://www.w3.org/2000/svg";
-    nodeEls = PHASE_HOURS.map((h, i) => {
-      const p = track.getPointAtLength((h / 24) * L);
-      const g = document.createElementNS(SVGNS, "g");
-
-      const c = document.createElementNS(SVGNS, "circle");
-      c.setAttribute("cx", p.x); c.setAttribute("cy", p.y);
-      c.setAttribute("r", 7); c.setAttribute("class", "arc-node-dot");
-      g.appendChild(c);
-
-      const anchor = i === 0 ? "start" : i === PHASE_HOURS.length - 1 ? "end" : "middle";
-      const labelX = i === 0 ? 6 : i === PHASE_HOURS.length - 1 ? 894 : p.x;
-
-      const label = document.createElementNS(SVGNS, "text");
-      label.setAttribute("class", "arc-node-label");
-      const above = p.y < 300;
-      label.setAttribute("x", labelX);
-      label.setAttribute("y", above ? p.y - 26 : p.y + 34);
-      label.setAttribute("text-anchor", anchor);
-      label.dataset.phaseIdx = i;
-      g.appendChild(label);
-
-      const hour = document.createElementNS(SVGNS, "text");
-      hour.setAttribute("class", "arc-node-hour");
-      hour.setAttribute("x", labelX);
-      hour.setAttribute("y", above ? p.y - 44 : p.y + 52);
-      hour.setAttribute("text-anchor", anchor);
-      hour.textContent = h + "h";
-      g.appendChild(hour);
-
-      nodesG.appendChild(g);
-      return { circle: c, label, h };
-    });
-
-    const pad2 = n => String(n).padStart(2, "0");
-
-    function tickArc() {
-      const elapsedS = (Date.now() - fastStart) / 1000;
-      const elapsedH = elapsedS / 3600;
-
-      // posição no arco (0–24h)
-      const t = Math.min(elapsedH / 24, 1);
-      const pt = track.getPointAtLength(t * L);
-      dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y);
-      glow.setAttribute("cx", pt.x); glow.setAttribute("cy", pt.y);
-      fill.style.strokeDashoffset = L * (1 - t);
-
-      // fase atual
-      let phase = 0;
-      for (let i = 0; i < PHASE_HOURS.length; i++) if (elapsedH >= PHASE_HOURS[i]) phase = i;
-      if (phaseEl && I18N[lang]?.phaseNames) phaseEl.textContent = I18N[lang].phaseNames[phase];
-
-      nodeEls.forEach((n, i) => {
-        const on = elapsedH >= n.h;
-        n.circle.classList.toggle("reached", on);
-        n.label.classList.toggle("reached", on);
-      });
-      phaseItems.forEach((el, i) => el.classList.toggle("lit", i === phase));
-
-      // textos
-      const h = Math.floor(elapsedH);
-      const m = Math.floor((elapsedS % 3600) / 60);
-      const s = Math.floor(elapsedS % 60);
-      if (timerEl) timerEl.textContent = `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
-      if (elapsedEl) elapsedEl.textContent = `${h}h ${pad2(m)}m`;
-      const remainS = Math.max(FAST_GOAL_H * 3600 - elapsedS, 0);
-      if (remainEl) remainEl.textContent = `${Math.floor(remainS / 3600)}h ${pad2(Math.floor((remainS % 3600) / 60))}m`;
-    }
-
-    function arcLabels() {
-      if (I18N[lang]?.phaseNames) {
-        nodeEls.forEach((n, i) => n.label.textContent = I18N[lang].phaseNames[i]);
-      }
-    }
-
-    tickArc();
-    arcLabels();
-    setInterval(tickArc, 1000);
-    if (langToggle) langToggle.addEventListener("click", arcLabels);
-  }
-
-  /* ---------------- carrossel com arraste + inércia ---------------- */
-  /* ---------------- carrossel fluido com física Apple (1:1 + rubberband + inércia + interrupção) ---------------- */
-  const strip = document.getElementById("dragStrip");
-  const bar = document.getElementById("dragBar");
-  if (strip && bar) {
-    let x = 0, startX = 0, lastX = 0, lastT = 0, vel = 0, dragging = false, raf = null;
-
-    const maxScroll = () => Math.max(strip.scrollWidth - strip.parentElement.clientWidth, 0);
-
-    // Apple rubberband (WWDC 2018): resistência física elástica nas bordas
-    function rubberband(overshoot, dimension = 340, constant = 0.55) {
-      return (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot));
-    }
-
-    function setX(nx) {
-      const max = maxScroll();
-      if (nx > 0) {
-        nx = rubberband(nx, 340);
-      } else if (nx < -max) {
-        const over = nx + max;
-        nx = -max + rubberband(over, 340);
-      }
-      x = nx;
-      strip.style.transform = `translate3d(${x}px,0,0)`;
-      const p = max ? Math.min(Math.max(-x / max, 0), 1) : 0;
-      bar.style.left = (p * 80) + "%";
-    }
-
-    // Interrupção instantânea ao toque (Princípio 3 do Apple Design)
-    strip.addEventListener("pointerdown", e => {
-      dragging = true;
-      strip.classList.add("dragging");
-      cancelAnimationFrame(raf);
-      try { strip.setPointerCapture(e.pointerId); } catch (_) {}
-      startX = e.clientX - x;
-      lastX = e.clientX;
-      lastT = performance.now();
-      vel = 0;
-    });
-
-    strip.addEventListener("pointermove", e => {
-      if (!dragging) return;
-      const now = performance.now();
-      const dt = Math.max(now - lastT, 1);
-      vel = ((e.clientX - lastX) / dt) * 16.67; // normalizado para 60fps
-      lastX = e.clientX;
-      lastT = now;
-      setX(e.clientX - startX);
-    });
-
-    // Mola criticamente amortecida da Apple (damping 1.0, suave e sem ressalto descontrolado)
-    function springSnap(target, initialVelocity = 0) {
-      cancelAnimationFrame(raf);
-      let currentVel = initialVelocity;
-      const settle = () => {
-        const force = (target - x) * 0.16; // resposta da mola
-        currentVel = (currentVel + force) * 0.76; // amortecimento crítico
-        setX(x + currentVel);
-        if (Math.abs(target - x) > 0.35 || Math.abs(currentVel) > 0.35) {
-          raf = requestAnimationFrame(settle);
-        } else {
-          setX(target);
-        }
-      };
-      settle();
-    }
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      strip.classList.remove("dragging");
-      const max = maxScroll();
-
-      // Fora das bordas: mola elástica de regresso imediato
-      if (x > 0) {
-        springSnap(0, vel);
-        return;
-      }
-      if (x < -max) {
-        springSnap(-max, vel);
-        return;
-      }
-
-      // Projeção de momentum (Apple WWDC 2018)
-      (function glide() {
-        vel *= 0.94;
-        if (Math.abs(vel) < 0.3) {
-          if (x > 0 || x < -max) {
-            springSnap(x > 0 ? 0 : -max);
-          }
-          return;
-        }
-        setX(x + vel);
-        if (x > 0 || x < -max) {
-          springSnap(x > 0 ? 0 : -max, vel);
-          return;
-        }
-        raf = requestAnimationFrame(glide);
-      })();
-    }
-
-    strip.addEventListener("pointerup", endDrag);
-    strip.addEventListener("pointercancel", endDrag);
-    addEventListener("resize", () => setX(Math.min(Math.max(x, -maxScroll()), 0)));
-    setX(0);
-  }
-
-  /* ---------------- modal beta ---------------- */
-  const modal = document.getElementById("betaModal");
-  if (modal) {
-    const openModal = () => { modal.hidden = false; document.body.style.overflow = "hidden"; };
-    const closeModal = () => { modal.hidden = true; document.body.style.overflow = ""; };
-
-    document.querySelectorAll("[data-open-beta]").forEach(b => b.addEventListener("click", openModal));
-    document.querySelectorAll("[data-close-beta]").forEach(b => b.addEventListener("click", closeModal));
-    addEventListener("keydown", e => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
-  }
-
-  /* ---------------- suporte legal pages (data-language-button) ---------------- */
-  const legalButtons = document.querySelectorAll("[data-language-button]");
-  if (legalButtons.length > 0) {
-    const setLegalLang = (l) => {
-      document.documentElement.dataset.activeLanguage = l;
-      document.documentElement.lang = l;
-      localStorage.setItem("kynio-legal-language", l);
-      legalButtons.forEach(btn => {
-        const isActive = btn.dataset.languageButton === l;
-        btn.classList.toggle("active", isActive);
-        btn.setAttribute("aria-pressed", String(isActive));
-      });
-    };
-    legalButtons.forEach(btn => {
-      btn.addEventListener("click", () => setLegalLang(btn.dataset.languageButton));
-    });
-    const saved = localStorage.getItem("kynio-legal-language") || (navigator.language.startsWith("pt") ? "pt" : "en");
-    setLegalLang(saved);
-  }
-
-  /* ---------------- init ---------------- */
-  applyLang(lang);
-})();
-
-</script>
 </body>
 </html>
