@@ -7,6 +7,9 @@ export interface PersonalFactualInsights {
   typicalMealStartHour: string | null;
   weeklyDiffMinutes: number;
   weeklyTrend: 'up' | 'down' | 'equal';
+  circadianAlignmentRate: number | null;
+  circadianAlignmentLabel: string | null;
+  completionRate: number;
 }
 
 const DAY_NAMES_PT = [
@@ -44,6 +47,9 @@ export function calculatePersonalInsights(
       typicalMealStartHour: null,
       weeklyDiffMinutes: 0,
       weeklyTrend: 'equal',
+      circadianAlignmentRate: null,
+      circadianAlignmentLabel: null,
+      completionRate: 0,
     };
   }
 
@@ -122,6 +128,26 @@ export function calculatePersonalInsights(
     typicalMealStartHour = `${String(topHour).padStart(2, '0')}:00`;
   }
 
+  // 4. Taxa de Alinhamento Circadiano (Jejuns que iniciaram antes das 20:00)
+  const earlyFastsCount = completedFasts.filter((f) => {
+    const startHour = new Date(f.startTime).getHours();
+    return startHour < 20;
+  }).length;
+
+  const circadianAlignmentRate = Math.round((earlyFastsCount / completedFasts.length) * 100);
+
+  const circadianAlignmentLabel =
+    language === 'en'
+      ? `${circadianAlignmentRate}% of fasts started before 20:00 (circadian early window)`
+      : `${circadianAlignmentRate}% dos jejuns iniciaram antes das 20:00 (janela circadiana precoce)`;
+
+  // 5. Taxa Global de Conclusão de Metas
+  const totalFastsCount = fastRecords.length;
+  const completionRate =
+    totalFastsCount > 0
+      ? Math.round((completedFasts.length / totalFastsCount) * 100)
+      : 100;
+
   return {
     hasEnoughData: true,
     mostConsistentDay,
@@ -129,5 +155,8 @@ export function calculatePersonalInsights(
     typicalMealStartHour,
     weeklyDiffMinutes,
     weeklyTrend,
+    circadianAlignmentRate,
+    circadianAlignmentLabel,
+    completionRate,
   };
 }

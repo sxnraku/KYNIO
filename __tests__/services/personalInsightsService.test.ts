@@ -5,9 +5,9 @@ describe('personalInsightsService', () => {
   const ONE_DAY_MS = 24 * 60 * 60 * 1000;
   const now = Date.now();
 
-  function makeFast(endTime: number, durationHours = 16): FastRecord {
+  function makeFast(endTime: number, durationHours = 16, completed = true): FastRecord {
     return {
-      completed: true,
+      completed,
       deletedAt: null,
       endTime,
       id: Math.random(),
@@ -21,6 +21,7 @@ describe('personalInsightsService', () => {
     const result = calculatePersonalInsights([]);
     expect(result.hasEnoughData).toBe(false);
     expect(result.mostConsistentDay).toBeNull();
+    expect(result.circadianAlignmentRate).toBeNull();
   });
 
   it('calcula comparação semanal e identifica tendência positiva', () => {
@@ -41,6 +42,7 @@ describe('personalInsightsService', () => {
     expect(result.thisWeekAvgHours).toBe(18);
     expect(result.weeklyTrend).toBe('up');
     expect(result.weeklyDiffMinutes).toBe(240); // 4 horas a mais = 240 mins
+    expect(result.completionRate).toBe(100);
   });
 
   it('identifica o dia da semana mais consistente e a hora típica de refeição', () => {
@@ -71,5 +73,19 @@ describe('personalInsightsService', () => {
     expect(result.hasEnoughData).toBe(true);
     expect(result.mostConsistentDay).toBe('Terça-feira');
     expect(result.typicalMealStartHour).toBeDefined();
+    expect(result.circadianAlignmentRate).toBeDefined();
+    expect(typeof result.circadianAlignmentRate).toBe('number');
+    expect(result.circadianAlignmentLabel).toContain('antes das 20:00');
+  });
+
+  it('calcula taxa de conclusão com jejuns não concluídos', () => {
+    const fast1 = makeFast(now - 1 * ONE_DAY_MS, 16, true);
+    const fast2 = makeFast(now - 2 * ONE_DAY_MS, 16, true);
+    const fast3 = makeFast(now - 3 * ONE_DAY_MS, 16, false); // cancelado / não concluído
+
+    const result = calculatePersonalInsights([fast1, fast2, fast3], [], 'en');
+    expect(result.hasEnoughData).toBe(true);
+    expect(result.completionRate).toBe(67); // 2 de 3 = ~67%
+    expect(result.circadianAlignmentLabel).toContain('circadian early window');
   });
 });

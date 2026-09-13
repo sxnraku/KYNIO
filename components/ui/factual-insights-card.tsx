@@ -160,6 +160,52 @@ export function FactualInsightsCard() {
             </View>
           </View>
         ) : null}
+
+        {/* 4. Alinhamento Circadiano Precoce */}
+        {insights.circadianAlignmentRate !== null ? (
+          <View className="flex-row items-center justify-between rounded-xl border border-border bg-surface-raised p-3">
+            <View className="flex-1 pr-2">
+              <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+                {language === "en" ? "Circadian Alignment (eTRF)" : "Alinhamento Circadiano (eTRF)"}
+              </Text>
+              <Text className="mt-1 font-headline text-sm text-foreground">
+                {language === "en"
+                  ? `${insights.circadianAlignmentRate}% started before 20:00`
+                  : `${insights.circadianAlignmentRate}% iniciados antes das 20:00`}
+              </Text>
+              <Text className="mt-0.5 font-body text-xs text-muted">
+                {language === "en"
+                  ? "Feeding window closed in sync with natural melatonin rise"
+                  : "Janela alimentar encerrada em harmonia com o ciclo da melatonina"}
+              </Text>
+            </View>
+            <View className="h-8 w-8 items-center justify-center rounded-lg bg-background">
+              <Ionicons color={COLORS.success} name="sunny-outline" size={16} />
+            </View>
+          </View>
+        ) : null}
+
+        {/* 5. Taxa de Conclusão Global */}
+        {insights.completionRate > 0 ? (
+          <View className="flex-row items-center justify-between rounded-xl border border-border bg-surface-raised p-3">
+            <View className="flex-1 pr-2">
+              <Text className="font-label text-[10px] uppercase tracking-wider text-muted">
+                {language === "en" ? "Goal Completion Rate" : "Taxa de Sucesso das Metas"}
+              </Text>
+              <Text className="mt-1 font-headline text-sm text-foreground">
+                {insights.completionRate}%
+              </Text>
+              <Text className="mt-0.5 font-body text-xs text-muted">
+                {language === "en"
+                  ? "Of all planned fasts completed successfully"
+                  : "De todos os jejuns planeados foram concluídos com êxito"}
+              </Text>
+            </View>
+            <View className="h-8 w-8 items-center justify-center rounded-lg bg-background">
+              <Ionicons color={COLORS.success} name="shield-checkmark-outline" size={16} />
+            </View>
+          </View>
+        ) : null}
       </View>
 
       <Text className="mt-3 font-body text-[10px] text-muted">

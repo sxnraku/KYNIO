@@ -5,6 +5,7 @@ import { ActivityIndicator, View } from "react-native";
 import { FastCompletionModal } from "@/components/ui/fast-completion-modal";
 import { FastingHistoryCard } from "@/components/ui/fasting-history-card";
 import { FastingSummaryCard } from "@/components/ui/fasting-summary-card";
+import { CircadianSolarBadge } from "@/components/ui/circadian-solar-badge";
 import { MetabolicPhases } from "@/components/ui/metabolic-phases";
 import { PwaInstallBanner } from "@/components/ui/pwa-install-banner";
 import { Screen } from "@/components/ui/screen";
@@ -113,6 +114,8 @@ export default function HomeScreen() {
           {getTodayLabel(language)}
         </Text>
       </View>
+
+      <CircadianSolarBadge />
 
       <FastingSummaryCard
         currentPhaseTitle={currentPhase.title}
